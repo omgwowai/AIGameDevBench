@@ -1,17 +1,10 @@
 diff --git a/components/health_component.gd b/components/health_component.gd
-index 35ad1cd..69b901e 100644
+index 6b972c1..8d66935 100644
 --- a/components/health_component.gd
 +++ b/components/health_component.gd
-@@ -1,17 +1,14 @@
+@@ -1,13 +1,10 @@
 -extends Control
 +extends Node
- 
--# Reusable health component. It is meant to be a pure gameplay component (a
--# plain Node) and must NOT depend on the ui/ layer, but right now it both
--# extends a UI type and reaches into the ui/ layer directly.
-+# Reusable health component. Pure gameplay: extends a plain Node and depends on
-+# nothing in the ui/ layer. It exposes health state via a signal so the UI layer
-+# can observe it without this component reaching into the UI.
  
 -const HealthBar := preload("res://ui/health_bar.gd")
 +signal health_changed(ratio: float)

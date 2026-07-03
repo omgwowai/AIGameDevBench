@@ -1,10 +1,21 @@
 from __future__ import annotations
 
+import csv
+import json
+from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+from typing import Any
 
 import click
 
 from aigamedevbench.git_ops import get_repo_root
+from aigamedevbench.codex_harness import materialize_codex_harness
+from aigamedevbench.experiment_config import (
+    COMPONENT_KEYS,
+    ExperimentCell,
+    load_experiment_file,
+)
 
 
 def _config(godot_binary: str) -> dict:
@@ -200,6 +211,376 @@ def scaffold_cmd(testcases_dir: str, testcase_id: str, category: str, task: str,
         click.echo(f"  {path}")
 
 
+def _harness_metadata(cell: ExperimentCell | None) -> dict:
+    if cell is None:
+        return {}
+    metadata = {
+        "experiment_id": cell.experiment_id,
+        "cell_id": cell.cell_id,
+        "model": cell.model,
+        "model_reasoning_effort": cell.model_reasoning_effort,
+        "agent_cli": cell.agent_cli,
+        "orchestration": cell.orchestration.to_dict(),
+        "orchestration_id": cell.orchestration.id,
+        "orchestration_source_type": cell.orchestration.source_type,
+        "task_set": cell.task_set,
+        "harness_preset": cell.harness.preset,
+        "harness_components": cell.harness.components,
+        "harness_fingerprint": cell.harness.fingerprint,
+    }
+    for key in COMPONENT_KEYS:
+        metadata[f"harness_{key}"] = cell.harness.components.get(key, [])
+    return metadata
+
+
+def _runner_version() -> str:
+    try:
+        return version("aigamedevbench")
+    except PackageNotFoundError:
+        return "0.1.0"
+
+
+def _benchmark_git_commit() -> str | None:
+    from aigamedevbench.git_ops import git_run
+
+    repo_root = Path(__file__).resolve().parents[2]
+    try:
+        return git_run(["rev-parse", "HEAD"], cwd=repo_root).strip()
+    except Exception:
+        return None
+
+
+def _new_run_metadata() -> dict[str, Any]:
+    return {
+        "git_commit": _benchmark_git_commit(),
+        "runner_version": _runner_version(),
+        "started_at": datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z"),
+    }
+
+
+def _write_manifest(
+    cell: ExperimentCell,
+    cell_dir: Path,
+    testcases: list,
+    run_metadata: dict[str, Any] | None = None,
+    codex_runtime: dict[str, Any] | None = None,
+) -> None:
+    manifest = {
+        **_harness_metadata(cell),
+        **(run_metadata or {}),
+        "testcases_dir": str(Path(cell.testcases_dir)),
+        "testcase_ids": [tc.id for tc in testcases],
+    }
+    if codex_runtime is not None:
+        manifest["codex_harness_runtime"] = codex_runtime
+    cell_dir.mkdir(parents=True, exist_ok=True)
+    (cell_dir / "manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8"
+    )
+
+
+def _csv_scalar(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        return "|".join(str(item) for item in value)
+    if isinstance(value, dict):
+        return json.dumps(value, sort_keys=True, ensure_ascii=False)
+    return str(value)
+
+
+def _write_final_results_csv(path: Path, report: dict[str, Any]) -> None:
+    columns = [
+        "experiment_id",
+        "cell_id",
+        "model",
+        "agent_cli",
+        "model_reasoning_effort",
+        "orchestration_id",
+        "orchestration_source_type",
+        "task_set",
+        "harness_preset",
+        "harness_fingerprint",
+        *[f"harness_{key}" for key in COMPONENT_KEYS],
+        "testcase_id",
+        "category",
+        "score",
+        "status",
+        "l0_l1_pass",
+        "error",
+        "harness",
+        "runner_version",
+        "git_commit",
+        "started_at",
+    ]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=columns)
+        writer.writeheader()
+        for record in report.get("testcases", []):
+            verifier = record.get("verifier_result") or {}
+            row = {
+                "status": record.get("status") or verifier.get("status"),
+                "error": record.get("error") or verifier.get("error"),
+            }
+            for column in columns:
+                if column not in row:
+                    row[column] = record.get(column, report.get(column))
+            writer.writerow({key: _csv_scalar(row.get(key)) for key in columns})
+
+
+def _write_report_outputs(
+    report: dict[str, Any],
+    report_file: str | None,
+    cell_dir: Path | None,
+) -> None:
+    if report_file:
+        Path(report_file).write_text(json.dumps(report, indent=2), encoding="utf-8")
+        click.echo(f"--- report written to {report_file}")
+    if cell_dir is not None:
+        cell_dir.mkdir(parents=True, exist_ok=True)
+        (cell_dir / "final_results.json").write_text(
+            json.dumps(report, indent=2), encoding="utf-8"
+        )
+        _write_final_results_csv(cell_dir / "final_results.csv", report)
+
+
+def _make_driver(
+    driver: str,
+    patch_file: str | None,
+    harness_cmd: str | None,
+    timeout: float,
+    stall_timeout: float,
+    log_dir: str,
+    stream: bool,
+    env: dict[str, str] | None = None,
+):
+    from aigamedevbench.driver import NoOpDriver, PatchDriver, CommandHarnessDriver
+
+    if driver == "patch":
+        if not patch_file:
+            raise click.ClickException("--patch FILE required with --driver patch")
+        return PatchDriver(Path(patch_file).read_text(encoding="utf-8"))
+    if driver == "command":
+        if not harness_cmd:
+            raise click.ClickException("--harness-cmd TEMPLATE required with --driver command")
+        on_line = None
+        drv = CommandHarnessDriver(
+            harness_cmd,
+            timeout=timeout,
+            log_dir=Path(log_dir),
+            stall_timeout=stall_timeout,
+            on_line=on_line,
+            env=env,
+        )
+        if stream:
+            def on_line(line: str) -> None:
+                click.echo(f"  [{drv.label}] {line}", err=True)
+            drv.on_line = on_line
+        return drv
+    return NoOpDriver()
+
+
+def _run_selected_testcases(
+    *,
+    testcases_dir: str,
+    testcase_id: str | None,
+    testcase_ids: list[str] | None,
+    harness_id: str,
+    driver_name: str,
+    patch_file: str | None,
+    harness_cmd: str | None,
+    timeout: float,
+    stall_timeout: float,
+    log_dir: str,
+    report_file: str | None,
+    workspace_root: str | None,
+    artifacts_dir: str | None,
+    stream: bool,
+    godot_binary: str,
+    cell: ExperimentCell | None = None,
+    cell_dir: Path | None = None,
+    run_metadata: dict[str, Any] | None = None,
+    codex_runtime: dict[str, Any] | None = None,
+    harness_env: dict[str, str] | None = None,
+) -> dict:
+    from aigamedevbench.testcase import discover_testcases
+    from aigamedevbench.runner import run_testcase
+    from aigamedevbench.driver import CommandHarnessDriver, PatchDriver
+
+    config = _config(godot_binary)
+    initial_driver_name = (
+        "noop" if driver_name == "patch" and patch_file is None and cell is not None
+        else driver_name
+    )
+    drv = _make_driver(
+        initial_driver_name, patch_file, harness_cmd, timeout, stall_timeout, log_dir, stream,
+        env=harness_env,
+    )
+
+    testcases = discover_testcases(Path(testcases_dir))
+    if testcase_id:
+        testcases = [t for t in testcases if t.id == testcase_id]
+    if testcase_ids:
+        wanted = set(testcase_ids)
+        testcases = [t for t in testcases if t.id in wanted]
+    if testcase_id and not testcases:
+        click.echo(f"Testcase '{testcase_id}' not found.")
+        return {"count": 0, "mean_score": 0.0, "testcases": []}
+
+    if cell is not None and cell_dir is not None:
+        _write_manifest(cell, cell_dir, testcases, run_metadata, codex_runtime)
+
+    if cell is not None and not cell.orchestration.is_supported:
+        metadata = {**_harness_metadata(cell), **(run_metadata or {})}
+        records = [
+            {
+                "testcase_id": tc.id,
+                "category": tc.category,
+                "score": 0.0,
+                "status": "unsupported",
+                "error": (
+                    "Unsupported orchestration: "
+                    f"{cell.orchestration.id} ({cell.orchestration.source_type})"
+                ),
+                **metadata,
+            }
+            for tc in testcases
+        ]
+        report = {
+            **metadata,
+            "harness": harness_id,
+            "count": len(testcases),
+            "mean_score": 0.0,
+            "testcases": records,
+        }
+        if codex_runtime is not None:
+            report["codex_harness_runtime"] = codex_runtime
+        _write_report_outputs(report, report_file, cell_dir)
+        return report
+
+    needs_repo = any(t.source_kind != "folder" for t in testcases)
+    repo_root = None
+    if needs_repo:
+        try:
+            repo_root = get_repo_root(Path.cwd())
+        except (RuntimeError, FileNotFoundError):
+            repo_root = None
+
+    total = 0.0
+    records = []
+    metadata = {**_harness_metadata(cell), **(run_metadata or {})}
+    for tc in testcases:
+        if isinstance(drv, CommandHarnessDriver):
+            drv.label = tc.id
+        effective_drv = drv
+        if driver_name == "patch" and cell is not None and patch_file is None:
+            effective_drv = PatchDriver((tc.dir / "fix.diff").read_text(encoding="utf-8"))
+        try:
+            result = run_testcase(repo_root, tc, effective_drv, harness_id, config,
+                                  workspace_root=workspace_root,
+                                  artifacts_dir=artifacts_dir)
+        except Exception as e:
+            click.echo(f"{tc.id}\t{tc.category}\terror\t0.00\t{e}")
+            records.append({"testcase_id": tc.id, "category": tc.category,
+                            "score": 0.0, "status": "error", "error": str(e),
+                            **metadata})
+            continue
+        total += result.score
+        click.echo(f"{tc.id}\t{tc.category}\t{result.verifier_result.status}\t{result.score:.2f}")
+        _echo_verifier_result(result.verifier_result)
+        _echo_diff(result)
+        if isinstance(effective_drv, CommandHarnessDriver) and effective_drv.last_outcome is not None:
+            _echo_harness_failure(tc.id, effective_drv.last_outcome)
+        record = {**result.to_dict(), **metadata}
+        if isinstance(effective_drv, CommandHarnessDriver) and effective_drv.last_outcome is not None:
+            record.update(effective_drv.last_outcome)
+        records.append(record)
+
+    mean = total / len(testcases) if testcases else 0.0
+    if testcases:
+        click.echo(f"--- mean score: {mean:.3f} over {len(testcases)} testcase(s)")
+
+    report = {
+        **metadata,
+        "harness": harness_id,
+        "count": len(testcases),
+        "mean_score": mean,
+        "testcases": records,
+    }
+    if codex_runtime is not None:
+        report["codex_harness_runtime"] = codex_runtime
+    _write_report_outputs(report, report_file, cell_dir)
+    return report
+
+
+def _dry_run_experiment(experiment_path: str) -> None:
+    experiment = load_experiment_file(experiment_path)
+    click.echo(f"DRY RUN EXPERIMENT {experiment.experiment_id}")
+    for cell in experiment.cells:
+        click.echo(f"cell: {cell.cell_id}")
+        click.echo(f"  model: {cell.model}")
+        click.echo(f"  agent_cli: {cell.agent_cli}")
+        click.echo(f"  orchestration: {cell.orchestration.id}")
+        click.echo(f"  task_set: {cell.task_set}")
+        click.echo(f"  testcases_dir: {cell.testcases_dir}")
+        click.echo(f"  testcases: {cell.testcase_ids}")
+        click.echo(f"  harness_preset: {cell.harness.preset}")
+        click.echo(f"  harness_fingerprint: {cell.harness.fingerprint}")
+
+
+def _run_experiment(
+    *,
+    experiment_path: str,
+    driver: str,
+    patch_file: str | None,
+    harness_cmd: str | None,
+    timeout: float,
+    stall_timeout: float,
+    log_dir: str,
+    results_dir: str,
+    workspace_root: str | None,
+    artifacts_dir: str | None,
+    stream: bool,
+    godot_binary: str,
+) -> list[dict]:
+    experiment = load_experiment_file(experiment_path)
+    reports = []
+    for cell in experiment.cells:
+        cell_dir = Path(results_dir) / cell.experiment_id / cell.cell_id
+        report_path = cell_dir / "report.json"
+        harness_id = cell.harness.preset or cell.agent_cli
+        run_metadata = _new_run_metadata()
+        codex_runtime = materialize_codex_harness(cell)
+        report = _run_selected_testcases(
+            testcases_dir=cell.testcases_dir,
+            testcase_id=None,
+            testcase_ids=cell.testcase_ids,
+            harness_id=harness_id,
+            driver_name=driver,
+            patch_file=patch_file,
+            harness_cmd=harness_cmd,
+            timeout=timeout,
+            stall_timeout=stall_timeout,
+            log_dir=str(cell_dir / "logs" if log_dir == "harness-logs" else Path(log_dir)),
+            report_file=str(report_path),
+            workspace_root=workspace_root,
+            artifacts_dir=str(cell_dir / "artifacts") if artifacts_dir is None else artifacts_dir,
+            stream=stream,
+            godot_binary=godot_binary,
+            cell=cell,
+            cell_dir=cell_dir,
+            run_metadata=run_metadata,
+            codex_runtime=codex_runtime.manifest if codex_runtime else None,
+            harness_env=codex_runtime.env if codex_runtime else None,
+        )
+        reports.append(report)
+    return reports
+
+
 @main.command("run")
 @click.option("--testcases-dir", default="./testcases", type=click.Path(exists=True),
               help="Directory of testcases (default: ./testcases)")
@@ -230,98 +611,63 @@ def scaffold_cmd(testcases_dir: str, testcase_id: str, category: str, task: str,
 @click.option("--stream/--no-stream", "stream", default=True,
               help="Stream harness output live to the screen (default: on).")
 @click.option("--godot-binary", default="godot", help="Godot executable for L0/runtime verifiers")
+@click.option("--experiment", "experiment_file", default=None, type=click.Path(exists=True),
+              help="Run a factorial experiment YAML instead of a single testcase set")
+@click.option("--results-dir", default="results", type=click.Path(),
+              help="Root for experiment cell reports/manifests")
+@click.option("--dry-run", is_flag=True,
+              help="Print selected experiment cells without running testcases")
 def run_cmd(testcases_dir: str, testcase_id: str | None, harness_id: str,
             driver: str, patch_file: str | None, harness_cmd: str | None,
             timeout: float, stall_timeout: float, log_dir: str, report_file: str | None,
             workspace_root: str | None, artifacts_dir: str | None,
-            stream: bool, godot_binary: str):
+            stream: bool, godot_binary: str, experiment_file: str | None,
+            results_dir: str, dry_run: bool):
     """Run testcases against a harness driver (executed inside the target game repo)."""
-    from aigamedevbench.testcase import discover_testcases
-    from aigamedevbench.runner import run_testcase
-    from aigamedevbench.driver import NoOpDriver, PatchDriver, CommandHarnessDriver
-
-    config = _config(godot_binary)
-
-    if driver == "patch":
-        if not patch_file:
-            click.echo("--patch FILE required with --driver patch")
+    if experiment_file:
+        if dry_run:
+            _dry_run_experiment(experiment_file)
             return
-        drv = PatchDriver(Path(patch_file).read_text(encoding="utf-8"))
-    elif driver == "command":
-        if not harness_cmd:
-            click.echo("--harness-cmd TEMPLATE required with --driver command")
-            return
-        # Stream each harness line live (prefixed) so a stuck prompt is visible
-        # the instant it appears, not after the timeout fires.
-        on_line = None
-        if stream:
-            def on_line(line: str) -> None:
-                click.echo(f"  [{drv.label}] {line}", err=True)
-        drv = CommandHarnessDriver(harness_cmd, timeout=timeout,
-                                   log_dir=Path(log_dir), stall_timeout=stall_timeout,
-                                   on_line=on_line)
-    else:
-        drv = NoOpDriver()
+        _run_experiment(
+            experiment_path=experiment_file,
+            driver=driver,
+            patch_file=patch_file,
+            harness_cmd=harness_cmd,
+            timeout=timeout,
+            stall_timeout=stall_timeout,
+            log_dir=log_dir,
+            results_dir=results_dir,
+            workspace_root=workspace_root,
+            artifacts_dir=artifacts_dir,
+            stream=stream,
+            godot_binary=godot_binary,
+        )
+        return
 
-    testcases = discover_testcases(Path(testcases_dir))
-    if testcase_id:
-        testcases = [t for t in testcases if t.id == testcase_id]
-        if not testcases:
-            click.echo(f"Testcase '{testcase_id}' not found.")
-            return
+    if driver == "patch" and not patch_file:
+        click.echo("--patch FILE required with --driver patch")
+        return
+    if driver == "command" and not harness_cmd:
+        click.echo("--harness-cmd TEMPLATE required with --driver command")
+        return
 
-    # Folder-type testcases are self-contained and run anywhere; only git-type
-    # ones need a repo root. Resolve it lazily and tolerantly: if cwd isn't a
-    # git repo, git-type testcases fail individually (below) rather than aborting
-    # the whole batch — a non-git cwd is normal when scoring folder-type cases.
-    needs_repo = any(t.source_kind != "folder" for t in testcases)
-    repo_root = None
-    if needs_repo:
-        try:
-            repo_root = get_repo_root(Path.cwd())
-        except (RuntimeError, FileNotFoundError):
-            repo_root = None
-
-    total = 0.0
-    records = []
-    for tc in testcases:
-        if isinstance(drv, CommandHarnessDriver):
-            drv.label = tc.id
-        try:
-            result = run_testcase(repo_root, tc, drv, harness_id, config,
-                                  workspace_root=workspace_root,
-                                  artifacts_dir=artifacts_dir)
-        except Exception as e:
-            # One un-runnable testcase (e.g. a git-type case with no repo root,
-            # or a bad baseline_ref) must not kill the rest of the batch.
-            click.echo(f"{tc.id}\t{tc.category}\terror\t0.00\t{e}")
-            records.append({"testcase_id": tc.id, "category": tc.category,
-                            "score": 0.0, "status": "error", "error": str(e)})
-            continue
-        total += result.score
-        click.echo(f"{tc.id}\t{tc.category}\t{result.verifier_result.status}\t{result.score:.2f}")
-        _echo_verifier_result(result.verifier_result)
-        _echo_diff(result)
-        # Surface harness failures on screen immediately (don't make the user dig
-        # through log files): if the command harness timed out or exited non-zero,
-        # echo the tail of its log right after the result row.
-        if isinstance(drv, CommandHarnessDriver) and drv.last_outcome is not None:
-            _echo_harness_failure(tc.id, drv.last_outcome)
-        record = result.to_dict()
-        if isinstance(drv, CommandHarnessDriver) and drv.last_outcome is not None:
-            record.update(drv.last_outcome)
-        records.append(record)
-
-    mean = total / len(testcases) if testcases else 0.0
-    if testcases:
-        click.echo(f"--- mean score: {mean:.3f} over {len(testcases)} testcase(s)")
-
-    if report_file:
-        import json
-        report = {"harness": harness_id, "count": len(testcases),
-                  "mean_score": mean, "testcases": records}
-        Path(report_file).write_text(json.dumps(report, indent=2), encoding="utf-8")
-        click.echo(f"--- report written to {report_file}")
+    _run_selected_testcases(
+        testcases_dir=testcases_dir,
+        testcase_id=testcase_id,
+        testcase_ids=None,
+        harness_id=harness_id,
+        driver_name=driver,
+        patch_file=patch_file,
+        harness_cmd=harness_cmd,
+        timeout=timeout,
+        stall_timeout=stall_timeout,
+        log_dir=log_dir,
+        report_file=report_file,
+        workspace_root=workspace_root,
+        artifacts_dir=artifacts_dir,
+        stream=stream,
+        godot_binary=godot_binary,
+    )
 
 
 @main.command("serve")

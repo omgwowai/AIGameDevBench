@@ -6,6 +6,7 @@ import shlex
 import subprocess
 import threading
 import time
+import os
 from pathlib import Path
 from typing import Callable, Protocol
 
@@ -66,12 +67,14 @@ class CommandHarnessDriver:
 
     def __init__(self, cmd_template: str, timeout: float = 600.0,
                  log_dir: Path | None = None, stall_timeout: float = 0.0,
-                 on_line: Callable[[str], None] | None = None):
+                 on_line: Callable[[str], None] | None = None,
+                 env: dict[str, str] | None = None):
         self.cmd_template = cmd_template
         self.timeout = timeout
         self.stall_timeout = stall_timeout
         self.on_line = on_line
         self.log_dir = Path(log_dir) if log_dir is not None else None
+        self.env = {str(k): str(v) for k, v in (env or {}).items()}
         self.label = ""
         self.last_outcome: dict | None = None
         self._counter = 0
@@ -156,6 +159,7 @@ class CommandHarnessDriver:
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 stdin=subprocess.DEVNULL,  # no TTY: interactive prompts get EOF
                 text=True, encoding="utf-8", errors="replace", bufsize=1,
+                env={**os.environ, **self.env} if self.env else None,
             )
 
             # A reader thread feeds lines into a queue so the main loop can apply

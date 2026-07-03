@@ -12,6 +12,7 @@ dependencies = [
     "godot-parser>=0.1.6",
     "gdtoolkit>=4.0",
     "networkx>=3.0",
+    "pyyaml>=6.0",
     "tomli>=2.0; python_version < '3.11'",
 ]
 

@@ -14,6 +14,7 @@ harness 的改动由自动验证器打分。核心契约：**什么都不做必�
 - [快速开始](#快速开始)
 - [评测一个真实的 AI harness](#评测一个真实的-ai-harness)
 - [Dashboard 可视化](#dashboard-可视化aigdbench-serve)
+- [正交实验](#正交实验experiment-yaml)
 - [Testcase 数据集](#testcase-数据集)
 - [验证器类型](#验证器类型)
 - [命令速查](#命令速查)
@@ -146,6 +147,56 @@ stalled·blocked 标志 / 日志路径，以及总体均值）。完整输出也
 
 **手动回路**（不想用 command driver 时）：手工完成任务 → `git diff > ai.diff` →
 `aigdbench run --driver patch --patch ai.diff` 出分。
+
+---
+
+## 正交实验（Experiment YAML）
+
+`aigdbench run --experiment` 用配置文件批量跑正交 cell。每个 cell 固定一组变量：
+
+```text
+model × agent_cli × orchestration × task_set × harness_components
+```
+
+`task_set` 指向 AIGameDevBench testcase 集合；本项目默认用 `testcases_filtered/` 的 30 个精选 case。
+`harness` 会解析成七类 `harness_components`，并写入稳定的 `harness_fingerprint`，用于后续按 model / harness / orchestration 分组比较。
+当 `agent_cli: codex` 时，runner 会为每个 cell materialize 独立的 `CODEX_HOME`，让 `bare-codex`
+和 `custom-current-full` 不只是 metadata 不同，而是真正改变 Codex 能看到的 instruction / skill /
+MCP / hook / memory surface。
+
+```bash
+# 只展开 cell，不运行 testcase
+aigdbench run --experiment experiments/filtered30-smoke.yaml --dry-run
+
+# 用每个 testcase 自带 fix.diff 做 smoke；纯 Python verifier 不需要 Godot
+aigdbench run --experiment experiments/filtered30-smoke.yaml \
+  --driver patch --results-dir results
+```
+
+输出按 cell 隔离：
+
+```text
+results/<experiment_id>/<cell_id>/
+  manifest.json
+  report.json
+  final_results.json
+  final_results.csv
+  artifacts/
+  logs/
+```
+
+`manifest.json` 记录复现实验所需的配置真源：`model`、`agent_cli`、`orchestration`、
+`task_set`、`testcases_dir`、`testcase_ids`、`harness_preset`、`harness_components` 和
+`harness_fingerprint`，同时写入 `git_commit`、`runner_version`、`started_at`。Codex cell
+额外写 `codex_harness_runtime`，包含隔离 `CODEX_HOME` 路径和 `codex debug prompt-input`
+probe 摘要；probe 只保存 `stdout_sha256`、字节数和 visibility flags，不保存完整 prompt。
+
+`report.json` 保留旧 dashboard 兼容路径；`final_results.json` 是同内容的 cell 结果真源，
+`final_results.csv` 把每条 testcase result 展平成可直接 groupby 的表格，并复制
+`experiment_id`、`cell_id`、`model`、`agent_cli`、`orchestration_*`、`task_set`、
+`harness_preset`、`harness_fingerprint` 和七类 `harness_*` 列。第一版只执行
+`single-agent` / `builtin` orchestration；其他 orchestration 会写 explicit `unsupported`
+result，不会静默降级。
 
 ---
 

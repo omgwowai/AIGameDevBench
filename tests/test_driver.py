@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -206,3 +207,30 @@ def test_command_driver_no_shell_injection(tmp_path):
     assert canary.read_text(encoding="utf-8") == "alive"
     # And the malicious string arrives intact as one argv element.
     assert out.read_text(encoding="utf-8").splitlines() == [payload]
+
+
+def test_command_driver_injects_environment(tmp_path):
+    ws = tmp_path / "ws"; ws.mkdir()
+    out = tmp_path / "env.json"
+    script = (
+        "import json, os, pathlib; "
+        f"pathlib.Path(r'{out}').write_text("
+        "json.dumps({'CODEX_HOME': os.environ.get('CODEX_HOME'), "
+        "'AIGDB_MARKER': os.environ.get('AIGDB_MARKER')}), "
+        "encoding='utf-8')"
+    )
+    drv = CommandHarnessDriver(
+        f'{sys.executable} -c "{script}"',
+        timeout=30,
+        log_dir=tmp_path / "logs",
+        env={"CODEX_HOME": str(tmp_path / "codex-home"), "AIGDB_MARKER": "present"},
+    )
+
+    drv.run("task", ws)
+
+    assert drv.last_outcome["exit_code"] == 0
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data == {
+        "CODEX_HOME": str(tmp_path / "codex-home"),
+        "AIGDB_MARKER": "present",
+    }
