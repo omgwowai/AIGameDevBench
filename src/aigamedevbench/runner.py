@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from aigamedevbench.driver import HarnessDriver
 from aigamedevbench.result import VerifierResult
@@ -42,25 +43,49 @@ class RunResult:
 
 @contextmanager
 def _workspace_for(repo_root: Path | None, testcase: Testcase,
-                   workspace_root: Path | str | None = None):
+                   workspace_root: Path | str | None = None,
+                   workspace_name: str | None = None,
+                   keep_workspace: bool = False):
     if testcase.source_kind == "folder":
-        with folder_workspace(testcase.dir / "baseline", workspace_root) as ws:
+        with folder_workspace(
+            testcase.dir / "baseline",
+            workspace_root,
+            workspace_name=workspace_name,
+            keep_workspace=keep_workspace,
+        ) as ws:
             yield ws
     else:
         source_repo = Path(testcase.source_repo) if testcase.source_repo else repo_root
         if source_repo is None:
             raise ValueError(f"git-type testcase '{testcase.id}' requires a repo root")
-        with isolated_workspace(source_repo, testcase.baseline_ref, workspace_root) as ws:
+        with isolated_workspace(
+            source_repo,
+            testcase.baseline_ref,
+            workspace_root,
+            workspace_name=workspace_name,
+            keep_workspace=keep_workspace,
+        ) as ws:
             yield ws
 
 
 def run_testcase(repo_root: Path | None, testcase: Testcase, driver: HarnessDriver,
                  harness_id: str, config: dict | None = None,
                  workspace_root: Path | str | None = None,
-                 artifacts_dir: Path | str | None = None) -> RunResult:
+                 artifacts_dir: Path | str | None = None,
+                 workspace_name: str | None = None,
+                 keep_workspace: bool = False,
+                 on_state: Callable[[str], None] | None = None) -> RunResult:
     config = config or {}
-    with _workspace_for(repo_root, testcase, workspace_root) as workspace:
+    with _workspace_for(
+        repo_root,
+        testcase,
+        workspace_root,
+        workspace_name=workspace_name,
+        keep_workspace=keep_workspace,
+    ) as workspace:
         driver.run(testcase.task, workspace)
+        if on_state is not None:
+            on_state("verifying")
 
         changed_files = _list_changed(workspace)
         # Snapshot the harness's work BEFORE validation runs: godot_import writes

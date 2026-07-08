@@ -1,0 +1,41 @@
+harnesses:
+  gd-baseline:
+    target_agent_cli: generic
+    components: {}
+
+  bare-codex:
+    target_agent_cli: codex
+    components: {}
+
+  skill-only:
+    target_agent_cli: generic
+    components:
+      skills:
+        - agentic-game-development
+
+  agents-md-skill-mcp:
+    target_agent_cli: generic
+    components:
+      instruction_files:
+        - codex-user-agents-md
+      skills:
+        - agentic-game-development
+
+  all-codex:
+    target_agent_cli: codex
+    components:
+      instruction_files:
+        - codex-user-agents-md
+      plugins:
+        - agentic-game-development-superpowers
+      skills:
+        - fast-context
+        - transcript-viewer
+      mcp_servers:
+        - node_repl
+      hooks:
+        - codex-user-hooks
+      cli_config:
+        - codex-full-auto
+      context_artifacts:
+        - codex-memory-summary

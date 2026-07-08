@@ -1,0 +1,62 @@
+test_sets:
+  filtered_30:
+    testcases_dir: ../testcases_filtered
+    default_timeout: 1200
+    testcases:
+    - ability-cooldown-gate
+    - collision-layer-precise-edit
+    - component-layer-boundary
+    - damage-formula-refactor
+    - event-bus-priority-dispatch
+    - gdb-task_0007
+    - gdb-task_0012
+    - gdb-task_0025
+    - gdb-task_0027
+    - gdb-task_0051
+    - gdb-task_0052
+    - gdb-task_0103
+    - gdb-task_0281
+    - gdscript-cannot-infer-type
+    - hard-mode-difficulty-preset
+    - health-damage-death
+    - hud-healthbar-anchor
+    - inventory-equipment-system
+    - loot-drop-rate-rebalance
+    - menu-panel-layout
+    - missing-resource-import
+    - no-hardcoded-res-path
+    - pathfinding-npc-bridge-astar
+    - pickup-inventory-ui-chain
+    - platformer-jump-retune
+    - player-fsm-transition-guard
+    - reparent-spawnpoint-precise
+    - timer-signal-wire
+    - wave-combat-score-system
+    - wave-spawner-hidden-bugs
+  filtered_6:
+    testcases_dir: ../testcases_filtered
+    default_timeout: 3600
+    testcases:
+    - id: event-bus-priority-dispatch
+      timeout: 3600
+    - id: inventory-equipment-system
+      timeout: 3600
+    - id: hard-mode-difficulty-preset
+      timeout: 3600
+    - id: reparent-spawnpoint-precise
+      timeout: 3600
+    - id: component-layer-boundary
+      timeout: 3600
+    - id: menu-panel-layout
+      timeout: 3600
+  smoke_2:
+    testcases_dir: ../testcases_filtered
+    default_timeout: 1200
+    testcases:
+    - id: wave-combat-score-system
+      timeout: 1800
+    - id: gdb-task_0281
+      timeout: 1800
+  all:
+    testcases_dir: ../testcases
+    default_timeout: 1200

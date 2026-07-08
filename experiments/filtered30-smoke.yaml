@@ -1,22 +1,7 @@
 id: filtered30-smoke
 description: Smoke experiment for factorial runs over the AIGameDevBench filtered testcase set.
-
-task_sets:
-  filtered30:
-    testcases_dir: testcases_filtered
-    testcases:
-      - hard-mode-difficulty-preset
-      - platformer-jump-retune
-      - collision-layer-precise-edit
-      - component-layer-boundary
-
-harness_presets:
-  gd-baseline:
-    components: {}
-  gd-skill:
-    components:
-      skills:
-        - godot-debugging
+test_set_file: testsets.yaml
+harness_file: harnesses.yaml
 
 cells:
   - id: baseline_filtered_smoke
@@ -25,9 +10,8 @@ cells:
     orchestration:
       id: single-agent
       source_type: builtin
-    task_set: filtered30
-    harness:
-      preset: gd-baseline
+    task_set: smoke_2
+    harness: gd-baseline
 
   - id: skill_filtered_smoke
     model: smoke-model
@@ -35,6 +19,5 @@ cells:
     orchestration:
       id: single-agent
       source_type: builtin
-    task_set: filtered30
-    harness:
-      preset: gd-skill
+    task_set: smoke_2
+    harness: skill-only

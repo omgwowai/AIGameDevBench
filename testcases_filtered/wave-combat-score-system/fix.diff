@@ -1,29 +1,11 @@
 diff --git a/scripts/enemy.gd b/scripts/enemy.gd
-index 9a6db3f..d475a3a 100644
 --- a/scripts/enemy.gd
 +++ b/scripts/enemy.gd
-@@ -1,16 +1,6 @@
- extends Node
- class_name Enemy
- 
--# A minimal enemy with a 3-state lifecycle: "alive" -> "dying" -> "dead".
--# Contract:
--#   - starts "alive" with hp = max_hp.
--#   - take_damage(n): reduce hp (clamped at 0). When hp hits 0, transition to
--#     "dying", emit died ONCE, then settle to "dead". Damage after death does
--#     nothing and never re-emits died.
--#   - state returns the current state string.
--#
--# BASELINE: unimplemented.
--
- signal died(enemy)
- 
- @export var max_hp: int = 10
-@@ -19,5 +9,10 @@ var hp: int = 10
+@@ -10,5 +10,10 @@ var hp: int = 10
  var state: String = "alive"
  
  func take_damage(n: int) -> void:
--	# TODO: implement the alive->dying->dead lifecycle with a single died emit.
+-	# TODO: implement
 -	pass
 +	if state == "dead":
 +		return
@@ -33,38 +15,13 @@ index 9a6db3f..d475a3a 100644
 +		state = "dead"
 +		died.emit(self)
 diff --git a/scripts/game_controller.gd b/scripts/game_controller.gd
-index 1adabf7..6a228b2 100644
 --- a/scripts/game_controller.gd
 +++ b/scripts/game_controller.gd
-@@ -1,23 +1,6 @@
- extends Node
- class_name GameController
- 
--# Orchestrates waves of enemies, scoring, and win detection.
--# Contract:
--#   - wave_sizes[i] = number of enemies in wave i.
--#   - start(): begin wave 0, creating its enemies (as Enemy children of self),
--#     connecting each enemy's `died` to the controller.
--#   - when an enemy dies: award score and increment the combo counter; when the
--#     whole current wave is dead, advance to the next wave (spawning it). After
--#     the LAST wave is fully cleared, emit game_won (once) and set won = true.
--#   - Scoring: each kill is worth 10 + 5*(combo-1), where combo is how many
--#     kills have happened SO FAR in the run (1 for the first kill, 2 for the
--#     second, ...). So kills score 10, 15, 20, 25, ...
--#   - alive_count() returns living enemies in the current wave.
--#   - the verifier kills enemies by calling kill_one() which damages the first
--#     living enemy of the current wave for lethal damage.
--#
--# BASELINE: unimplemented.
--
- signal game_won
- 
- @export var wave_sizes: Array[int] = [2, 3]
-@@ -30,13 +13,43 @@ var won: bool = false
+@@ -15,13 +15,43 @@ var won: bool = false
  var _enemies: Array = []
  
  func start() -> void:
--	# TODO: spawn wave 0, wire up deaths.
+-	# TODO: implement
 -	pass
 +	current_wave = 0
 +	_spawn_wave()
@@ -104,7 +61,7 @@ index 1adabf7..6a228b2 100644
 +	return c
  
  func kill_one() -> void:
--	# TODO: deal lethal damage to the first living enemy of the current wave.
+-	# TODO: implement
 -	pass
 +	for e in _enemies:
 +		if e.state != "dead":

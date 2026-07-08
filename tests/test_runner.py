@@ -165,3 +165,33 @@ def test_noop_run_has_empty_diff_and_no_artifacts(tmp_path):
     # Doing nothing produces no diff; the changes.diff is written but empty.
     assert result.diff.strip() == ""
     assert (art / "gdb-x" / "changes.diff").read_text(encoding="utf-8").strip() == ""
+
+
+def test_run_uses_fixed_attempt_workspace(tmp_path):
+    tc = _folder_testcase(tmp_path)
+    attempt_dir = tmp_path / "attempt"
+    seen = {}
+
+    class RecordingDriver:
+        def run(self, task, workspace):
+            seen["workspace"] = workspace
+            seen["task"] = task
+            (workspace / "TASK.md").write_text(task, encoding="utf-8")
+            (workspace / "data" / "char.json").write_text(
+                json.dumps({"attack": 60}) + "\n", encoding="utf-8"
+            )
+
+    result = run_testcase(
+        None,
+        tc,
+        RecordingDriver(),
+        "recording",
+        config={},
+        workspace_root=attempt_dir,
+        workspace_name="workspace",
+        keep_workspace=True,
+    )
+
+    assert result.score == 1.0
+    assert seen["workspace"] == attempt_dir / "workspace"
+    assert (attempt_dir / "workspace" / "TASK.md").read_text(encoding="utf-8") == "task"

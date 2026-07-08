@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
+import math
+import shutil
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
@@ -10,12 +15,54 @@ from typing import Any
 import click
 
 from aigamedevbench.git_ops import get_repo_root
-from aigamedevbench.codex_harness import materialize_codex_harness
+from aigamedevbench.codex_harness import (
+    CodexHarnessRuntime,
+    materialize_attempt_codex_runtime,
+    materialize_codex_harness,
+)
+from aigamedevbench.driver import CommandHarnessDriver
+from aigamedevbench.execution_config import ExecutionConfig, load_execution_config
 from aigamedevbench.experiment_config import (
     COMPONENT_KEYS,
     ExperimentCell,
     load_experiment_file,
 )
+
+try:
+    import yaml
+except ModuleNotFoundError:  # pragma: no cover - dependency is declared.
+    yaml = None
+
+
+DEFAULT_TIMEOUT = 1200.0
+_OUTPUT_LOCK = threading.Lock()
+
+
+def _safe_path_name(value: str) -> str:
+    return "".join(c if c.isalnum() or c in "-_." else "_" for c in value) or "default"
+
+
+def _json_default(value: Any) -> str:
+    return str(value)
+
+
+class _JsonlEventWriter:
+    def __init__(self, path: Path):
+        self.path = path
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = threading.Lock()
+
+    def write(self, event: dict[str, Any]) -> None:
+        payload = {
+            "ts": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z"),
+            **event,
+        }
+        with self._lock:
+            with self.path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(payload, ensure_ascii=False, default=_json_default) + "\n")
 
 
 def _config(godot_binary: str) -> dict:
@@ -174,6 +221,50 @@ def smoke_cmd(testcases_dir: str, testcase_id: str, patch_file: str | None,
         raise click.exceptions.Exit(1)
 
 
+@main.command("probe-permissions")
+@click.option("--harness-cmd", "harness_cmd", required=True,
+              help="Command template to probe, e.g. 'codex exec --cd {workspace} {task}'")
+@click.option("--probe-root", default=".aigdbench-permission-probe", type=click.Path(),
+              help="Directory where probe workspace, canaries, logs, and JSON result are written")
+@click.option("--timeout", default=120.0, type=float, help="Probe harness timeout (s)")
+@click.option("--stall-timeout", "stall_timeout", default=0.0, type=float,
+              help="Abort if the probe produces no output for this many seconds; default disabled")
+@click.option("--stream/--no-stream", "stream", default=True,
+              help="Stream probe harness output live to the screen")
+def probe_permissions_cmd(
+    harness_cmd: str,
+    probe_root: str,
+    timeout: float,
+    stall_timeout: float,
+    stream: bool,
+) -> None:
+    """Verify a harness can write the test workspace but not outside canary dirs."""
+    from aigamedevbench.permission_probe import run_permission_probe
+
+    on_line = None
+    if stream:
+        def on_line(line: str) -> None:
+            click.echo(f"  [permission-probe] {line}", err=True)
+
+    result = run_permission_probe(
+        harness_cmd,
+        Path(probe_root),
+        timeout=timeout,
+        stall_timeout=stall_timeout,
+        on_line=on_line,
+    )
+    status = "PASS" if result["passed"] else "FAIL"
+    click.echo(
+        f"{status} permission probe: "
+        f"inside_write_ok={result['inside_write_ok']} "
+        f"outside_read_blocked={result['outside_read_blocked']} "
+        f"outside_write_blocked={result['outside_write_blocked']}"
+    )
+    click.echo(f"--- permission probe written to {result['result_path']}")
+    if not result["passed"]:
+        raise click.exceptions.Exit(1)
+
+
 @main.command("scaffold")
 @click.option("--testcases-dir", default="./testcases", type=click.Path(),
               help="Directory where the testcase will be created (default: ./testcases)")
@@ -225,6 +316,7 @@ def _harness_metadata(cell: ExperimentCell | None) -> dict:
         "orchestration_source_type": cell.orchestration.source_type,
         "task_set": cell.task_set,
         "harness_preset": cell.harness.preset,
+        "harness_target_agent_cli": cell.harness.target_agent_cli,
         "harness_components": cell.harness.components,
         "harness_fingerprint": cell.harness.fingerprint,
     }
@@ -267,13 +359,25 @@ def _write_manifest(
     testcases: list,
     run_metadata: dict[str, Any] | None = None,
     codex_runtime: dict[str, Any] | None = None,
+    execution_config: ExecutionConfig | None = None,
 ) -> None:
     manifest = {
         **_harness_metadata(cell),
         **(run_metadata or {}),
         "testcases_dir": str(Path(cell.testcases_dir)),
         "testcase_ids": [tc.id for tc in testcases],
+        "testcase_timeouts": {
+            tc.id: (cell.testcase_timeouts or {})[tc.id]
+            for tc in testcases
+            if tc.id in (cell.testcase_timeouts or {})
+        },
     }
+    if execution_config is not None:
+        manifest["execution_config"] = {
+            "experiment_jobs": execution_config.experiment_jobs,
+            "testcase_jobs": execution_config.testcase_jobs,
+            "max_jobs": execution_config.max_jobs,
+        }
     if codex_runtime is not None:
         manifest["codex_harness_runtime"] = codex_runtime
     cell_dir.mkdir(parents=True, exist_ok=True)
@@ -303,6 +407,7 @@ def _write_final_results_csv(path: Path, report: dict[str, Any]) -> None:
         "orchestration_source_type",
         "task_set",
         "harness_preset",
+        "harness_target_agent_cli",
         "harness_fingerprint",
         *[f"harness_{key}" for key in COMPONENT_KEYS],
         "testcase_id",
@@ -357,8 +462,10 @@ def _make_driver(
     log_dir: str,
     stream: bool,
     env: dict[str, str] | None = None,
+    log_name: str | None = None,
+    completion_probe=None,
 ):
-    from aigamedevbench.driver import NoOpDriver, PatchDriver, CommandHarnessDriver
+    from aigamedevbench.driver import NoOpDriver, PatchDriver
 
     if driver == "patch":
         if not patch_file:
@@ -375,6 +482,8 @@ def _make_driver(
             stall_timeout=stall_timeout,
             on_line=on_line,
             env=env,
+            log_name=log_name,
+            completion_probe=completion_probe,
         )
         if stream:
             def on_line(line: str) -> None:
@@ -382,6 +491,222 @@ def _make_driver(
             drv.on_line = on_line
         return drv
     return NoOpDriver()
+
+
+def _attempt_paths(cell_dir: Path | None, testcase_id: str) -> tuple[Path | None, Path | None, Path | None]:
+    if cell_dir is None:
+        return None, None, None
+    attempt_dir = cell_dir / "attempts" / _safe_path_name(testcase_id)
+    logs_dir = attempt_dir / "logs"
+    return attempt_dir, logs_dir / "events.jsonl", logs_dir / "harness.log"
+
+
+def _codex_task_complete(codex_home: Path) -> bool:
+    sessions_dir = codex_home / "sessions"
+    if not sessions_dir.is_dir():
+        return False
+    for path in sessions_dir.rglob("*.jsonl"):
+        try:
+            with path.open("r", encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    if '"type":"task_complete"' in line or '"type": "task_complete"' in line:
+                        return True
+        except OSError:
+            continue
+    return False
+
+
+def _backup_codex_transcripts(
+    codex_home: Path,
+    destination_dir: Path,
+    *,
+    cell_id: str,
+    testcase_id: str,
+) -> list[Path]:
+    sessions_dir = codex_home / "sessions"
+    if not sessions_dir.is_dir():
+        return []
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    copied: list[Path] = []
+    prefix = f"{_safe_path_name(cell_id)}__{_safe_path_name(testcase_id)}"
+    for source in sorted(sessions_dir.rglob("*.jsonl")):
+        source_digest = hashlib.sha256(str(source.relative_to(sessions_dir)).encode("utf-8")).hexdigest()[:12]
+        destination = destination_dir / f"{prefix}__{source_digest}.jsonl"
+        if destination.exists():
+            stem = destination.stem
+            suffix = destination.suffix
+            counter = 2
+            while True:
+                candidate = destination_dir / f"{stem}-{counter}{suffix}"
+                if not candidate.exists():
+                    destination = candidate
+                    break
+                counter += 1
+        shutil.copy2(source, destination)
+        copied.append(destination.resolve())
+    return copied
+
+
+def _run_one_attempt(
+    *,
+    index: int,
+    repo_root: Path | None,
+    testcase,
+    harness_id: str,
+    driver_name: str,
+    patch_file: str | None,
+    harness_cmd: str | None,
+    timeout: float,
+    stall_timeout: float,
+    log_dir: str,
+    stream: bool,
+    godot_binary: str,
+    workspace_root: str | None,
+    artifacts_dir: str | None,
+    cell: ExperimentCell | None,
+    cell_dir: Path | None,
+    metadata: dict[str, Any],
+    codex_runtime_obj: CodexHarnessRuntime | None,
+    harness_env: dict[str, str] | None,
+) -> dict[str, Any]:
+    from aigamedevbench.runner import run_testcase
+    from aigamedevbench.driver import PatchDriver
+
+    attempt_dir, events_path, attempt_log_path = _attempt_paths(cell_dir, testcase.id)
+    if attempt_dir is not None:
+        attempt_dir = attempt_dir.resolve()
+        events_path = attempt_dir / "logs" / "events.jsonl"
+        attempt_log_path = attempt_dir / "logs" / "harness.log"
+    event_writer = _JsonlEventWriter(events_path) if events_path is not None else None
+    attempt_codex_runtime = materialize_attempt_codex_runtime(codex_runtime_obj, attempt_dir) if attempt_dir else None
+    transcript_backup_dir = (
+        (cell_dir.resolve().parent / "transcripts")
+        if cell_dir is not None and attempt_codex_runtime is not None
+        else None
+    )
+    effective_env = dict(harness_env or {})
+    if attempt_codex_runtime is not None:
+        effective_env.update(attempt_codex_runtime.env)
+    configured_timeout = None
+    if (
+        cell is not None
+        and driver_name == "command"
+        and testcase.id in (cell.testcase_timeouts or {})
+    ):
+        configured_timeout = (cell.testcase_timeouts or {})[testcase.id]
+    effective_timeout = configured_timeout if configured_timeout is not None else timeout
+    effective_log_dir = str(attempt_log_path.parent) if attempt_log_path is not None else log_dir
+    completion_probe = (
+        (lambda: _codex_task_complete(attempt_codex_runtime.codex_home))
+        if attempt_codex_runtime is not None and driver_name == "command"
+        else None
+    )
+    effective_drv = _make_driver(
+        "noop" if driver_name == "patch" and patch_file is None and cell is not None else driver_name,
+        patch_file,
+        harness_cmd,
+        effective_timeout,
+        stall_timeout,
+        effective_log_dir,
+        stream,
+        env=effective_env,
+        log_name="harness.log" if attempt_log_path is not None and driver_name == "command" else None,
+        completion_probe=completion_probe,
+    )
+    if isinstance(effective_drv, CommandHarnessDriver):
+        effective_drv.label = testcase.id
+    if driver_name == "patch" and cell is not None and patch_file is None:
+        effective_drv = PatchDriver((testcase.dir / "fix.diff").read_text(encoding="utf-8"))
+
+    if event_writer is not None:
+        event_writer.write({"type": "state", "state": "running", "testcase_id": testcase.id})
+    try:
+        def on_state(state: str) -> None:
+            if event_writer is not None:
+                event_writer.write({"type": "state", "state": state, "testcase_id": testcase.id})
+
+        result = run_testcase(
+            repo_root,
+            testcase,
+            effective_drv,
+            harness_id,
+            _config(godot_binary),
+            workspace_root=(attempt_dir if attempt_dir is not None else workspace_root),
+            artifacts_dir=(attempt_dir / "artifacts" if attempt_dir is not None else artifacts_dir),
+            workspace_name="workspace" if attempt_dir is not None else None,
+            keep_workspace=attempt_dir is not None,
+            on_state=on_state,
+        )
+        record = {**result.to_dict(), **metadata}
+        if isinstance(effective_drv, CommandHarnessDriver) and effective_drv.last_outcome is not None:
+            record.update(effective_drv.last_outcome)
+        if configured_timeout is not None:
+            record["configured_timeout"] = configured_timeout
+        if attempt_dir is not None:
+            record["attempt_dir"] = str(attempt_dir)
+            record["workspace_path"] = str(attempt_dir / "workspace")
+            record["events_path"] = str(events_path)
+            record["log_path"] = str(attempt_log_path)
+        if attempt_codex_runtime is not None:
+            record["codex_home"] = str(attempt_codex_runtime.codex_home)
+        if transcript_backup_dir is not None:
+            backup_paths = _backup_codex_transcripts(
+                attempt_codex_runtime.codex_home,
+                transcript_backup_dir,
+                cell_id=cell.cell_id if cell is not None else harness_id,
+                testcase_id=testcase.id,
+            )
+            record["transcript_backup_dir"] = str(transcript_backup_dir.resolve())
+            record["transcript_backup_paths"] = [str(path) for path in backup_paths]
+        if event_writer is not None:
+            event_writer.write({
+                "type": "state",
+                "state": "finished",
+                "testcase_id": testcase.id,
+                "score": result.score,
+                "status": result.verifier_result.status,
+            })
+        if attempt_dir is not None:
+            (attempt_dir / "result.json").write_text(
+                json.dumps(record, indent=2, ensure_ascii=False, default=_json_default),
+                encoding="utf-8",
+            )
+        return {"index": index, "result": result, "record": record, "error": None}
+    except Exception as e:
+        record = {
+            "testcase_id": testcase.id,
+            "category": testcase.category,
+            "score": 0.0,
+            "status": "error",
+            "error": str(e),
+            **metadata,
+        }
+        if configured_timeout is not None:
+            record["configured_timeout"] = configured_timeout
+        if attempt_dir is not None:
+            record["attempt_dir"] = str(attempt_dir)
+            record["workspace_path"] = str(attempt_dir / "workspace")
+            record["events_path"] = str(events_path)
+            record["log_path"] = str(attempt_log_path)
+        if attempt_codex_runtime is not None:
+            record["codex_home"] = str(attempt_codex_runtime.codex_home)
+        if transcript_backup_dir is not None:
+            backup_paths = _backup_codex_transcripts(
+                attempt_codex_runtime.codex_home,
+                transcript_backup_dir,
+                cell_id=cell.cell_id if cell is not None else harness_id,
+                testcase_id=testcase.id,
+            )
+            record["transcript_backup_dir"] = str(transcript_backup_dir.resolve())
+            record["transcript_backup_paths"] = [str(path) for path in backup_paths]
+        if event_writer is not None:
+            event_writer.write({"type": "state", "state": "error", "testcase_id": testcase.id, "error": str(e)})
+        if attempt_dir is not None:
+            (attempt_dir / "result.json").write_text(
+                json.dumps(record, indent=2, ensure_ascii=False, default=_json_default),
+                encoding="utf-8",
+            )
+        return {"index": index, "result": None, "record": record, "error": e}
 
 
 def _run_selected_testcases(
@@ -405,7 +730,10 @@ def _run_selected_testcases(
     cell_dir: Path | None = None,
     run_metadata: dict[str, Any] | None = None,
     codex_runtime: dict[str, Any] | None = None,
+    codex_runtime_obj: CodexHarnessRuntime | None = None,
     harness_env: dict[str, str] | None = None,
+    execution_config: ExecutionConfig | None = None,
+    global_limiter: threading.Semaphore | None = None,
 ) -> dict:
     from aigamedevbench.testcase import discover_testcases
     from aigamedevbench.runner import run_testcase
@@ -432,7 +760,7 @@ def _run_selected_testcases(
         return {"count": 0, "mean_score": 0.0, "testcases": []}
 
     if cell is not None and cell_dir is not None:
-        _write_manifest(cell, cell_dir, testcases, run_metadata, codex_runtime)
+        _write_manifest(cell, cell_dir, testcases, run_metadata, codex_runtime, execution_config)
 
     if cell is not None and not cell.orchestration.is_supported:
         metadata = {**_harness_metadata(cell), **(run_metadata or {})}
@@ -473,22 +801,131 @@ def _run_selected_testcases(
     total = 0.0
     records = []
     metadata = {**_harness_metadata(cell), **(run_metadata or {})}
+    if cell_dir is not None:
+        ordered_attempts: list[dict[str, Any] | None] = [None] * len(testcases)
+
+        def run_attempt(index: int, tc):
+            if global_limiter is not None:
+                global_limiter.acquire()
+            try:
+                return _run_one_attempt(
+                    index=index,
+                    repo_root=repo_root,
+                    testcase=tc,
+                    harness_id=harness_id,
+                    driver_name=driver_name,
+                    patch_file=patch_file,
+                    harness_cmd=harness_cmd,
+                    timeout=timeout,
+                    stall_timeout=stall_timeout,
+                    log_dir=log_dir,
+                    stream=stream,
+                    godot_binary=godot_binary,
+                    workspace_root=workspace_root,
+                    artifacts_dir=artifacts_dir,
+                    cell=cell,
+                    cell_dir=cell_dir,
+                    metadata=metadata,
+                    codex_runtime_obj=codex_runtime_obj,
+                    harness_env=harness_env,
+                )
+            finally:
+                if global_limiter is not None:
+                    global_limiter.release()
+
+        max_workers = execution_config.testcase_jobs if execution_config is not None else 1
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                executor.submit(run_attempt, index, tc): (index, tc)
+                for index, tc in enumerate(testcases)
+            }
+            for future in as_completed(futures):
+                index, tc = futures[future]
+                try:
+                    attempt = future.result()
+                except Exception as e:
+                    attempt = {
+                        "index": index,
+                        "result": None,
+                        "record": {
+                            "testcase_id": tc.id,
+                            "category": tc.category,
+                            "score": 0.0,
+                            "status": "error",
+                            "error": str(e),
+                            **metadata,
+                        },
+                        "error": e,
+                    }
+                ordered_attempts[index] = attempt
+
+        for index, tc in enumerate(testcases):
+            attempt = ordered_attempts[index]
+            assert attempt is not None
+            result = attempt["result"]
+            record = attempt["record"]
+            records.append(record)
+            with _OUTPUT_LOCK:
+                if result is None:
+                    click.echo(f"{tc.id}\t{tc.category}\terror\t0.00\t{record.get('error')}")
+                    continue
+                total += result.score
+                click.echo(f"{tc.id}\t{tc.category}\t{result.verifier_result.status}\t{result.score:.2f}")
+                _echo_verifier_result(result.verifier_result)
+                _echo_diff(result)
+                if record.get("exit_code") is not None:
+                    _echo_harness_failure(tc.id, record)
+        mean = total / len(testcases) if testcases else 0.0
+        if testcases:
+            with _OUTPUT_LOCK:
+                click.echo(f"--- mean score: {mean:.3f} over {len(testcases)} testcase(s)")
+
+        report = {
+            **metadata,
+            "harness": harness_id,
+            "count": len(testcases),
+            "mean_score": mean,
+            "testcases": records,
+        }
+        if codex_runtime is not None:
+            report["codex_harness_runtime"] = codex_runtime
+        _write_report_outputs(report, report_file, cell_dir)
+        return report
+
     for tc in testcases:
         if isinstance(drv, CommandHarnessDriver):
             drv.label = tc.id
         effective_drv = drv
         if driver_name == "patch" and cell is not None and patch_file is None:
             effective_drv = PatchDriver((tc.dir / "fix.diff").read_text(encoding="utf-8"))
+        configured_timeout = None
+        original_timeout = None
+        if (
+            cell is not None
+            and isinstance(effective_drv, CommandHarnessDriver)
+            and tc.id in (cell.testcase_timeouts or {})
+        ):
+            configured_timeout = (cell.testcase_timeouts or {})[tc.id]
+            original_timeout = effective_drv.timeout
+            effective_drv.timeout = configured_timeout
         try:
             result = run_testcase(repo_root, tc, effective_drv, harness_id, config,
                                   workspace_root=workspace_root,
                                   artifacts_dir=artifacts_dir)
         except Exception as e:
             click.echo(f"{tc.id}\t{tc.category}\terror\t0.00\t{e}")
-            records.append({"testcase_id": tc.id, "category": tc.category,
-                            "score": 0.0, "status": "error", "error": str(e),
-                            **metadata})
+            record = {"testcase_id": tc.id, "category": tc.category,
+                      "score": 0.0, "status": "error", "error": str(e),
+                      **metadata}
+            if configured_timeout is not None:
+                record["configured_timeout"] = configured_timeout
+            records.append(record)
+            if original_timeout is not None and isinstance(effective_drv, CommandHarnessDriver):
+                effective_drv.timeout = original_timeout
             continue
+        finally:
+            if original_timeout is not None and isinstance(effective_drv, CommandHarnessDriver):
+                effective_drv.timeout = original_timeout
         total += result.score
         click.echo(f"{tc.id}\t{tc.category}\t{result.verifier_result.status}\t{result.score:.2f}")
         _echo_verifier_result(result.verifier_result)
@@ -496,6 +933,8 @@ def _run_selected_testcases(
         if isinstance(effective_drv, CommandHarnessDriver) and effective_drv.last_outcome is not None:
             _echo_harness_failure(tc.id, effective_drv.last_outcome)
         record = {**result.to_dict(), **metadata}
+        if configured_timeout is not None:
+            record["configured_timeout"] = configured_timeout
         if isinstance(effective_drv, CommandHarnessDriver) and effective_drv.last_outcome is not None:
             record.update(effective_drv.last_outcome)
         records.append(record)
@@ -515,6 +954,70 @@ def _run_selected_testcases(
         report["codex_harness_runtime"] = codex_runtime
     _write_report_outputs(report, report_file, cell_dir)
     return report
+
+
+def _recommended_timeout(record: dict[str, Any]) -> float | None:
+    current = record.get("configured_timeout")
+    wall_time = record.get("wall_time")
+    if not isinstance(current, (int, float)) or current <= 0:
+        return None
+    if record.get("timed_out") or record.get("stalled"):
+        return float(current) * 2.0
+    if not isinstance(wall_time, (int, float)) or wall_time <= 0:
+        return None
+    return max(float(current), float(math.ceil(wall_time * 1.5)))
+
+
+def _normalize_timeout_value(value: float) -> int | float:
+    return int(value) if float(value).is_integer() else round(float(value), 3)
+
+
+def _update_test_set_timeouts(experiment_path: str, reports: list[dict]) -> None:
+    if yaml is None:
+        return
+    experiment_path_obj = Path(experiment_path)
+    experiment_data = yaml.safe_load(experiment_path_obj.read_text(encoding="utf-8")) or {}
+    test_set_file = experiment_data.get("test_set_file")
+    if not test_set_file:
+        return
+    test_set_path = Path(test_set_file)
+    if not test_set_path.is_absolute():
+        test_set_path = experiment_path_obj.parent / test_set_path
+    data = yaml.safe_load(test_set_path.read_text(encoding="utf-8")) or {}
+    test_sets = data.get("test_sets", {}) or {}
+    changed = False
+    for report in reports:
+        task_set_name = report.get("task_set")
+        task_set = test_sets.get(task_set_name)
+        if not isinstance(task_set, dict):
+            continue
+        raw_testcases = task_set.get("testcases")
+        if not isinstance(raw_testcases, list):
+            continue
+        entries_by_id: dict[str, dict[str, Any]] = {}
+        for index, item in enumerate(raw_testcases):
+            if isinstance(item, str):
+                entry = {"id": item}
+                raw_testcases[index] = entry
+                entries_by_id[item] = entry
+            elif isinstance(item, dict) and item.get("id") is not None:
+                entries_by_id[str(item["id"])] = item
+        for record in report.get("testcases", []):
+            testcase_id = record.get("testcase_id")
+            if testcase_id not in entries_by_id:
+                continue
+            next_timeout = _recommended_timeout(record)
+            if next_timeout is None:
+                continue
+            normalized = _normalize_timeout_value(next_timeout)
+            if entries_by_id[testcase_id].get("timeout") != normalized:
+                entries_by_id[testcase_id]["timeout"] = normalized
+                changed = True
+    if changed:
+        test_set_path.write_text(
+            yaml.safe_dump(data, sort_keys=False, allow_unicode=True),
+            encoding="utf-8",
+        )
 
 
 def _dry_run_experiment(experiment_path: str) -> None:
@@ -546,16 +1049,20 @@ def _run_experiment(
     artifacts_dir: str | None,
     stream: bool,
     godot_binary: str,
+    execution_config: ExecutionConfig | None = None,
 ) -> list[dict]:
     experiment = load_experiment_file(experiment_path)
-    reports = []
-    for cell in experiment.cells:
+    execution_config = execution_config or load_execution_config()
+    reports: list[dict | None] = [None] * len(experiment.cells)
+    global_limiter = threading.Semaphore(execution_config.max_jobs)
+
+    def run_cell(index: int, cell: ExperimentCell) -> dict:
         cell_dir = Path(results_dir) / cell.experiment_id / cell.cell_id
         report_path = cell_dir / "report.json"
         harness_id = cell.harness.preset or cell.agent_cli
         run_metadata = _new_run_metadata()
         codex_runtime = materialize_codex_harness(cell)
-        report = _run_selected_testcases(
+        return _run_selected_testcases(
             testcases_dir=cell.testcases_dir,
             testcase_id=None,
             testcase_ids=cell.testcase_ids,
@@ -575,10 +1082,23 @@ def _run_experiment(
             cell_dir=cell_dir,
             run_metadata=run_metadata,
             codex_runtime=codex_runtime.manifest if codex_runtime else None,
+            codex_runtime_obj=codex_runtime,
             harness_env=codex_runtime.env if codex_runtime else None,
+            execution_config=execution_config,
+            global_limiter=global_limiter,
         )
-        reports.append(report)
-    return reports
+
+    with ThreadPoolExecutor(max_workers=execution_config.experiment_jobs) as executor:
+        futures = {
+            executor.submit(run_cell, index, cell): index
+            for index, cell in enumerate(experiment.cells)
+        }
+        for future in as_completed(futures):
+            index = futures[future]
+            reports[index] = future.result()
+    completed_reports = [report for report in reports if report is not None]
+    _update_test_set_timeouts(experiment_path, completed_reports)
+    return completed_reports
 
 
 @main.command("run")
@@ -590,7 +1110,7 @@ def _run_experiment(
 @click.option("--patch", "patch_file", default=None, type=click.Path(exists=True))
 @click.option("--harness-cmd", "harness_cmd", default=None,
               help="Command template for --driver command, e.g. 'claude -p {task}'")
-@click.option("--timeout", default=600.0, type=float, help="Per-testcase harness timeout (s)")
+@click.option("--timeout", default=DEFAULT_TIMEOUT, type=float, help="Per-testcase harness timeout (s)")
 @click.option("--stall-timeout", "stall_timeout", default=0.0, type=float,
               help="Abort a harness that produces no output for this many seconds. "
                    "Default 0 (disabled): harnesses like 'claude -p' print nothing "
@@ -641,6 +1161,7 @@ def run_cmd(testcases_dir: str, testcase_id: str | None, harness_id: str,
             artifacts_dir=artifacts_dir,
             stream=stream,
             godot_binary=godot_binary,
+            execution_config=load_execution_config(),
         )
         return
 

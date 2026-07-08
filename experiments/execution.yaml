@@ -1,0 +1,4 @@
+parallelism:
+  experiment_jobs: 2
+  testcase_jobs: 2
+  max_jobs: 4

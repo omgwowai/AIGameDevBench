@@ -1,0 +1,35 @@
+id: codex-harness-smoke2-low
+description: Compare bare Codex and full Codex harness surfaces on smoke_2 with low reasoning effort.
+test_set_file: testsets.yaml
+harness_file: harnesses.yaml
+
+cells:
+  - id: bare_low
+    model: gpt-5.5
+    model_reasoning_effort: low
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: smoke_2
+    testcases:
+      - id: wave-combat-score-system
+        timeout: 1800
+      - id: gdb-task_0281
+        timeout: 1800
+    harness: bare-codex
+
+  - id: all_low
+    model: gpt-5.5
+    model_reasoning_effort: low
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: smoke_2
+    testcases:
+      - id: wave-combat-score-system
+        timeout: 1800
+      - id: gdb-task_0281
+        timeout: 1800
+    harness: all-codex

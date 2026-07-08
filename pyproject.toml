@@ -22,5 +22,8 @@ dev = ["pytest>=8.0"]
 [project.scripts]
 aigdbench = "aigamedevbench.cli:main"
 
+[tool.pytest.ini_options]
+addopts = ["-p", "no:libtmux"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/aigamedevbench"]

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
+import threading
+import time
 from pathlib import Path
 
 from aigamedevbench.driver import NoOpDriver, PatchDriver, CommandHarnessDriver
@@ -70,8 +73,15 @@ def test_command_driver_records_outcome(tmp_path):
     drv.label = "tc-1"
     drv.run("task", ws)
     o = drv.last_outcome
-    assert set(o) == {"exit_code", "wall_time", "timed_out", "stalled",
-                      "blocked_on_approval", "log_path"}
+    assert set(o) == {
+        "exit_code",
+        "wall_time",
+        "timed_out",
+        "stalled",
+        "blocked_on_approval",
+        "completed_but_hung",
+        "log_path",
+    }
     assert o["exit_code"] == 0
     assert o["timed_out"] is False
     assert o["wall_time"] >= 0.0
@@ -93,6 +103,89 @@ def test_command_driver_timeout_is_killed(tmp_path):
     drv = CommandHarnessDriver(cmd, timeout=1, log_dir=tmp_path / "logs")
     drv.run("task", ws)  # must not raise, returns quickly after kill
     assert drv.last_outcome["timed_out"] is True
+    assert drv.last_outcome["exit_code"] == -1
+
+
+def _pid_is_running(pid: int) -> bool:
+    if sys.platform == "win32":
+        import subprocess
+        proc = subprocess.run(
+            ["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        return f'"{pid}"' in proc.stdout
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    return True
+
+
+def test_command_driver_timeout_kills_child_process_tree(tmp_path):
+    ws = tmp_path / "ws"; ws.mkdir()
+    child_pid_file = tmp_path / "child.pid"
+    child_script = tmp_path / "child.py"
+    child_script.write_text(
+        "import pathlib, sys, time\n"
+        "path = pathlib.Path(sys.argv[1])\n"
+        "pid_file = pathlib.Path(sys.argv[2])\n"
+        "handle = path.open('w')\n"
+        "handle.write('locked')\n"
+        "handle.flush()\n"
+        "pid_file.write_text(str(__import__('os').getpid()), encoding='utf-8')\n"
+        "time.sleep(30)\n",
+        encoding="utf-8",
+    )
+    parent_script = tmp_path / "parent.py"
+    parent_script.write_text(
+        "import subprocess, sys, time\n"
+        "subprocess.Popen([sys.executable, sys.argv[1], sys.argv[2], sys.argv[3]])\n"
+        "time.sleep(30)\n",
+        encoding="utf-8",
+    )
+    locked_file = ws / "locked.txt"
+    cmd = (
+        f"{sys.executable} {parent_script} "
+        f"{child_script} {locked_file} {child_pid_file}"
+    )
+    drv = CommandHarnessDriver(cmd, timeout=1, log_dir=tmp_path / "logs")
+
+    drv.run("task", ws)
+
+    assert drv.last_outcome["timed_out"] is True
+    assert child_pid_file.exists()
+    child_pid = int(child_pid_file.read_text(encoding="utf-8"))
+    assert not _pid_is_running(child_pid)
+
+
+def test_command_driver_completion_probe_kills_hung_process(tmp_path):
+    ws = tmp_path / "ws"; ws.mkdir()
+    marker = tmp_path / "complete.marker"
+    script = tmp_path / "hang_after_complete.py"
+    script.write_text(
+        "import pathlib, sys, time\n"
+        "pathlib.Path(sys.argv[1]).write_text('done', encoding='utf-8')\n"
+        "time.sleep(30)\n",
+        encoding="utf-8",
+    )
+    drv = CommandHarnessDriver(
+        f"{sys.executable} {script} {marker}",
+        timeout=30,
+        log_dir=tmp_path / "logs",
+        completion_probe=lambda: marker.exists(),
+        completion_grace_timeout=0.2,
+    )
+
+    start = time.perf_counter()
+    drv.run("task", ws)
+    elapsed = time.perf_counter() - start
+
+    assert elapsed < 10
+    assert drv.last_outcome["completed_but_hung"] is True
+    assert drv.last_outcome["timed_out"] is False
     assert drv.last_outcome["exit_code"] == -1
 
 
@@ -187,6 +280,37 @@ def test_command_driver_streams_lines(tmp_path):
                                on_line=got.append)
     drv.run("task", ws)
     assert "hi" in got
+    assert drv.last_outcome["exit_code"] == 0
+
+
+def test_command_driver_streams_to_log_before_exit(tmp_path):
+    ws = tmp_path / "ws"; ws.mkdir()
+    log_dir = tmp_path / "logs"
+    script = (
+        "import sys, time; "
+        "print('progress one'); sys.stdout.flush(); "
+        "time.sleep(2)"
+    )
+    drv = CommandHarnessDriver(
+        f'{sys.executable} -c "{script}"',
+        timeout=30,
+        log_dir=log_dir,
+        log_name="harness.log",
+    )
+
+    thread = threading.Thread(target=lambda: drv.run("task", ws))
+    thread.start()
+    deadline = time.perf_counter() + 1.5
+    log_path = log_dir / "harness.log"
+    saw_progress = False
+    while time.perf_counter() < deadline:
+        if log_path.exists() and "progress one" in log_path.read_text(encoding="utf-8"):
+            saw_progress = True
+            break
+        time.sleep(0.05)
+    thread.join(timeout=5)
+
+    assert saw_progress
     assert drv.last_outcome["exit_code"] == 0
 
 

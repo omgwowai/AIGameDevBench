@@ -1,0 +1,25 @@
+id: codex-harness-filtered6-low
+description: Compare bare Codex and full Codex harness surfaces on filtered_6 with low reasoning effort.
+test_set_file: testsets.yaml
+harness_file: harnesses.yaml
+
+cells:
+  - id: bare_low
+    model: gpt-5.5
+    model_reasoning_effort: low
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: filtered_6
+    harness: bare-codex
+
+  - id: all_low
+    model: gpt-5.5
+    model_reasoning_effort: low
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: filtered_6
+    harness: all-codex

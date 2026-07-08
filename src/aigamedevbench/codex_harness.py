@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -41,8 +42,10 @@ def materialize_codex_harness(cell: ExperimentCell) -> CodexHarnessRuntime | Non
     fingerprint_prefix = cell.harness.fingerprint.split(":", 1)[-1][:12]
     effort = cell.model_reasoning_effort or "default"
     preset = cell.harness.preset or "components"
-    codex_home = homes_root / f"{_safe_name(preset)}-{_safe_name(effort)}-{fingerprint_prefix}"
-    _reset_directory(codex_home, homes_root)
+    cell_root = homes_root / _safe_name(cell.experiment_id) / _safe_name(cell.cell_id)
+    cell_root.mkdir(parents=True, exist_ok=True)
+    codex_home = cell_root / f"{_safe_name(preset)}-{_safe_name(effort)}-{fingerprint_prefix}"
+    _reset_directory(codex_home, cell_root)
 
     warnings: list[str] = []
     _materialize_common(source_home, codex_home)
@@ -50,6 +53,8 @@ def materialize_codex_harness(cell: ExperimentCell) -> CodexHarnessRuntime | Non
         _copy_path(source_home / "AGENTS.md", codex_home / "AGENTS.md")
     if _has_any_component(cell, "hooks"):
         _copy_path(source_home / "hooks.json", codex_home / "hooks.json")
+    if _has_any_component(cell, "plugins"):
+        warnings.extend(_copy_plugins(source_home, codex_home, cell.harness.components["plugins"]))
     if _has_any_component(cell, "skills"):
         warnings.extend(_copy_named_children(
             source_home / "skills",
@@ -78,6 +83,25 @@ def materialize_codex_harness(cell: ExperimentCell) -> CodexHarnessRuntime | Non
     )
 
 
+def materialize_attempt_codex_runtime(
+    runtime: CodexHarnessRuntime | None,
+    attempt_dir: Path,
+) -> CodexHarnessRuntime | None:
+    if runtime is None:
+        return None
+    attempt_dir = attempt_dir.resolve()
+    codex_home = attempt_dir / "codex_home"
+    if codex_home.exists():
+        shutil.rmtree(codex_home)
+    _copy_path(runtime.codex_home, codex_home)
+    manifest = {**runtime.manifest, "codex_home": str(codex_home)}
+    return CodexHarnessRuntime(
+        codex_home=codex_home,
+        env={**runtime.env, "CODEX_HOME": str(codex_home)},
+        manifest=manifest,
+    )
+
+
 def _safe_name(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("._-") or "default"
 
@@ -88,7 +112,10 @@ def _reset_directory(path: Path, root: Path) -> None:
     if parent != root:
         raise ValueError(f"Refusing to reset CODEX_HOME outside bench root: {path}")
     if path.exists():
-        shutil.rmtree(path)
+        try:
+            shutil.rmtree(path)
+        except FileNotFoundError:
+            pass
     path.mkdir(parents=True, exist_ok=True)
 
 
@@ -104,9 +131,19 @@ def _copy_path(src: Path, dst: Path) -> None:
     if not effective_src.exists():
         return
     if effective_src.is_dir():
-        shutil.copytree(effective_src, dst, dirs_exist_ok=True)
+        shutil.copytree(_fs_path(effective_src), _fs_path(dst), dirs_exist_ok=True)
     elif effective_src.is_file():
-        shutil.copy2(effective_src, dst)
+        shutil.copy2(_fs_path(effective_src), _fs_path(dst))
+
+
+def _fs_path(path: Path) -> str:
+    text = str(path)
+    if os.name != "nt" or text.startswith("\\\\?\\"):
+        return text
+    absolute = str(path.absolute())
+    if absolute.startswith("\\\\?\\"):
+        return absolute
+    return "\\\\?\\" + absolute
 
 
 def _copy_named_children(
@@ -123,6 +160,100 @@ def _copy_named_children(
             continue
         _copy_path(src, dst_root / name)
     return warnings
+
+
+def _copy_plugins(source_home: Path, codex_home: Path, names: list[str]) -> list[str]:
+    warnings: list[str] = []
+    for name in names:
+        plugin = _resolve_plugin(source_home, name)
+        if plugin is None:
+            warnings.append(f"plugin '{name}' not found under {source_home / 'plugins'}")
+            continue
+        version = _plugin_version(plugin)
+        dst = (
+            codex_home
+            / "managed-marketplaces"
+            / "agd"
+            / "plugins"
+            / name
+        )
+        _copy_path(plugin, dst)
+        cache_dst = (
+            codex_home
+            / "plugins"
+            / "cache"
+            / "agentic-game-development"
+            / name
+            / version
+        )
+        _copy_path(plugin, cache_dst)
+        _write_plugin_marketplace(codex_home, name)
+    return warnings
+
+
+def _resolve_plugin(source_home: Path, name: str) -> Path | None:
+    candidates = [
+        source_home / "plugins" / name,
+    ]
+    for candidate in candidates:
+        if (candidate / ".codex-plugin" / "plugin.json").is_file():
+            return candidate
+
+    cache_root = source_home / "plugins" / "cache"
+    if cache_root.is_dir():
+        for plugin_json in cache_root.rglob(".codex-plugin/plugin.json"):
+            plugin_dir = plugin_json.parent.parent
+            plugin_data = _load_json(plugin_json)
+            if plugin_dir.name == name or plugin_data.get("name") == name:
+                return plugin_dir
+
+    repo_plugin_root = Path(
+        os.environ.get(
+            "AIGDB_AGENTIC_GAME_PLUGIN_ROOT",
+            r"D:\omgwow\agentic-game-development\plugins",
+        )
+    )
+    repo_plugin = repo_plugin_root / name
+    if (repo_plugin / ".codex-plugin" / "plugin.json").is_file():
+        return repo_plugin
+    return None
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {}
+
+
+def _plugin_version(plugin_dir: Path) -> str:
+    plugin_data = _load_json(plugin_dir / ".codex-plugin" / "plugin.json")
+    version = str(plugin_data.get("version", "")).strip()
+    return version or "0.1.0"
+
+
+def _write_plugin_marketplace(codex_home: Path, plugin_name: str) -> None:
+    marketplace_root = codex_home / "managed-marketplaces" / "agd"
+    agents_plugins = marketplace_root / ".agents" / "plugins"
+    agents_plugins.mkdir(parents=True, exist_ok=True)
+    marketplace = {
+        "name": "agentic-game-development",
+        "interface": {"displayName": "Agentic Game Development"},
+        "plugins": [
+            {
+                "name": plugin_name,
+                "source": {"source": "local", "path": f"./plugins/{plugin_name}"},
+                "policy": {
+                    "installation": "AVAILABLE",
+                    "authentication": "ON_INSTALL",
+                },
+                "category": "Developer Tools",
+            }
+        ],
+    }
+    (agents_plugins / "marketplace.json").write_text(
+        json.dumps(marketplace, indent=2), encoding="utf-8"
+    )
 
 
 def _resolve_named_component(src_root: Path, name: str, source_home: Path) -> Path | None:
@@ -157,6 +288,8 @@ def _write_config(source_home: Path, codex_home: Path, cell: ExperimentCell) -> 
         text = _bare_config_text(source_config, cell)
     else:
         text = source_config.read_text(encoding="utf-8", errors="replace") if source_config.exists() else ""
+        text = _filter_mcp_servers(text, cell.harness.components.get("mcp_servers", []))
+        text = _set_plugin_config(text, codex_home, cell.harness.components.get("plugins", []))
         text = _set_top_level_toml_value(text, "model", cell.model)
         if cell.model_reasoning_effort:
             text = _set_top_level_toml_value(
@@ -168,6 +301,56 @@ def _write_config(source_home: Path, codex_home: Path, cell: ExperimentCell) -> 
             text,
         )
     (codex_home / "config.toml").write_text(text, encoding="utf-8")
+
+
+def _filter_mcp_servers(text: str, keep_servers: list[str]) -> str:
+    if not keep_servers:
+        return _remove_toml_tables_with_prefix(text, "mcp_servers.")
+    keep = set(keep_servers)
+    lines = text.splitlines()
+    result: list[str] = []
+    include = True
+    for line in lines:
+        section = _toml_section_name(line)
+        if section is not None:
+            include = not section.startswith("mcp_servers.") or section.split(".", 1)[1] in keep
+        if include:
+            result.append(line)
+    return "\n".join(result).rstrip() + "\n"
+
+
+def _remove_toml_tables_with_prefix(text: str, prefix: str) -> str:
+    lines = text.splitlines()
+    result: list[str] = []
+    include = True
+    for line in lines:
+        section = _toml_section_name(line)
+        if section is not None:
+            include = not section.startswith(prefix)
+        if include:
+            result.append(line)
+    return "\n".join(result).rstrip() + "\n"
+
+
+def _toml_section_name(line: str) -> str | None:
+    stripped = line.strip()
+    if not (stripped.startswith("[") and stripped.endswith("]")):
+        return None
+    return stripped.strip("[]").strip().strip('"')
+
+
+def _set_plugin_config(text: str, codex_home: Path, plugin_names: list[str]) -> str:
+    if not plugin_names:
+        return text
+    text = text.rstrip() + "\n\n"
+    source = codex_home / "managed-marketplaces" / "agd"
+    text += "[marketplaces.agentic-game-development]\n"
+    text += 'source_type = "local"\n'
+    text += f"source = {_toml_value(str(source))}\n\n"
+    for plugin_name in plugin_names:
+        text += f'[plugins."{plugin_name}@agentic-game-development"]\n'
+        text += "enabled = true\n\n"
+    return text.rstrip() + "\n"
 
 
 def _empty_components() -> dict[str, list[str]]:
@@ -182,6 +365,8 @@ def _bare_config_text(source_config: Path, cell: ExperimentCell) -> str:
         "model_provider",
         "openai_base_url",
         "model_catalog_json",
+        "model_context_window",
+        "model_auto_compact_token_limit",
         "disable_response_storage",
         "approval_policy",
         "sandbox_mode",

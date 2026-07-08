@@ -1,0 +1,25 @@
+id: codex-harness-smoke2
+description: Compare bare Codex and full Codex harness surfaces on the smoke_2 task set.
+test_set_file: testsets.yaml
+harness_file: harnesses.yaml
+
+cells:
+  - id: bare
+    model: gpt-5.5
+    model_reasoning_effort: xhigh
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: smoke_2
+    harness: bare-codex
+
+  - id: all
+    model: gpt-5.5
+    model_reasoning_effort: xhigh
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: smoke_2
+    harness: all-codex

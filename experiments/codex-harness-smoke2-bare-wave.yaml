@@ -1,0 +1,17 @@
+id: codex-harness-smoke2-bare-wave
+description: Rerun bare Codex on the wave-combat-score-system smoke testcase.
+test_set_file: testsets.yaml
+harness_file: harnesses.yaml
+
+cells:
+  - id: bare_wave
+    model: gpt-5.5
+    model_reasoning_effort: xhigh
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: smoke_2
+    testcases:
+      - wave-combat-score-system
+    harness: bare-codex

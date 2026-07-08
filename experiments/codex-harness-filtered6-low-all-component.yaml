@@ -1,0 +1,18 @@
+id: codex-harness-filtered6-low-all-component
+description: Rerun full Codex low-effort harness on component-layer-boundary to verify task_complete hang handling.
+test_set_file: testsets.yaml
+harness_file: harnesses.yaml
+
+cells:
+  - id: all_low_component
+    model: gpt-5.5
+    model_reasoning_effort: low
+    agent_cli: codex
+    orchestration:
+      id: single-agent
+      source_type: builtin
+    task_set: filtered_6
+    testcases:
+      - id: component-layer-boundary
+        timeout: 3600
+    harness: all-codex
