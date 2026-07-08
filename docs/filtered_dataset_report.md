@@ -1,3 +1,21 @@
+> **2026-07 更新（当前实况：30 个）**：本报告正文描述的是早期 50 个版本，分布数字已过时。
+> 当前 `testcases_filtered/` 为 **30 个**，最近一次改动：
+> - **移除** 4 个较"送分"的 `gdb-task_*`（behavior_logic / godot_scene_assert），缓解 behavior_logic 过度集中；
+> - **新增** 4 个源自 `gdquest-demos/godot-open-rpg` 真实修复 commit 的 `survey-history_*` case（区分度更高的资源崩溃 / 组合缺陷）：
+>   `73dc20c_000`、`9cbd293_003`、`019b51c_009`、`1406822_013`。
+>   它们是 folder 型但 baseline 来自**共享项目快照**（`snapshot` 字段；快照不入库，由 `scripts/make_snapshots.py` 按需生成），
+>   打分用 `scoring.mode="gated"`（noop=0 / `good.diff`=1），验证器沿用 `survey_bad_case`。
+> - **筛选过程**：从 485 个 git case 里，按验证器 oracle 区分度筛出 16 个候选（全 godot-open-rpg，带运行时 L0 oracle），
+>   再用容器（含 Godot）逐个实测 golden 是否能干净过 L0/L1 门禁——**只有 4 个能**。其余 12 个撞上项目主场景/其它场景的
+>   **既有崩溃**（`resources still in use`、脚本属性错误等，与被测 bug 无关），故淘汰。
+> - **配套门禁修复**：L0/L1 默认排除 `addons/`（第三方插件的编辑器专用场景在 headless 下的信号/资源噪声不是被测对象），
+>   可经 `config global.validation.excluded_path_prefixes` 覆盖。此修复救活了 3 个原本被 addons 噪声误拦的候选。
+> - **当前分布**：category = behavior_logic ×15、architecture ×6、precise_edit ×4、intent_translation ×3、visual_audio ×2；
+>   verifier = godot_scene_assert ×17、survey_bad_case ×4、py_config ×3、py_gdscript_ast ×2、py_tscn_diff ×2、visual_static ×2（**6 种全覆盖**）。
+> - 迁移脚本：`scripts/_migrate_survey_to_filtered.py`（选中清单在其中）；repo→URL 映射：`scripts/_survey_repos.py`；快照生成：`scripts/make_snapshots.py`。
+
+---
+
 # 精选数据集报告 — `testcases_filtered/`（50 个）
 
 > 目的：让读者快速、准确地认识**精选子集**，并通过**具体 testcase 例子**理解每类任务到底长什么样、怎么打分。

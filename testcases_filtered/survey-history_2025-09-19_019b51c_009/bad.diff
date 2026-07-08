@@ -1,0 +1,4553 @@
+diff --git a/addons/dialogic/Editor/HomePage/icon_bg.png.import b/addons/dialogic/Editor/HomePage/icon_bg.png.import
+index f4c58ef..2160d4d 100644
+--- a/addons/dialogic/Editor/HomePage/icon_bg.png.import
++++ b/addons/dialogic/Editor/HomePage/icon_bg.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_bg.png-5937ce0a857c4a8a9d624ea9ebf09a97.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/default.svg.import b/addons/dialogic/Editor/Images/Dropdown/default.svg.import
+index e8c82b0..3106df7 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/default.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/default.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/default.svg-3f34de5e45bef5de4d9c15ef78c00c6c.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/divide.svg.import b/addons/dialogic/Editor/Images/Dropdown/divide.svg.import
+index 9a64c5f..b9ee08d 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/divide.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/divide.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/divide.svg-4928f878a07ba93ebc44d8ae73ad4c1f.c
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/join.svg.import b/addons/dialogic/Editor/Images/Dropdown/join.svg.import
+index 8342607..9a91637 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/join.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/join.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/join.svg-2f0d7b9e8e01cf0e62b8c3a85aff6213.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/leave.svg.import b/addons/dialogic/Editor/Images/Dropdown/leave.svg.import
+index bd1bff5..bf243da 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/leave.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/leave.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/leave.svg-c936f6e3d601b8c12c23f205a765084e.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/minus.svg.import b/addons/dialogic/Editor/Images/Dropdown/minus.svg.import
+index d44178a..63d5e9a 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/minus.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/minus.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/minus.svg-29f22d1aa24635bae2c03057c07be8bc.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/multiply.svg.import b/addons/dialogic/Editor/Images/Dropdown/multiply.svg.import
+index a23c37b..93bb66a 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/multiply.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/multiply.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/multiply.svg-0e9db99aafb66d43ee14adcca26c5b47
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/plus.svg.import b/addons/dialogic/Editor/Images/Dropdown/plus.svg.import
+index e86414b..80d686d 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/plus.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/plus.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/plus.svg-e094b0b8505b5d910717883d06553532.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/set.svg.import b/addons/dialogic/Editor/Images/Dropdown/set.svg.import
+index 6c31572..948482b 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/set.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/set.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/set.svg-f100fad003be2285d5d0da5c58417203.ctex
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Dropdown/update.svg.import b/addons/dialogic/Editor/Images/Dropdown/update.svg.import
+index 17546a6..cd0064c 100644
+--- a/addons/dialogic/Editor/Images/Dropdown/update.svg.import
++++ b/addons/dialogic/Editor/Images/Dropdown/update.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/update.svg-cefa0fe6bfa50911bb9a77982288e485.c
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Interactable/decrement_icon.svg.import b/addons/dialogic/Editor/Images/Interactable/decrement_icon.svg.import
+index d9bb539..26aa135 100644
+--- a/addons/dialogic/Editor/Images/Interactable/decrement_icon.svg.import
++++ b/addons/dialogic/Editor/Images/Interactable/decrement_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/decrement_icon.svg-9556cf56db91e200fb946372e0
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Interactable/increment_icon.svg.import b/addons/dialogic/Editor/Images/Interactable/increment_icon.svg.import
+index 4256591..f411bd0 100644
+--- a/addons/dialogic/Editor/Images/Interactable/increment_icon.svg.import
++++ b/addons/dialogic/Editor/Images/Interactable/increment_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/increment_icon.svg-081e6509e76349f0628c55a41e
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/add-folder.svg.import b/addons/dialogic/Editor/Images/Pieces/add-folder.svg.import
+index b7765a4..cd569e7 100644
+--- a/addons/dialogic/Editor/Images/Pieces/add-folder.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/add-folder.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/add-folder.svg-41a970370f904038e63c13bddbdb64
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/close-icon.svg.import b/addons/dialogic/Editor/Images/Pieces/close-icon.svg.import
+index cbc36f2..bc57609 100644
+--- a/addons/dialogic/Editor/Images/Pieces/close-icon.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/close-icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/close-icon.svg-c630c93ada599b08938f4854f5376f
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/closed-icon.svg.import b/addons/dialogic/Editor/Images/Pieces/closed-icon.svg.import
+index 146327e..17fd504 100644
+--- a/addons/dialogic/Editor/Images/Pieces/closed-icon.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/closed-icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/closed-icon.svg-b4f16653b91d6792313a130565319
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/expand-icon.svg.import b/addons/dialogic/Editor/Images/Pieces/expand-icon.svg.import
+index 0813669..0d7d7e7 100644
+--- a/addons/dialogic/Editor/Images/Pieces/expand-icon.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/expand-icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/expand-icon.svg-26099b197ab0f314e2253848fcc22
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/open-icon.svg.import b/addons/dialogic/Editor/Images/Pieces/open-icon.svg.import
+index eaec29c..1288c3a 100644
+--- a/addons/dialogic/Editor/Images/Pieces/open-icon.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/open-icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/open-icon.svg-1a2ae6d0121a79b624c0fb87cc9ceea
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/variable.svg.import b/addons/dialogic/Editor/Images/Pieces/variable.svg.import
+index 80be2ae..f3eddb1 100644
+--- a/addons/dialogic/Editor/Images/Pieces/variable.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/variable.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/variable.svg-50a50248b9d47e5556571e4111e8d5b4
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/variable_icon.png.import b/addons/dialogic/Editor/Images/Pieces/variable_icon.png.import
+index 7f8b408..5aed468 100644
+--- a/addons/dialogic/Editor/Images/Pieces/variable_icon.png.import
++++ b/addons/dialogic/Editor/Images/Pieces/variable_icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/variable_icon.png-df9d711980209a7752dc8762037
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Pieces/warning.svg.import b/addons/dialogic/Editor/Images/Pieces/warning.svg.import
+index b9442db..06a13ac 100644
+--- a/addons/dialogic/Editor/Images/Pieces/warning.svg.import
++++ b/addons/dialogic/Editor/Images/Pieces/warning.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/warning.svg-a48ae93c4663637f2aca88d055604495.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Resources/character.svg.import b/addons/dialogic/Editor/Images/Resources/character.svg.import
+index 37eeb11..79b6082 100644
+--- a/addons/dialogic/Editor/Images/Resources/character.svg.import
++++ b/addons/dialogic/Editor/Images/Resources/character.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/character.svg-48bc1c93fa13733a935ca2c669d933a
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Resources/icon_character.png.import b/addons/dialogic/Editor/Images/Resources/icon_character.png.import
+index 667d330..a03e360 100644
+--- a/addons/dialogic/Editor/Images/Resources/icon_character.png.import
++++ b/addons/dialogic/Editor/Images/Resources/icon_character.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_character.png-97a1851bbafe2b302ea88c25a8
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Resources/portrait.svg.import b/addons/dialogic/Editor/Images/Resources/portrait.svg.import
+index eea180b..d12dd14 100644
+--- a/addons/dialogic/Editor/Images/Resources/portrait.svg.import
++++ b/addons/dialogic/Editor/Images/Resources/portrait.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/portrait.svg-7d29c7cfe3e086d65dce33c3d66c48cd
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Toolbar/add-character.svg.import b/addons/dialogic/Editor/Images/Toolbar/add-character.svg.import
+index 5f2b494..3ad3985 100644
+--- a/addons/dialogic/Editor/Images/Toolbar/add-character.svg.import
++++ b/addons/dialogic/Editor/Images/Toolbar/add-character.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/add-character.svg-a658b65c1225b02657a50d5c965
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Toolbar/add-timeline.svg.import b/addons/dialogic/Editor/Images/Toolbar/add-timeline.svg.import
+index 807fec0..9f497f9 100644
+--- a/addons/dialogic/Editor/Images/Toolbar/add-timeline.svg.import
++++ b/addons/dialogic/Editor/Images/Toolbar/add-timeline.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/add-timeline.svg-86961b528ebdf01f585931a15fea
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/Unknown.png.import b/addons/dialogic/Editor/Images/Unknown.png.import
+index 7be217a..d05ffc3 100644
+--- a/addons/dialogic/Editor/Images/Unknown.png.import
++++ b/addons/dialogic/Editor/Images/Unknown.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/Unknown.png-1cc7645f56036e8d378a70ac1dd772bb.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/dialogic-logo.svg.import b/addons/dialogic/Editor/Images/dialogic-logo.svg.import
+index cc2421b..7003395 100644
+--- a/addons/dialogic/Editor/Images/dialogic-logo.svg.import
++++ b/addons/dialogic/Editor/Images/dialogic-logo.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/dialogic-logo.svg-e43201cabc9573eeb3f78fd91ea
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/plugin-icon.svg.import b/addons/dialogic/Editor/Images/plugin-icon.svg.import
+index e6f203a..a6315d5 100644
+--- a/addons/dialogic/Editor/Images/plugin-icon.svg.import
++++ b/addons/dialogic/Editor/Images/plugin-icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/plugin-icon.svg-aa6701e8ed73f5fe5d177dfddce3a
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/preview_character.png.import b/addons/dialogic/Editor/Images/preview_character.png.import
+index abf95b1..95b3c15 100644
+--- a/addons/dialogic/Editor/Images/preview_character.png.import
++++ b/addons/dialogic/Editor/Images/preview_character.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview_character.png-54f0625ad8281c635fea35a
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Editor/Images/preview_character_speaker.png.import b/addons/dialogic/Editor/Images/preview_character_speaker.png.import
+index 6f21e66..80a5a2f 100644
+--- a/addons/dialogic/Editor/Images/preview_character_speaker.png.import
++++ b/addons/dialogic/Editor/Images/preview_character_speaker.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview_character_speaker.png-c0667c648e2901a
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/Fonts/Roboto-Bold.ttf.import b/addons/dialogic/Example Assets/Fonts/Roboto-Bold.ttf.import
+index 9b84652..0a0d10a 100644
+--- a/addons/dialogic/Example Assets/Fonts/Roboto-Bold.ttf.import	
++++ b/addons/dialogic/Example Assets/Fonts/Roboto-Bold.ttf.import	
+@@ -21,6 +21,7 @@ msdf_pixel_range=8
+ msdf_size=48
+ allow_system_fallback=true
+ force_autohinter=false
++modulate_color_glyphs=false
+ hinting=1
+ subpixel_positioning=1
+ keep_rounding_remainders=true
+diff --git a/addons/dialogic/Example Assets/Fonts/Roboto-Italic.ttf.import b/addons/dialogic/Example Assets/Fonts/Roboto-Italic.ttf.import
+index a3ee330..df58996 100644
+--- a/addons/dialogic/Example Assets/Fonts/Roboto-Italic.ttf.import	
++++ b/addons/dialogic/Example Assets/Fonts/Roboto-Italic.ttf.import	
+@@ -21,6 +21,7 @@ msdf_pixel_range=8
+ msdf_size=48
+ allow_system_fallback=true
+ force_autohinter=false
++modulate_color_glyphs=false
+ hinting=1
+ subpixel_positioning=1
+ keep_rounding_remainders=true
+diff --git a/addons/dialogic/Example Assets/Fonts/Roboto-Regular.ttf.import b/addons/dialogic/Example Assets/Fonts/Roboto-Regular.ttf.import
+index 9ffb1b2..32bcf9f 100644
+--- a/addons/dialogic/Example Assets/Fonts/Roboto-Regular.ttf.import	
++++ b/addons/dialogic/Example Assets/Fonts/Roboto-Regular.ttf.import	
+@@ -21,6 +21,7 @@ msdf_pixel_range=8
+ msdf_size=48
+ allow_system_fallback=true
+ force_autohinter=false
++modulate_color_glyphs=false
+ hinting=1
+ subpixel_positioning=1
+ keep_rounding_remainders=true
+diff --git a/addons/dialogic/Example Assets/backgrounds/BubbleEnd.png.import b/addons/dialogic/Example Assets/backgrounds/BubbleEnd.png.import
+index 0e57598..993ad63 100644
+--- a/addons/dialogic/Example Assets/backgrounds/BubbleEnd.png.import	
++++ b/addons/dialogic/Example Assets/backgrounds/BubbleEnd.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/BubbleEnd.png-a2bd812e4aeb33a7c97291d41dcc179
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/backgrounds/rpg_box.webp.import b/addons/dialogic/Example Assets/backgrounds/rpg_box.webp.import
+index 3f5f239..49d713f 100644
+--- a/addons/dialogic/Example Assets/backgrounds/rpg_box.webp.import	
++++ b/addons/dialogic/Example Assets/backgrounds/rpg_box.webp.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/rpg_box.webp-6ea0804b52e01599dbc94ffacc31d433
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/next-indicator/next-indicator-dialogic-1.png.import b/addons/dialogic/Example Assets/next-indicator/next-indicator-dialogic-1.png.import
+index 90ac646..623e114 100644
+--- a/addons/dialogic/Example Assets/next-indicator/next-indicator-dialogic-1.png.import	
++++ b/addons/dialogic/Example Assets/next-indicator/next-indicator-dialogic-1.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/next-indicator-dialogic-1.png-694f122eff55e96
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/next-indicator/next-indicator.png.import b/addons/dialogic/Example Assets/next-indicator/next-indicator.png.import
+index fa458c5..626f916 100644
+--- a/addons/dialogic/Example Assets/next-indicator/next-indicator.png.import	
++++ b/addons/dialogic/Example Assets/next-indicator/next-indicator.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/next-indicator.png-e3b7b80d9da791a1d0a061a728
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 blink.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 blink.png.import
+index 4056cb2..4ea02cc 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 blink.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 blink.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 blink.png-dd40283850366d49ae61df7b137ffd7
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 doubt.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 doubt.png.import
+index bfd6ca9..0200ee0 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 doubt.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 doubt.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 doubt.png-c657bfaf88fd5c06956ec703146704c
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 hate.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 hate.png.import
+index 4ac4f9e..feaa43a 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 hate.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 hate.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 hate.png-004951da12b71d275d61f3fe7af6c760
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 plot.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 plot.png.import
+index cb22c00..dff98a8 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 plot.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 plot.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 plot.png-7c5bbb51327eb4b7b1b78f4597ed6c60
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 sad.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 sad.png.import
+index 8770dc6..42b345b 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 sad.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 sad.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 sad.png-778e9490c4f77059d6c87f720b2bbff7.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 scoff.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 scoff.png.import
+index 730a905..3a987f9 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 scoff.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 scoff.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 scoff.png-f0b3e5d0a8895f55d2377978a0992a3
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 shy.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 shy.png.import
+index dd69593..afa1345 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 shy.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 shy.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 shy.png-db66f14e608e1c150163af82c8a9f341.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5 surprise.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5 surprise.png.import
+index 273fa00..765add5 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5 surprise.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5 surprise.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5 surprise.png-9f07d67f3c68589bb2cfec738d68
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Antonio/pl5.png.import b/addons/dialogic/Example Assets/portraits/Antonio/pl5.png.import
+index 3dc08d1..87c96a6 100644
+--- a/addons/dialogic/Example Assets/portraits/Antonio/pl5.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Antonio/pl5.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl5.png-0e78d740b51df476d423c20a3850d39a.ctex
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 avoid.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 avoid.png.import
+index 5278433..ebc5542 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 avoid.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 avoid.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 avoid.png-f8f5fd2a91f270ef9417e3b4bda0f35
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 blink.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 blink.png.import
+index b70a67a..86e6bd9 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 blink.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 blink.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 blink.png-bc002e72d459c371c5ebb5d3d237500
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 concept.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 concept.png.import
+index 9236dd7..82e5a64 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 concept.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 concept.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 concept.png-baa2419b24f73cd7e47554567e865
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 confusion.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 confusion.png.import
+index 98bbb6e..2c034fe 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 confusion.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 confusion.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 confusion.png-447505e4db69107e418a56eb992
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 doubt.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 doubt.png.import
+index fa7850c..3a9c584 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 doubt.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 doubt.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 doubt.png-ad639761c380e37b578d46414772df7
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 happy.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 happy.png.import
+index 6959b10..8226488 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 happy.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 happy.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 happy.png-7a49313244ae7097b2150a258b29afb
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 plot.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 plot.png.import
+index f847ad4..86b99a1 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 plot.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 plot.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 plot.png-92e4eb96f6aac50f2afc301dcb1954fb
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 sad.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 sad.png.import
+index e383481..fbf041a 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 sad.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 sad.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 sad.png-4ce7b7a2f701590bc444115bab6e0c4e.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 shy.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 shy.png.import
+index cf74c11..05bedc2 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 shy.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 shy.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 shy.png-7dc343f1ee98343c9fe2c9cf93a8d574.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Jane/pl3 surprise.png.import b/addons/dialogic/Example Assets/portraits/Jane/pl3 surprise.png.import
+index 5c2d371..3020d9f 100644
+--- a/addons/dialogic/Example Assets/portraits/Jane/pl3 surprise.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Jane/pl3 surprise.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/pl3 surprise.png-92cfd8f7846a35eec2d62e62d532
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Portrait1.png.import b/addons/dialogic/Example Assets/portraits/Portrait1.png.import
+index 2598433..36ed802 100644
+--- a/addons/dialogic/Example Assets/portraits/Portrait1.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Portrait1.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/Portrait1.png-c609e542fb60d6627e07ca0a12ddd86
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Portrait2.png.import b/addons/dialogic/Example Assets/portraits/Portrait2.png.import
+index 205d8f0..ed1bb17 100644
+--- a/addons/dialogic/Example Assets/portraits/Portrait2.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Portrait2.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/Portrait2.png-c9d044982430f12029c2193cba14c11
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/anger.png.import b/addons/dialogic/Example Assets/portraits/Princess/anger.png.import
+index 17c4eaf..08035ff 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/anger.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/anger.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/anger.png-dbcae35ced97cd8763301ede55f7634a.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/frown.png.import b/addons/dialogic/Example Assets/portraits/Princess/frown.png.import
+index d753452..0a8acca 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/frown.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/frown.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/frown.png-2ea012492bc6286b36736d621adfd96a.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/joy.png.import b/addons/dialogic/Example Assets/portraits/Princess/joy.png.import
+index 2f45c81..0af674c 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/joy.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/joy.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/joy.png-a06db3f0763984942582106f69acd2ac.ctex
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/neutral.png.import b/addons/dialogic/Example Assets/portraits/Princess/neutral.png.import
+index 0c16fb4..6a26bbb 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/neutral.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/neutral.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/neutral.png-b67f36561d5798f6bdf0e487c71053f7.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/princess_blank.png.import b/addons/dialogic/Example Assets/portraits/Princess/princess_blank.png.import
+index e2be550..becf819 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/princess_blank.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/princess_blank.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/princess_blank.png-fb2f5b52f38dc68c3bb1b4bf7b
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/shock.png.import b/addons/dialogic/Example Assets/portraits/Princess/shock.png.import
+index 5a561b8..638febd 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/shock.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/shock.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/shock.png-8c83d26226ef9a4e882afabd3875355f.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/Princess/smile.png.import b/addons/dialogic/Example Assets/portraits/Princess/smile.png.import
+index b99f2dd..999cd31 100644
+--- a/addons/dialogic/Example Assets/portraits/Princess/smile.png.import	
++++ b/addons/dialogic/Example Assets/portraits/Princess/smile.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/smile.png-763f387a68c52e40326ccdf00129e290.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/rpg_portraits/base1.png.import b/addons/dialogic/Example Assets/portraits/rpg_portraits/base1.png.import
+index 6570c35..09aa8cc 100644
+--- a/addons/dialogic/Example Assets/portraits/rpg_portraits/base1.png.import	
++++ b/addons/dialogic/Example Assets/portraits/rpg_portraits/base1.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/base1.png-d5d7d1c85b1cab665dc0b54194bbd33b.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/rpg_portraits/base2.png.import b/addons/dialogic/Example Assets/portraits/rpg_portraits/base2.png.import
+index 0d2af42..72f8317 100644
+--- a/addons/dialogic/Example Assets/portraits/rpg_portraits/base2.png.import	
++++ b/addons/dialogic/Example Assets/portraits/rpg_portraits/base2.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/base2.png-4cf3c53a4d499097fe6532e4b778d0b3.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/rpg_portraits/base3.png.import b/addons/dialogic/Example Assets/portraits/rpg_portraits/base3.png.import
+index e867c50..5734fba 100644
+--- a/addons/dialogic/Example Assets/portraits/rpg_portraits/base3.png.import	
++++ b/addons/dialogic/Example Assets/portraits/rpg_portraits/base3.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/base3.png-65e60d03716a9b546a46a38772fc2ace.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Example Assets/portraits/rpg_portraits/base4.png.import b/addons/dialogic/Example Assets/portraits/rpg_portraits/base4.png.import
+index a62c662..3076cf3 100644
+--- a/addons/dialogic/Example Assets/portraits/rpg_portraits/base4.png.import	
++++ b/addons/dialogic/Example Assets/portraits/rpg_portraits/base4.png.import	
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/base4.png-ea3084656f4403d3ff87bdd890f73843.ct
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Audio/icon_music.png.import b/addons/dialogic/Modules/Audio/icon_music.png.import
+index 093a008..13d5a06 100644
+--- a/addons/dialogic/Modules/Audio/icon_music.png.import
++++ b/addons/dialogic/Modules/Audio/icon_music.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_music.png-ffc971ba1265164a55f745186974be
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Audio/icon_sound.png.import b/addons/dialogic/Modules/Audio/icon_sound.png.import
+index 3e35ee6..171732d 100644
+--- a/addons/dialogic/Modules/Audio/icon_sound.png.import
++++ b/addons/dialogic/Modules/Audio/icon_sound.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_sound.png-7a1a8a5533773d97969b6311b6a913
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Background/icon.png.import b/addons/dialogic/Modules/Background/icon.png.import
+index a601e47..cae88f7 100644
+--- a/addons/dialogic/Modules/Background/icon.png.import
++++ b/addons/dialogic/Modules/Background/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-cab4c78f59b171335e340ba590cf5991.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Call/icon.png.import b/addons/dialogic/Modules/Call/icon.png.import
+index 425b7b4..430260f 100644
+--- a/addons/dialogic/Modules/Call/icon.png.import
++++ b/addons/dialogic/Modules/Call/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-12e444f0ed59397c7537943ea85b475c.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/custom_portrait_thumbnail.png.import b/addons/dialogic/Modules/Character/custom_portrait_thumbnail.png.import
+index c570321..bdad57f 100644
+--- a/addons/dialogic/Modules/Character/custom_portrait_thumbnail.png.import
++++ b/addons/dialogic/Modules/Character/custom_portrait_thumbnail.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/custom_portrait_thumbnail.png-0513583853d8734
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/default_portrait_thumbnail.png.import b/addons/dialogic/Modules/Character/default_portrait_thumbnail.png.import
+index 5ecc041..5355a94 100644
+--- a/addons/dialogic/Modules/Character/default_portrait_thumbnail.png.import
++++ b/addons/dialogic/Modules/Character/default_portrait_thumbnail.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/default_portrait_thumbnail.png-f9f92adb946f40
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/icon.svg.import b/addons/dialogic/Modules/Character/icon.svg.import
+index 1c98575..4dd47d3 100644
+--- a/addons/dialogic/Modules/Character/icon.svg.import
++++ b/addons/dialogic/Modules/Character/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-4f340f6efbb83004dbd5c761dd1dc448.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/icon_position.png.import b/addons/dialogic/Modules/Character/icon_position.png.import
+index 120f0f4..8ce8e2a 100644
+--- a/addons/dialogic/Modules/Character/icon_position.png.import
++++ b/addons/dialogic/Modules/Character/icon_position.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_position.png-221b7c348ec45b22fd4df49fdb9
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/portrait_position.svg.import b/addons/dialogic/Modules/Character/portrait_position.svg.import
+index 763036a..aada16b 100644
+--- a/addons/dialogic/Modules/Character/portrait_position.svg.import
++++ b/addons/dialogic/Modules/Character/portrait_position.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/portrait_position.svg-f025767e40032b9ebdeab1f
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/simple_image_portrait_thumbnail.png.import b/addons/dialogic/Modules/Character/simple_image_portrait_thumbnail.png.import
+index d049ed0..d56dac5 100644
+--- a/addons/dialogic/Modules/Character/simple_image_portrait_thumbnail.png.import
++++ b/addons/dialogic/Modules/Character/simple_image_portrait_thumbnail.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/simple_image_portrait_thumbnail.png-3d6c6de81
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/update_mirror.svg.import b/addons/dialogic/Modules/Character/update_mirror.svg.import
+index 74a5f39..d2aad72 100644
+--- a/addons/dialogic/Modules/Character/update_mirror.svg.import
++++ b/addons/dialogic/Modules/Character/update_mirror.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/update_mirror.svg-d6fa4832a7758cad02a7f322824
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/update_portrait.svg.import b/addons/dialogic/Modules/Character/update_portrait.svg.import
+index 9ceb2ab..b6a73d2 100644
+--- a/addons/dialogic/Modules/Character/update_portrait.svg.import
++++ b/addons/dialogic/Modules/Character/update_portrait.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/update_portrait.svg-b90fa6163d3720d34df8578ce
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/update_position.svg.2023_09_23_08_37_47.0.svg.import b/addons/dialogic/Modules/Character/update_position.svg.2023_09_23_08_37_47.0.svg.import
+index 1496c17..537be0c 100644
+--- a/addons/dialogic/Modules/Character/update_position.svg.2023_09_23_08_37_47.0.svg.import
++++ b/addons/dialogic/Modules/Character/update_position.svg.2023_09_23_08_37_47.0.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/update_position.svg.2023_09_23_08_37_47.0.svg
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/update_position.svg.import b/addons/dialogic/Modules/Character/update_position.svg.import
+index 0d90b2f..0c98cc7 100644
+--- a/addons/dialogic/Modules/Character/update_position.svg.import
++++ b/addons/dialogic/Modules/Character/update_position.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/update_position.svg-4be50608dc0768e715ff659ca
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Character/update_z_index.svg.import b/addons/dialogic/Modules/Character/update_z_index.svg.import
+index 706b609..0b25a61 100644
+--- a/addons/dialogic/Modules/Character/update_z_index.svg.import
++++ b/addons/dialogic/Modules/Character/update_z_index.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/update_z_index.svg-204064db9241de79bf8dfd23af
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Choice/icon.svg.import b/addons/dialogic/Modules/Choice/icon.svg.import
+index 2198f10..6a28924 100644
+--- a/addons/dialogic/Modules/Choice/icon.svg.import
++++ b/addons/dialogic/Modules/Choice/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-372a9bfce8bea67fff1988d7acf09a9a.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/clear_background.svg.import b/addons/dialogic/Modules/Clear/clear_background.svg.import
+index fc09019..67f5a98 100644
+--- a/addons/dialogic/Modules/Clear/clear_background.svg.import
++++ b/addons/dialogic/Modules/Clear/clear_background.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/clear_background.svg-32f657ae646e5867a8ceb054
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/clear_characters.svg.import b/addons/dialogic/Modules/Clear/clear_characters.svg.import
+index bd18d6c..23cfa81 100644
+--- a/addons/dialogic/Modules/Clear/clear_characters.svg.import
++++ b/addons/dialogic/Modules/Clear/clear_characters.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/clear_characters.svg-58481eec0869d46b2d90f210
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/clear_music.svg.import b/addons/dialogic/Modules/Clear/clear_music.svg.import
+index bbf00a8..043a2da 100644
+--- a/addons/dialogic/Modules/Clear/clear_music.svg.import
++++ b/addons/dialogic/Modules/Clear/clear_music.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/clear_music.svg-ab19a5f3dc85de8ba17b7c720b838
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/clear_positions.svg.import b/addons/dialogic/Modules/Clear/clear_positions.svg.import
+index d779f5e..a01717d 100644
+--- a/addons/dialogic/Modules/Clear/clear_positions.svg.import
++++ b/addons/dialogic/Modules/Clear/clear_positions.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/clear_positions.svg-9c6ef9c2e28a63b87a3c7d0ed
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/clear_style.svg.import b/addons/dialogic/Modules/Clear/clear_style.svg.import
+index 7ae2d62..d1f6c7e 100644
+--- a/addons/dialogic/Modules/Clear/clear_style.svg.import
++++ b/addons/dialogic/Modules/Clear/clear_style.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/clear_style.svg-ab3288e6e47f45c4e12ce1862403a
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/clear_textbox.svg.import b/addons/dialogic/Modules/Clear/clear_textbox.svg.import
+index d5ecd58..e658a4f 100644
+--- a/addons/dialogic/Modules/Clear/clear_textbox.svg.import
++++ b/addons/dialogic/Modules/Clear/clear_textbox.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/clear_textbox.svg-04935e3d82350d24a197adcb47d
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Clear/icon.png.import b/addons/dialogic/Modules/Clear/icon.png.import
+index 5db2c8f..eebcb46 100644
+--- a/addons/dialogic/Modules/Clear/icon.png.import
++++ b/addons/dialogic/Modules/Clear/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-b4986c88bf1e20891dc480c8f4703ca4.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Comment/icon.png.import b/addons/dialogic/Modules/Comment/icon.png.import
+index 42e8340..8fc2a38 100644
+--- a/addons/dialogic/Modules/Comment/icon.png.import
++++ b/addons/dialogic/Modules/Comment/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-fab76b8a5886dac0012cf73c317dbee4.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Condition/icon.svg.import b/addons/dialogic/Modules/Condition/icon.svg.import
+index 1e6a663..d792f29 100644
+--- a/addons/dialogic/Modules/Condition/icon.svg.import
++++ b/addons/dialogic/Modules/Condition/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-502d45c064cc30f576b7b105a01357ce.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Core/icon.png.import b/addons/dialogic/Modules/Core/icon.png.import
+index cd8e9ef..3e4e832 100644
+--- a/addons/dialogic/Modules/Core/icon.png.import
++++ b/addons/dialogic/Modules/Core/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-6a95c038153eac5ac32780e8a0c1529b.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/background_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/background_layer_icon.svg.import
+index ca6283c..0897452 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/background_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/background_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/background_layer_icon.svg-021cd7ab7c646ee621f
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/preview.png.import
+index b70b2e2..025759d 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_FullBackground/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-4e6ca7ca01626d69870923f306b0d377.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/popup_glossary_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/popup_glossary_layer_icon.svg.import
+index ff8f9ba..3c17af6 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/popup_glossary_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/popup_glossary_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/popup_glossary_layer_icon.svg-4af96bdb70714a5
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/preview.png.import
+index c398ff2..06b40ed 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Glossary/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-573567ffd6162e40c78fe5aca0af73c9.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/history_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/history_icon.svg.import
+index a4abdc6..a1619ef 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/history_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/history_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/history_icon.svg-0be9d23e65368ea3983968e4ce0e
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/preview.png.import
+index b259c64..936047e 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_History/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-b328f7e30aebed2adb4720cdbf791362.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/input_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/input_layer_icon.svg.import
+index 9cbbbdf..0dfa079 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/input_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/input_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/input_layer_icon.svg-3f439e08e8c66cbf3522ce60
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/preview.png.import
+index 4959e78..b404155 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Input/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-c20c74f5253522c0ea9ec9a21fcd804d.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/preview.png.import
+index 8359f89..cec9777 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-dcc8befd9aebdd8b4c988971a734c72f.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/speaker-textbox-icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/speaker-textbox-icon.svg.import
+index b8126d4..ea16b0c 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/speaker-textbox-icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_SpeakerPortraitTextbox/speaker-textbox-icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/speaker-textbox-icon.svg-e67964032c31cfdc4bf5
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/preview.png.import
+index f2ce80d..a0587e5 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-bcceb5d2b7f92c1d0f818071294dc895.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/text_input_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/text_input_layer_icon.svg.import
+index de3367b..181a884 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/text_input_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_TextInput/text_input_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/text_input_layer_icon.svg-5a1e8bca317bf45f680
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/preview.png.import
+index ddcf471..086ab46 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-136e526350ab989f1e1d2ba13d756aaa.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/text_bubble_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/text_bubble_layer_icon.svg.import
+index e9cd223..d98f682 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/text_bubble_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_Textbubble/text_bubble_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/text_bubble_layer_icon.svg-d46d5806bbf83c1dc5
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/choices_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/choices_layer_icon.svg.import
+index 00b7c3a..f382b1e 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/choices_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/choices_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/choices_layer_icon.svg-2f676308da08dddba733cb
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/preview.png.import
+index d521996..7242d06 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Choices/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-ae89c99370d002f2ecf00af8e270d88c.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/portrait_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/portrait_layer_icon.svg.import
+index f8ad81b..11a0b4f 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/portrait_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/portrait_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/portrait_layer_icon.svg-4bc8b0ebd4dd0977a12c0
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/preview.png.import
+index 9ff3218..98f6f42 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Portraits/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-8a6dae1a8e205382d354326ea6961ed2.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/next.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/next.svg.import
+index 968d066..7a3fef1 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/next.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/next.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/next.svg-689f85597f487815b8ddefa23d22bf6f.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/preview.png.import
+index ef3d09b..0a3961e 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-38205c265cdc5033fdb5a79a6f5d3394.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/textbox_layer_icon.svg.import b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/textbox_layer_icon.svg.import
+index 848fbe0..fdd52d2 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/textbox_layer_icon.svg.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Layer_VN_Textbox/textbox_layer_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/textbox_layer_icon.svg-d6678fedd53dcb59cc32e1
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Style_SpeakerTextbox/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Style_SpeakerTextbox/preview.png.import
+index b5b5a73..55f22e4 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Style_SpeakerTextbox/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Style_SpeakerTextbox/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-fffb64b5a80dfa536274e4a967369cfc.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Style_TextBubbles/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Style_TextBubbles/preview.png.import
+index 7490a73..2987c2b 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Style_TextBubbles/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Style_TextBubbles/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-566f98d1e24a8b079521a4925ee523c7.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/DefaultLayoutParts/Style_VN_Default/preview.png.import b/addons/dialogic/Modules/DefaultLayoutParts/Style_VN_Default/preview.png.import
+index f7d5a65..d484e25 100644
+--- a/addons/dialogic/Modules/DefaultLayoutParts/Style_VN_Default/preview.png.import
++++ b/addons/dialogic/Modules/DefaultLayoutParts/Style_VN_Default/preview.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/preview.png-d02c673e03782a715fbd3fbe644d96d1.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/End/icon.png.import b/addons/dialogic/Modules/End/icon.png.import
+index 650020d..28b17a0 100644
+--- a/addons/dialogic/Modules/End/icon.png.import
++++ b/addons/dialogic/Modules/End/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-8e345f81e023043fdbb4f75b1b0e9bb0.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Glossary/add-glossary.svg.import b/addons/dialogic/Modules/Glossary/add-glossary.svg.import
+index 901b932..7499bce 100644
+--- a/addons/dialogic/Modules/Glossary/add-glossary.svg.import
++++ b/addons/dialogic/Modules/Glossary/add-glossary.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/add-glossary.svg-1cde77c043d3874d9bc84cc14d0e
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Glossary/icon.svg.import b/addons/dialogic/Modules/Glossary/icon.svg.import
+index 288e61f..3fcaaf9 100644
+--- a/addons/dialogic/Modules/Glossary/icon.svg.import
++++ b/addons/dialogic/Modules/Glossary/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-4fc0c12c53379638e37d654e7bbaea1a.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/HighlightPortrait/highlight_portrait_thumbnail.png.import b/addons/dialogic/Modules/HighlightPortrait/highlight_portrait_thumbnail.png.import
+index 5efd4a7..1c112db 100644
+--- a/addons/dialogic/Modules/HighlightPortrait/highlight_portrait_thumbnail.png.import
++++ b/addons/dialogic/Modules/HighlightPortrait/highlight_portrait_thumbnail.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/highlight_portrait_thumbnail.png-6fa128edf7f6
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/History/definition.svg.import b/addons/dialogic/Modules/History/definition.svg.import
+index 29dbf39..93c651a 100644
+--- a/addons/dialogic/Modules/History/definition.svg.import
++++ b/addons/dialogic/Modules/History/definition.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/definition.svg-dbaabe55d84e4ad95047a50fc6c138
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/History/icon.svg.import b/addons/dialogic/Modules/History/icon.svg.import
+index 4362cc9..e1faac1 100644
+--- a/addons/dialogic/Modules/History/icon.svg.import
++++ b/addons/dialogic/Modules/History/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-82841efe3f86e947d4f66fd24dc8f52c.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Jump/icon_jump.png.import b/addons/dialogic/Modules/Jump/icon_jump.png.import
+index 762a4e7..1bb7522 100644
+--- a/addons/dialogic/Modules/Jump/icon_jump.png.import
++++ b/addons/dialogic/Modules/Jump/icon_jump.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_jump.png-50f6cdd715fcbdbed16b43c5beb6b85
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Jump/icon_label.png.import b/addons/dialogic/Modules/Jump/icon_label.png.import
+index 005f3d3..781da37 100644
+--- a/addons/dialogic/Modules/Jump/icon_label.png.import
++++ b/addons/dialogic/Modules/Jump/icon_label.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_label.png-3923bd1131990c8869923c838ffdb9
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Jump/icon_return.svg.import b/addons/dialogic/Modules/Jump/icon_return.svg.import
+index dada652..2054c71 100644
+--- a/addons/dialogic/Modules/Jump/icon_return.svg.import
++++ b/addons/dialogic/Modules/Jump/icon_return.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon_return.svg-dc7fb704ff391638f73cbbc2b30b3
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/LayeredPortrait/layered_portrait_thumbnail.png.import b/addons/dialogic/Modules/LayeredPortrait/layered_portrait_thumbnail.png.import
+index 6b85071..004eee0 100644
+--- a/addons/dialogic/Modules/LayeredPortrait/layered_portrait_thumbnail.png.import
++++ b/addons/dialogic/Modules/LayeredPortrait/layered_portrait_thumbnail.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/layered_portrait_thumbnail.png-107af8817a839c
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Save/icon.svg.import b/addons/dialogic/Modules/Save/icon.svg.import
+index 793c259..be08a82 100644
+--- a/addons/dialogic/Modules/Save/icon.svg.import
++++ b/addons/dialogic/Modules/Save/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-aad0408eebe298e9d92c76d6f2c79cf6.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Settings/icon.svg.import b/addons/dialogic/Modules/Settings/icon.svg.import
+index 95e00d4..526c739 100644
+--- a/addons/dialogic/Modules/Settings/icon.svg.import
++++ b/addons/dialogic/Modules/Settings/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-d4407cb145fa5c1d965de3d2bd63ce5f.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Signal/icon.png.import b/addons/dialogic/Modules/Signal/icon.png.import
+index a32d463..56ae09e 100644
+--- a/addons/dialogic/Modules/Signal/icon.png.import
++++ b/addons/dialogic/Modules/Signal/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-5e2e422904d471016252dff8d4bdfa96.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Style/icon.png.import b/addons/dialogic/Modules/Style/icon.png.import
+index 046ac48..6a4e037 100644
+--- a/addons/dialogic/Modules/Style/icon.png.import
++++ b/addons/dialogic/Modules/Style/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-ee52cc92a2b11ac2a101ff92d2eaaa7c.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/StyleEditor/styles_icon.svg.import b/addons/dialogic/Modules/StyleEditor/styles_icon.svg.import
+index 97e9a65..75343df 100644
+--- a/addons/dialogic/Modules/StyleEditor/styles_icon.svg.import
++++ b/addons/dialogic/Modules/StyleEditor/styles_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/styles_icon.svg-c55f9f7d15c3512c8b20dbf30eed7
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Text/icon.svg.import b/addons/dialogic/Modules/Text/icon.svg.import
+index 2fc77a9..e5ae13d 100644
+--- a/addons/dialogic/Modules/Text/icon.svg.import
++++ b/addons/dialogic/Modules/Text/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-e2501ddcdef01c7f2c3538940f5abfc1.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Text/node_dialog_text_icon.svg.import b/addons/dialogic/Modules/Text/node_dialog_text_icon.svg.import
+index 7e9d833..0ca0d81 100644
+--- a/addons/dialogic/Modules/Text/node_dialog_text_icon.svg.import
++++ b/addons/dialogic/Modules/Text/node_dialog_text_icon.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/node_dialog_text_icon.svg-3cf845e99d76137d815
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Text/node_name_label_icon.svg.import b/addons/dialogic/Modules/Text/node_name_label_icon.svg.import
+index f8c7d3d..d1d8625 100644
+--- a/addons/dialogic/Modules/Text/node_name_label_icon.svg.import
++++ b/addons/dialogic/Modules/Text/node_name_label_icon.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/node_name_label_icon.svg-d482939b74b41ec2da6e
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Text/node_next_indicator_icon.svg.import b/addons/dialogic/Modules/Text/node_next_indicator_icon.svg.import
+index 6c70ba2..fd5e629 100644
+--- a/addons/dialogic/Modules/Text/node_next_indicator_icon.svg.import
++++ b/addons/dialogic/Modules/Text/node_next_indicator_icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/node_next_indicator_icon.svg-06167a3b3e290941
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/TextInput/icon.png.import b/addons/dialogic/Modules/TextInput/icon.png.import
+index 7ce1e39..502f286 100644
+--- a/addons/dialogic/Modules/TextInput/icon.png.import
++++ b/addons/dialogic/Modules/TextInput/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-aea103d18fdc694e2da87b3c5a56be35.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Variable/add-variable.svg.import b/addons/dialogic/Modules/Variable/add-variable.svg.import
+index e12513c..f2803ba 100644
+--- a/addons/dialogic/Modules/Variable/add-variable.svg.import
++++ b/addons/dialogic/Modules/Variable/add-variable.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/add-variable.svg-26eb3bd7fac746c574d054e8416d
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Variable/icon.png.import b/addons/dialogic/Modules/Variable/icon.png.import
+index 5abb1c3..09d1289 100644
+--- a/addons/dialogic/Modules/Variable/icon.png.import
++++ b/addons/dialogic/Modules/Variable/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-99064bb3920f49262c581fccbfcfc353.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Variable/variable.svg.import b/addons/dialogic/Modules/Variable/variable.svg.import
+index f42c4cd..d29ffec 100644
+--- a/addons/dialogic/Modules/Variable/variable.svg.import
++++ b/addons/dialogic/Modules/Variable/variable.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/variable.svg-52aeb47fe1705a3f04d919f8dcd5d319
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Voice/icon.png.import b/addons/dialogic/Modules/Voice/icon.png.import
+index dd1c6ea..fffc3ee 100644
+--- a/addons/dialogic/Modules/Voice/icon.png.import
++++ b/addons/dialogic/Modules/Voice/icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.png-85989da147a1404ecd08c88eac72cda1.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/Wait/icon.svg.import b/addons/dialogic/Modules/Wait/icon.svg.import
+index f2e9bef..00ecb27 100644
+--- a/addons/dialogic/Modules/Wait/icon.svg.import
++++ b/addons/dialogic/Modules/Wait/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-7e9f52b17ae6e5e1f284e12048cb8f05.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/addons/dialogic/Modules/WaitInput/icon.svg.import b/addons/dialogic/Modules/WaitInput/icon.svg.import
+index ec7d372..0cc182d 100644
+--- a/addons/dialogic/Modules/WaitInput/icon.svg.import
++++ b/addons/dialogic/Modules/WaitInput/icon.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/icon.svg-cb8e50b081a310c64183b12c6d12fcf2.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/editor/icons/Contact.svg.import b/assets/editor/icons/Contact.svg.import
+index 390ae3d..8884674 100644
+--- a/assets/editor/icons/Contact.svg.import
++++ b/assets/editor/icons/Contact.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/Contact.svg-e52d7239f5cdd031ceb85473942bb9d5.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/editor/icons/Cutscene.svg.import b/assets/editor/icons/Cutscene.svg.import
+index 20e735b..d7a6186 100644
+--- a/assets/editor/icons/Cutscene.svg.import
++++ b/assets/editor/icons/Cutscene.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/Cutscene.svg-3963c8d0e788b7a54eb4060733026cde
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/editor/icons/Gamepiece.svg.import b/assets/editor/icons/Gamepiece.svg.import
+index 200ae97..8aeaea5 100644
+--- a/assets/editor/icons/Gamepiece.svg.import
++++ b/assets/editor/icons/Gamepiece.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/Gamepiece.svg-ab80ccbe6fac33845a9728bc0c94bf5
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/editor/icons/GamepieceAnimation.svg.import b/assets/editor/icons/GamepieceAnimation.svg.import
+index 5c4474d..649255f 100644
+--- a/assets/editor/icons/GamepieceAnimation.svg.import
++++ b/assets/editor/icons/GamepieceAnimation.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/GamepieceAnimation.svg-17679565d019f272f1aa98
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/editor/icons/IconGamepieceController.svg.import b/assets/editor/icons/IconGamepieceController.svg.import
+index 6c10ff4..47475ed 100644
+--- a/assets/editor/icons/IconGamepieceController.svg.import
++++ b/assets/editor/icons/IconGamepieceController.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/IconGamepieceController.svg-a36f8180947a39f37
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/editor/icons/Interaction.svg.import b/assets/editor/icons/Interaction.svg.import
+index bbfa073..f00975b 100644
+--- a/assets/editor/icons/Interaction.svg.import
++++ b/assets/editor/icons/Interaction.svg.import
+@@ -19,6 +19,8 @@ dest_files=["res://.godot/imported/Interaction.svg-89c1ea24da1e5efa77719b68a9bcf
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -26,6 +28,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/gui/combat/turn_bar_bg.png.import b/assets/gui/combat/turn_bar_bg.png.import
+index fe1740c..16b8d70 100644
+--- a/assets/gui/combat/turn_bar_bg.png.import
++++ b/assets/gui/combat/turn_bar_bg.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/turn_bar_bg.png-17ae3bec4bbbd0260810ed6571e13
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/gui/emotes/emote__.png.import b/assets/gui/emotes/emote__.png.import
+index 00a94d5..8de27c4 100644
+--- a/assets/gui/emotes/emote__.png.import
++++ b/assets/gui/emotes/emote__.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/emote__.png-81bb84473a338b622ad97daf0172b897.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/gui/emotes/emote_combat.png.import b/assets/gui/emotes/emote_combat.png.import
+index 904e085..ce93536 100644
+--- a/assets/gui/emotes/emote_combat.png.import
++++ b/assets/gui/emotes/emote_combat.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/emote_combat.png-a6eedb2e63af4d03438055536a74
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/gui/emotes/emote_exclamations.png.import b/assets/gui/emotes/emote_exclamations.png.import
+index a3c87ed..36f681f 100644
+--- a/assets/gui/emotes/emote_exclamations.png.import
++++ b/assets/gui/emotes/emote_exclamations.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/emote_exclamations.png-b471705a4dc0dd54fc6bf1
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/gui/emotes/emote_question.png.import b/assets/gui/emotes/emote_question.png.import
+index ade05a9..d84ea40 100644
+--- a/assets/gui/emotes/emote_question.png.import
++++ b/assets/gui/emotes/emote_question.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/emote_question.png-f8aa5ca3a92e9eb5eaa1f0e7a2
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/assets/gui/font/Kenney Pixel.ttf.import b/assets/gui/font/Kenney Pixel.ttf.import
+index 98764ef..34532ea 100644
+--- a/assets/gui/font/Kenney Pixel.ttf.import	
++++ b/assets/gui/font/Kenney Pixel.ttf.import	
+@@ -21,6 +21,7 @@ msdf_pixel_range=8
+ msdf_size=48
+ allow_system_fallback=true
+ force_autohinter=false
++modulate_color_glyphs=false
+ hinting=1
+ subpixel_positioning=1
+ keep_rounding_remainders=true
+diff --git a/assets/gui/font/SourceCodePro-Bold.ttf.import b/assets/gui/font/SourceCodePro-Bold.ttf.import
+index b87e9ed..ef8847f 100644
+--- a/assets/gui/font/SourceCodePro-Bold.ttf.import
++++ b/assets/gui/font/SourceCodePro-Bold.ttf.import
+@@ -21,6 +21,7 @@ msdf_pixel_range=8
+ msdf_size=48
+ allow_system_fallback=true
+ force_autohinter=false
++modulate_color_glyphs=false
+ hinting=1
+ subpixel_positioning=1
+ keep_rounding_remainders=true
+diff --git a/assets/gui/icons/app_icon.png.import b/assets/gui/icons/app_icon.png.import
+index 6edd141..aa0875c 100644
+--- a/assets/gui/icons/app_icon.png.import
++++ b/assets/gui/icons/app_icon.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/app_icon.png-a4c487d2f3408a76cf282722bfec21e3
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/arenas/steppes.png.import b/combat/arenas/steppes.png.import
+index 4ab23cb..0308669 100644
+--- a/combat/arenas/steppes.png.import
++++ b/combat/arenas/steppes.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/steppes.png-f6191cbc6b9ecb70124594dd367bfb90.
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/bear/bear.png.import b/combat/battlers/bear/bear.png.import
+index 2bc35ed..12f1e11 100644
+--- a/combat/battlers/bear/bear.png.import
++++ b/combat/battlers/bear/bear.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/bear.png-915fb881d65bd45e02e117cf8f2d101c.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/bear/icon_punch.svg.import b/combat/battlers/bear/icon_punch.svg.import
+index b969372..d55f1ea 100644
+--- a/combat/battlers/bear/icon_punch.svg.import
++++ b/combat/battlers/bear/icon_punch.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_punch.svg-6d2300056c12971c2b6ce8af11c11b
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/bear/icon_raise.svg.import b/combat/battlers/bear/icon_raise.svg.import
+index 41511c6..dbd4e66 100644
+--- a/combat/battlers/bear/icon_raise.svg.import
++++ b/combat/battlers/bear/icon_raise.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_raise.svg-283e1597326be7ec66d64acdc699bf
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/bugcat/bugcat.png.import b/combat/battlers/bugcat/bugcat.png.import
+index 13822c7..8ebfafa 100644
+--- a/combat/battlers/bugcat/bugcat.png.import
++++ b/combat/battlers/bugcat/bugcat.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/bugcat.png-f145a36c3b8b7a310a8c450ee1ee985b.c
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/squirrel/icon_arrows.svg.import b/combat/battlers/squirrel/icon_arrows.svg.import
+index 941554d..c4252aa 100644
+--- a/combat/battlers/squirrel/icon_arrows.svg.import
++++ b/combat/battlers/squirrel/icon_arrows.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_arrows.svg-93f11bfc028871112e9f653cbdf9e
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/squirrel/icon_first_aid.svg.import b/combat/battlers/squirrel/icon_first_aid.svg.import
+index b0285a1..68aa857 100644
+--- a/combat/battlers/squirrel/icon_first_aid.svg.import
++++ b/combat/battlers/squirrel/icon_first_aid.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon_first_aid.svg-d0a85ff7422b7c9ce7bc050e8b
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/squirrel/squirrel.png.import b/combat/battlers/squirrel/squirrel.png.import
+index bf775c1..50ddff8 100644
+--- a/combat/battlers/squirrel/squirrel.png.import
++++ b/combat/battlers/squirrel/squirrel.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/squirrel.png-40b82afcd6713b60ce238e7a0780293f
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/combat/battlers/wolf/wolf.png.import b/combat/battlers/wolf/wolf.png.import
+index 42e98be..287db96 100644
+--- a/combat/battlers/wolf/wolf.png.import
++++ b/combat/battlers/wolf/wolf.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/wolf.png-cc03016b83a6ef6d5230118d9606f3f6.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/icon.svg.import b/icon.svg.import
+index 08ac71f..54756d5 100644
+--- a/icon.svg.import
++++ b/icon.svg.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.cte
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/overworld/characters/character_generic.png.import b/overworld/characters/character_generic.png.import
+index b892a6c..76579e3 100644
+--- a/overworld/characters/character_generic.png.import
++++ b/overworld/characters/character_generic.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/character_generic.png-4e0f13544e17c0aa3eb7b02
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/overworld/characters/gobot_field.png.import b/overworld/characters/gobot_field.png.import
+index d13f8a5..b72d3c3 100644
+--- a/overworld/characters/gobot_field.png.import
++++ b/overworld/characters/gobot_field.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/gobot_field.png-501c279b4cdefbcc435594745ac2b
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/overworld/maps/tilesets/dungeon_tilemap.png.import b/overworld/maps/tilesets/dungeon_tilemap.png.import
+index 5938926..a314baa 100644
+--- a/overworld/maps/tilesets/dungeon_tilemap.png.import
++++ b/overworld/maps/tilesets/dungeon_tilemap.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/dungeon_tilemap.png-9b7198d6aaaebcce120db5678
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/overworld/maps/tilesets/town_tilemap.png.import b/overworld/maps/tilesets/town_tilemap.png.import
+index db8f393..d9daebd 100644
+--- a/overworld/maps/tilesets/town_tilemap.png.import
++++ b/overworld/maps/tilesets/town_tilemap.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/town_tilemap.png-4b70887ab77bf7f5afd671c31fe0
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/battlers/battler.gd b/src/combat/battlers/battler.gd
+index df8d0e9..f94e995 100644
+--- a/src/combat/battlers/battler.gd
++++ b/src/combat/battlers/battler.gd
+@@ -27,6 +27,9 @@ signal ready_to_act
+ ## player-controlled battlers.
+ signal selection_toggled(value: bool)
+ 
++## The name of the node group that will contain all combat Battlers.
++const GROUP: = "_COMBAT_BATTLER_GROUP"
++
+ ## A Battler must have [BattlerStats] to act and receive actions.
+ @export var stats: BattlerStats = null
+ ## Each action's data stored in this array represents an action the battler can perform.
+@@ -88,6 +91,23 @@ signal selection_toggled(value: bool)
+ 				ai = new_instance
+ 				add_child(ai)
+ 
++## The [Actor] object that will determine the Battler's combat behavior. A Battler without an Actor
++## is just a dummy object that will not take turns or perform actions.
++@export var actor_scene: PackedScene:
++	set(value):
++		if value == actor_scene:
++			return
++		
++		actor_scene = value
++		
++		if not is_inside_tree():
++			await ready
++		
++		if actor:
++			actor.queue_free()
++			actor = null
++
++#TODO: Battler.is_player is redundant. Use that defined by Actor instead.
+ ## Player battlers are controlled by the player.
+ @export var is_player: = false:
+ 	set(value):
+@@ -96,12 +116,17 @@ signal selection_toggled(value: bool)
+ 			var facing: = BattlerAnim.Direction.LEFT if is_player else BattlerAnim.Direction.RIGHT
+ 			anim.direction = facing
+ 
++## Reference to the Battler's child [Actor], which controls it's combat behaviour.
++## Note that this value is assigned automatically with reference to [member actor_scene].
++var actor: Actor = null
++
+ ## Reference to this Battler's child [CombatAI] node, if applicable.
+ var ai: CombatAI = null
+ 
+ ## Reference to this Battler's child [BattlerAnim] node.
+ var anim: BattlerAnim = null
+ 
++# TODO: this property belongs with the Actor.
+ ## If `false`, the battler will not be able to act.
+ var is_active: bool = true:
+ 	set(value):
+@@ -150,7 +175,9 @@ func _ready() -> void:
+ 	
+ 	else:
+ 		assert(stats, "Battler %s does not have stats assigned!" % name)
+-
++		
++		add_to_group(GROUP)
++		
+ 		# Resources are NOT unique, so treat the currently assigned BattlerStats as a prototype.
+ 		# That is, copy what it is now and use the copy, so that the original remains unaltered.
+ 		stats = stats.duplicate()
+diff --git a/src/combat/combat.gd b/src/combat/combat.gd
+index 515c151..2920fef 100644
+--- a/src/combat/combat.gd
++++ b/src/combat/combat.gd
+@@ -22,8 +22,8 @@ func _ready() -> void:
+ 	FieldEvents.combat_triggered.connect(start)
+ 
+ 
+-## Begin a combat. Takes a PackedScene as its only parameter, expecting it to be a CombatState object once
+-## instantiated.
++## Begin a combat. Takes a PackedScene as its only parameter, expecting it to be a CombatState 
++## object once instantiated.
+ ## This is normally a response to [signal FieldEvents.combat_triggered].
+ func start(arena: PackedScene) -> void:
+ 	assert(_active_arena == null, "Attempting to start a combat while one is ongoing!")
+diff --git a/src/combat/combat_arena.tscn b/src/combat/combat_arena.tscn
+index fd15149..f543b0b 100644
+--- a/src/combat/combat_arena.tscn
++++ b/src/combat/combat_arena.tscn
+@@ -124,7 +124,6 @@ grow_vertical = 0
+ theme_override_constants/margin_bottom = 32
+ 
+ [node name="ActionMenuAnchor" type="Control" parent="UI/PlayerMenus"]
+-layout_mode = 2
+ anchors_preset = 0
+ offset_left = 1056.0
+ offset_top = 896.0
+@@ -137,5 +136,5 @@ size_flags_vertical = 0
+ 
+ [node name="AnimationPlayer" type="AnimationPlayer" parent="UI"]
+ libraries = {
+-"": SubResource("AnimationLibrary_v7uy0")
++&"": SubResource("AnimationLibrary_v7uy0")
+ }
+diff --git a/src/combat/ui/action_menu/action_description_background.png.import b/src/combat/ui/action_menu/action_description_background.png.import
+index d8d6ed2..92796aa 100644
+--- a/src/combat/ui/action_menu/action_description_background.png.import
++++ b/src/combat/ui/action_menu/action_description_background.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/action_description_background.png-5299892547b
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/action_menu/menu_action_bg.png.import b/src/combat/ui/action_menu/menu_action_bg.png.import
+index 99be718..6c010ff 100644
+--- a/src/combat/ui/action_menu/menu_action_bg.png.import
++++ b/src/combat/ui/action_menu/menu_action_bg.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/menu_action_bg.png-83b3b2643d9c5e68487e5de330
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/action_menu/menu_action_bg_disabled.png.import b/src/combat/ui/action_menu/menu_action_bg_disabled.png.import
+index d74b6aa..3876fef 100644
+--- a/src/combat/ui/action_menu/menu_action_bg_disabled.png.import
++++ b/src/combat/ui/action_menu/menu_action_bg_disabled.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/menu_action_bg_disabled.png-d4adc448851d867e8
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/action_menu/menu_action_bg_focused.png.import b/src/combat/ui/action_menu/menu_action_bg_focused.png.import
+index 7dd338e..5a24245 100644
+--- a/src/combat/ui/action_menu/menu_action_bg_focused.png.import
++++ b/src/combat/ui/action_menu/menu_action_bg_focused.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/menu_action_bg_focused.png-3a6995c4c8d5330b70
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/action_menu/menu_action_bg_pressed.png.import b/src/combat/ui/action_menu/menu_action_bg_pressed.png.import
+index 87c9ac1..cfe4e20 100644
+--- a/src/combat/ui/action_menu/menu_action_bg_pressed.png.import
++++ b/src/combat/ui/action_menu/menu_action_bg_pressed.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/menu_action_bg_pressed.png-d23d386f5e22e4805d
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/action_menu/menu_selection_arrow.png.import b/src/combat/ui/action_menu/menu_selection_arrow.png.import
+index 7a44510..041774a 100644
+--- a/src/combat/ui/action_menu/menu_selection_arrow.png.import
++++ b/src/combat/ui/action_menu/menu_selection_arrow.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/menu_selection_arrow.png-25a4a09cf9983c5291e0
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/battler_entry/battler_hud_background.png.import b/src/combat/ui/battler_entry/battler_hud_background.png.import
+index a4700d7..8ff9836 100644
+--- a/src/combat/ui/battler_entry/battler_hud_background.png.import
++++ b/src/combat/ui/battler_entry/battler_hud_background.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/battler_hud_background.png-eda472162a57e5a374
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/battler_entry/energy_point_bg.png.import b/src/combat/ui/battler_entry/energy_point_bg.png.import
+index 451ba60..614bf61 100644
+--- a/src/combat/ui/battler_entry/energy_point_bg.png.import
++++ b/src/combat/ui/battler_entry/energy_point_bg.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/energy_point_bg.png-f0deee18402458431394bee6d
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/battler_entry/energy_point_fill.png.import b/src/combat/ui/battler_entry/energy_point_fill.png.import
+index fa37034..d13476a 100644
+--- a/src/combat/ui/battler_entry/energy_point_fill.png.import
++++ b/src/combat/ui/battler_entry/energy_point_fill.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/energy_point_fill.png-0427c8ff9a1587b64e5c803
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/battler_entry/life_bar_bg.png.import b/src/combat/ui/battler_entry/life_bar_bg.png.import
+index 102394b..735c3d5 100644
+--- a/src/combat/ui/battler_entry/life_bar_bg.png.import
++++ b/src/combat/ui/battler_entry/life_bar_bg.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/life_bar_bg.png-580361f045d05fdb3d746444b8f27
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/battler_entry/life_bar_fill.png.import b/src/combat/ui/battler_entry/life_bar_fill.png.import
+index b719fa1..d7658c8 100644
+--- a/src/combat/ui/battler_entry/life_bar_fill.png.import
++++ b/src/combat/ui/battler_entry/life_bar_fill.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/life_bar_fill.png-37b0658160c5281abb0d1d15bbe
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/turn_bar/portrait_bg_ally.png.import b/src/combat/ui/turn_bar/portrait_bg_ally.png.import
+index ab69e80..b7d74a0 100644
+--- a/src/combat/ui/turn_bar/portrait_bg_ally.png.import
++++ b/src/combat/ui/turn_bar/portrait_bg_ally.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/portrait_bg_ally.png-c4cbdeb48156b9eee64db936
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/turn_bar/portrait_bg_enemy.png.import b/src/combat/ui/turn_bar/portrait_bg_enemy.png.import
+index 6a94198..eb2d445 100644
+--- a/src/combat/ui/turn_bar/portrait_bg_enemy.png.import
++++ b/src/combat/ui/turn_bar/portrait_bg_enemy.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/portrait_bg_enemy.png-b47360190e5adcea6e504f7
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/combat/ui/turn_bar/portrait_bg_player.png.import b/src/combat/ui/turn_bar/portrait_bg_player.png.import
+index 4ee0b83..ad841eb 100644
+--- a/src/combat/ui/turn_bar/portrait_bg_player.png.import
++++ b/src/combat/ui/turn_bar/portrait_bg_player.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/portrait_bg_player.png-a0e1f8422c2822b299fa3a
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false
+diff --git a/src/field/gameboard/debug/debug_cell_occupancy.png.import b/src/field/gameboard/debug/debug_cell_occupancy.png.import
+index a6a7cd9..a87fbd5 100644
+--- a/src/field/gameboard/debug/debug_cell_occupancy.png.import
++++ b/src/field/gameboard/debug/debug_cell_occupancy.png.import
+@@ -18,6 +18,8 @@ dest_files=["res://.godot/imported/debug_cell_occupancy.png-2d693575bd82620e7b01
+ compress/mode=0
+ compress/high_quality=false
+ compress/lossy_quality=0.7
++compress/uastc_level=0
++compress/rdo_quality_loss=0.0
+ compress/hdr_compression=1
+ compress/normal_map=0
+ compress/channel_pack=0
+@@ -25,6 +27,10 @@ mipmaps/generate=false
+ mipmaps/limit=-1
+ roughness/mode=0
+ roughness/src_normal=""
++process/channel_remap/red=0
++process/channel_remap/green=1
++process/channel_remap/blue=2
++process/channel_remap/alpha=3
+ process/fix_alpha_border=true
+ process/premult_alpha=false
+ process/normal_map_invert_y=false

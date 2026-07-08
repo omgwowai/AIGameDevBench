@@ -2,27 +2,8 @@ diff --git a/scripts/state_machine.gd b/scripts/state_machine.gd
 index 1cd9f41..53b0187 100644
 --- a/scripts/state_machine.gd
 +++ b/scripts/state_machine.gd
-@@ -1,15 +1,6 @@
- extends Node
- class_name PlayerStateMachine
- 
--# Holds the player states and the active one. change_state(name) must:
--#   - reject the transition if the current state does not allow it
--#     (return false, change nothing, call no enter/exit);
--#   - otherwise call exit() on the current state, enter() on the new state,
--#     update `current`, and return true.
--#
--# BASELINE (buggy): change_state just swaps `current` with no guard and no
--# enter()/exit() calls.
--
- var states: Dictionary = {}
- var current: PlayerState = null
- 
-@@ -22,6 +13,12 @@ func set_initial(name: String) -> void:
- 		current.enter()
- 
+@@ -17,3 +17,9 @@ func set_initial(name: String) -> void:
  func change_state(target_name: String) -> bool:
--	# TODO: guard with current.can_transition_to(), call exit()/enter().
 -	current = states.get(target_name)
 +	if current == null or not current.can_transition_to(target_name):
 +		return false

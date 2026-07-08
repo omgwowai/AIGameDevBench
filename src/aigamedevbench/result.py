@@ -66,6 +66,8 @@ class VerifierResult:
     def from_checks(cls, checks: list[CheckResult], category: str, mode: str) -> "VerifierResult":
         if mode == "tristate":
             return cls._tristate(checks, category)
+        if mode == "gated":
+            return cls._gated(checks, category)
         if mode == "weighted":
             total_w = sum(float(c.expected or 1.0) for c in checks) or 1.0
             got = sum(float(c.expected or 1.0) for c in checks if c.passed)
@@ -84,6 +86,34 @@ class VerifierResult:
         if score <= 0.0:
             return "fail"
         return "partial"
+
+    # Checks that pass regardless of what the harness did (empty bad.diff, oracle
+    # metadata, documentation). Under checkpoints scoring these inflate a no-op
+    # run's score; the gated mode ignores them so noop scores 0.
+    _GATED_INERT_CHECKS = frozenset({
+        "does_not_reproduce_original_bad_diff",
+        "oracle_is_discriminating",
+        "survey_bad_case_documented",
+        "original_human_intervention_context_available",
+        "original_multi_round_context_available",
+    })
+
+    @classmethod
+    def _gated(cls, checks: list[CheckResult], category: str) -> "VerifierResult":
+        """All-or-nothing gate for regression-style (survey) cases used in the
+        filtered set. A no-op must score 0 and the golden fix must score 1, so we
+        score only the *action* checks — did the harness change a relevant file
+        and clear the L0/L1 regression — and drop the inert metadata checks that
+        pass even when nothing changed. Any action gate failing → 0.0."""
+        gates = [c for c in checks if c.name not in cls._GATED_INERT_CHECKS]
+        # Guard: if somehow no action check survives, fall back to "all gates" so
+        # we never award a free 1.0 from an empty gate set.
+        if not gates:
+            return cls(score=0.0, status="fail", checks=checks, category=category)
+        passed = all(c.passed for c in gates)
+        return cls(score=1.0 if passed else 0.0,
+                   status="pass" if passed else "fail",
+                   checks=checks, category=category)
 
     @classmethod
     def _tristate(cls, checks: list[CheckResult], category: str) -> "VerifierResult":

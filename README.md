@@ -48,6 +48,7 @@ runner:
   准备隔离工作区                        # 见下方"两种起点"
   driver.run(task, workspace)          # noop | patch | command(你的 AI harness)
   godot --import (folder 型)            # 构建资源缓存，让场景能加载
+                                        #   ↳ 缓存已在且未改动可导入资产时自动跳过(省~2.5s/次)
   L0/L1 门禁                            # 场景能加载？无坏引用？否则直接 0 分
   注入黄金验证器 -> 打分                 # 打完分即删除（防作弊）
 ```
@@ -128,7 +129,23 @@ aigdbench run --testcases-dir ./testcases_filtered \
 
 其它要点：
 
+- **并行评测**：`--jobs N`（`-j N`）同时跑 N 个 testcase（默认 1 = 串行）。harness 与 Godot 都是子进程，
+  线程池并行其 I/O 等待即可。每个 testcase 用独立工作区和独立 driver，**结果与串行完全一致**（含顺序、分数、
+  failure_stage）;report 里 testcase 顺序仍按输入顺序排，稳定可 diff。跑 runtime（Godot）验证器时注意机器负载。
+- **重复评测求方差**：`--repeat N`（默认 1）让每个 testcase 跑 N 次。AI harness 有随机性，单次运行分不清
+  「真强」还是「运气好」。开了之后每个 testcase 的 report 记录带一个 `repeat` 块（每次 attempt 的分数列表、
+  mean、std、95% 置信区间、pass@1、各 attempt 的 failure_stage 分布），记录的 `score` 取 N 次均值;report 顶层
+  还写 `mean_score_ci95`（整套的置信区间）。屏幕摘要打成 `mean X.XXX ± Y.YYY [95% CI ...]`。与 `--jobs` 组合时，
+  (testcase × attempt) 会被展平进同一个线程池，最大化并行。dashboard 的均分柱会画出置信区间带，
+  点开某 case 能看到 N 次分数的分布小图。（CI 用正态近似，N 小时仅作离散度参考，非严格区间。）
 - harness 输出**实时打印到屏幕**（带 testcase id 前缀），卡住的提示第一时间可见；`--no-stream` 关闭。
+  `--jobs > 1` 或 `--repeat > 1` 时自动改为「整块汇总」：每个 testcase/attempt 完成时一次性打印它的完整输出块，不逐行交错;
+  完整日志仍逐个写 `--log-dir`。
+- **harness 内部活动记录**：`--harness-format {auto,stream-json,text}`（默认 `auto`）把 harness 的 stdout
+  解析成结构化的**逐 turn 事件**（tool 调用、输出、token 用量），写进 report 的 `ai_agent_context`，
+  dashboard 的 AI activity 面板会像展示 survey 行一样把它们逐 turn 展开。`auto` 先按行试 stream-json 再回退到
+  文本启发式;若 harness 能吐 JSON 事件流（如 Claude Code `--output-format stream-json --verbose`），
+  用 `stream-json` 最精确、还能拿到 token 数。
 - **超时保护**：`--timeout` 是单 testcase harness 上限，默认 1200 秒（20 分钟）；另有审批提示检测器，
   识别到 "waiting on your permission approval" 之类会立即中止并给出提示。
 - 任何失败（超时/审批阻塞/非零退出）都会把日志尾部打到屏幕，该 testcase 记 0 分，批次继续。
@@ -142,11 +159,32 @@ aigdbench run --testcases-dir ./testcases_filtered \
 `--report` 写一份 JSON 汇总（每个 testcase 的 score / status / wall_time / exit_code /
 stalled·blocked 标志 / 日志路径，以及总体均值）。完整输出也写到 `--log-dir`。
 
+每条 testcase 记录还带两个用于**结果分析**的结构化字段：
+
+- **`failure_stage`** —— 这次运行失败/停在哪一层，便于画失败漏斗、区分「流程失败」与「能力不足」：
+  `no_change`（harness 什么都没改）/ `harness_error`（超时·卡死·审批阻塞·非零退出）/
+  `l0` · `l1`（准入门禁拒绝了改动）/ `verifier`（过了门禁但验证器自身报错）/
+  `none`（验证器正常跑完——score 可能仍 <1，那是能力差距而非流程失败）。
+- **`timings`** —— 分层耗时（毫秒）：`import_ms` / `l0_ms` / `l1_ms` / `verifier_ms` / `total_ms`
+  （command driver 另有 `harness_ms`）。用于**耗时 / 正确性 tradeoff** 分析——例如 folder 型
+  case 的 `import_ms`（godot 资源导入）本是整条 pipeline 的耗时大头（~2.5s 的 Godot 启动+扫描）。
+  另有布尔 `import_skipped`：当 workspace 已有 `.godot/` 缓存、且 harness 未改动任何可导入资产
+  （`.png`/`.ogg`/`.svg`/`.import` 等）时，这个冗余的 import pass 会被**跳过**，`import_ms` 归零。
+  script/scene（`.gd`/`.tscn`/`.tres`）改动不触发重导入;无缓存、改了资产、或改动未知时照常 import
+  （对正确性零风险）。这在 `--repeat N` 下收益乘以 N。
+
+批次结尾会打印一行 `--- failure stages: ...` 汇总；dashboard 的 timing 视图也会显示每层均耗时与失败漏斗。
+
 > **示例脚本**：`scripts/run_bench50.sh` 是一个用 `claude -p` 跑整套 `testcases_filtered/`
 > 的完整脚本，结果与日志都落在 `bench_runs/` 下。建议在 `tmux` 里运行以便断开重连。
 
 **手动回路**（不想用 command driver 时）：手工完成任务 → `git diff > ai.diff` →
 `aigdbench run --driver patch --patch ai.diff` 出分。
+
+> **patch 应用的鲁棒性**：`--driver patch` 应用 diff 时容忍几类常见的「语义正确但格式不规整」的补丁——
+> CRLF/LF 与空白差异（`--ignore-whitespace`）、hunk 头 `@@ -a,b +c,d @@` 行数算错（`--recount`，
+> 以正文的 +/-/context 行为准）、以及 hunk 内空行丢了行首空格（自动补 `" "`）。这些在 harness/LLM
+> 产出的 diff 里很常见;基准只看语义改动，所以不因格式瑕疵拒绝一个正确的补丁。
 
 ---
 
@@ -370,10 +408,16 @@ aigdbench serve --reports-dir . --testcases-dir ./testcases_filtered
 
 从完整库里人为**再平衡**挑出的 30 个最有代表性、oracle 最鲁棒的 case。特点：
 
-- **全部自包含 folder 型**，任意目录可跑；
-- **5 个 category 全覆盖**：behavior_logic ×19、precise_edit ×4、intent_translation ×3、architecture ×2、visual_audio ×2；
-- **5 种验证器全覆盖**：`godot_scene_assert` ×21、`py_config` ×3、`py_gdscript_ast` ×2、`py_tscn_diff` ×2、`visual_static` ×2；
+- **26 个自包含 folder 型**（任意目录可跑）+ **4 个源自真实 git bug-fix commit 的高区分度 case**（见下）；
+- **5 个 category 全覆盖**：behavior_logic ×15、architecture ×6、precise_edit ×4、intent_translation ×3、visual_audio ×2；
+- **6 种验证器全覆盖**：`godot_scene_assert` ×17、`survey_bad_case` ×4、`py_config` ×3、`py_gdscript_ast` ×2、`py_tscn_diff` ×2、`visual_static` ×2；
 - 全部通过 `aigdbench audit`（noop 0 / golden 1），并带有分级陷阱（部分正确 → 部分分）。
+
+> **4 个 git bug-fix case（`survey-history_*`）**：从 `gdquest-demos/godot-open-rpg` 的真实修复 commit 挖掘而来，比手工 case 更有区分度（真实的资源导入崩溃、组合缺陷）。从 16 个"oracle 有区分度"的候选里筛出——只保留 golden 在真实 Godot 下能干净通过 L0/L1 门禁的 4 个（其余候选撞上项目主场景的既有崩溃，与被测 bug 无关）。为保持**完全离线**又不臃肿仓库，它们不 vendored 整份项目树，而是引用一份**共享项目快照**（`manifest` 里的 `snapshot` 字段 + 各 case 的 `snapshot.json` 记录 repo + base commit）。快照**不入库**，首次运行前本地生成一次：
+> ```bash
+> python3 scripts/make_snapshots.py --testcases-dir testcases_filtered   # 需联网 clone 一次
+> ```
+> 生成后这些 case 与其它 folder 型一样纯离线运行。打分用 `scoring.mode="gated"`（改了相关文件且清除 L0/L1 回归→1，否则→0），并复用 `survey_bad_case.json` 内藏 oracle（`good.diff` 为 golden）。
 
 选取标准与逐类代表性例子见 [`docs/filtered_dataset_report.md`](docs/filtered_dataset_report.md)；
 完整库分布见 [`docs/full_dataset_report.md`](docs/full_dataset_report.md)。
@@ -443,13 +487,34 @@ aigdbench run --testcase gdb-task_0002 --driver patch --patch ./testcases/gdb-ta
 # 用真实 harness 评测整个（推荐）集合，写报告
 aigdbench run --testcases-dir ./testcases_filtered --driver command \
   --harness-cmd 'claude -p {task} --dangerously-skip-permissions' \
-  --harness my-claude-code --timeout 900 \
+  --harness my-claude-code --timeout 900 --jobs 4 --repeat 3 \
   --log-dir ./harness-logs --workspace-root ./bench-workspaces \
   --report ./report.json
 
 # 可视化并对比所有 report*.json
 aigdbench serve --reports-dir . --testcases-dir ./testcases_filtered
+
+# 统计对比两个 harness（配对 bootstrap：均分差 + 95% CI + p 值）
+aigdbench compare --report-a report_claude.json --report-b report_codex.json
 ```
+
+### 统计显著性对比（`aigdbench compare`）
+
+两个 report 跑同一套 testcase 后，`compare` 在**共同 case** 上做**配对 bootstrap**——对每个 case 的分数差
+`d_i = A_i − B_i` 重采样求分布——输出均分差、95% 置信区间、双尾 p 值，把「A 比 B 强」从目视变成可判定：
+
+```
+--- compare: A=claude  vs  B=codex  (10 shared testcase(s))
+  A mean 0.843   B mean 0.105
+  mean diff (A-B): +0.738  [95% CI +0.527, +0.909]  p=0.0000
+  verdict: significant (CI excludes 0); point estimate favors claude
+  per-category mean diff (A-B): behavior_logic +0.738 (n=10)
+  top 5 contributing testcase(s): gdb-task_0002 +1.000 ...
+```
+
+配对（同 case 求差）消掉了 case 间难度方差，比直接比两个独立均值敏感得多。`--iters` 控制重采样次数、
+`--seed` 保证可复现;还会按 category 拆分差异、并列出贡献最大的 top-N testcase，定位差异来源。
+配合 `--repeat` 跑出的稳定分数一起用最佳。
 
 ---
 
@@ -458,10 +523,108 @@ aigdbench serve --reports-dir . --testcases-dir ./testcases_filtered
 | 脚本 | 作用 |
 |---|---|
 | `run_bench50.sh` | 用 `claude -p` 跑整套 `testcases_filtered/`，结果/代码/日志落在 `bench_runs/` |
+| `run_k8s_matrix.sh` | 构建/推送 runner 镜像，一 testcase 一 k8s Job 并行 fan-out，聚合 `report.{json,md}` |
+| `build_runner_image.sh` | 构建含 **claude CLI + 最新 agentic-game-development 插件**的 runner 镜像 |
+| `bench-orchestrator.sh` | 由 GitHub webhook 触发一次全量并行 bench（见下方「webhook 自动触发」） |
+| `compare-and-maybe-release.sh` | bench 完成后对比插件基线，优于则自动打新 release |
 | `import_gamedevbench.py` | 把 GameDevBench 的自包含 task 导入成本仓 folder 型 testcase |
 | `mine_retry_sessions.py` | 扫本地 Claude/Codex 对话历史，挖掘"反复重试"的真实开发会话 |
 | `audit_testcases.py` | 门禁整套 testcase，写机器可读健康快照 |
 | `_*.py` | 数据集统计 / oracle 强度分析 / survey 任务脱敏改写等一次性辅助脚本 |
+
+---
+
+## Webhook 自动触发：push → 并行 bench → 优于基线则自动发布
+
+一条 GitHub webhook 投递可以自动跑一次**全量并行 benchmark**（每个 testcase 一个隔离的
+k8s Job，harness = **claude + `agentic-game-development` 插件最新 skill**），跑完自动和
+`agentic-game-development` **上一个 release 的成绩**对比——**优于就在插件仓自动打新 release**。
+
+### 端到端流程
+
+```text
+game repo push
+  └─▶ https://hook.omgwow.tech/github            (GitHub webhook)
+        └─▶ github-webhook receiver (k8s webhook ns，已部署)
+              │  ① 校验 HMAC；② 仅 push 事件
+              │  ③ fire-and-forget 转发（不阻塞、照常回 202）
+              ▼
+        POST $BENCH_TRIGGER_URL/trigger  {delivery, repo, ref, after}
+              └─▶ bench-orchestrator.sh（常驻本机，tmux）
+                    ① x-bench-token 校验 + 按 delivery id 去重
+                    ② run_k8s_matrix.sh：一 testcase 一 Job（-j 并发 gated）
+                    │     · 镜像内 claude -p {task} --plugin-dir /opt/agd-plugin
+                    │     · 凭证来自 k8s Secret aigdbench-harness
+                    │     · 从每个 pod 日志收集 report → 聚合 report.{json,md}
+                    ③ compare-and-maybe-release.sh：
+                          · 读 report.json 的 mean_score
+                          · 对比 agentic-game-development/workflow/benchmark-baseline.json
+                          · 若 delta > MIN_DELTA：bump 插件版本 + 刷新基线 + push main
+                          · release-on-bump.yml 检测到版本变更 → 自动打 release
+```
+
+每次投递的产物落在 `results/<delivery>/`：`report.json` / `report.md` / 各 pod 日志 /
+`batch.log`（fan-out 日志）/ `release.log`（对比+发布日志）/ `trigger.meta`（触发溯源）。
+
+### 前置准备（各做一次）
+
+1. **runner 镜像**（含 claude + 插件）：
+   ```bash
+   scripts/build_runner_image.sh -i harbor.omgwow.ai/<proj>/aigdbench-runner:latest --push
+   ```
+   > 若目标集群是本机单节点 k3s、且无 registry 推送权限，可改为导入本地 containerd：
+   > `docker save <img> | sudo k3s ctr -n k8s.io images import -`（Job 用 `imagePullPolicy: IfNotPresent`）。
+
+2. **harness 凭证 Secret**（default ns）：
+   ```bash
+   kubectl -n default create secret generic aigdbench-harness \
+     --from-literal=HARNESS_CMD='claude -p {task} --dangerously-skip-permissions --plugin-dir /opt/agd-plugin' \
+     --from-literal=ANTHROPIC_API_KEY=sk-... \
+     --from-literal=IS_SANDBOX=1          # 容器以 root 运行时，claude 需要它才允许 --dangerously-skip-permissions
+   ```
+   （网关部署可再加 `ANTHROPIC_BASE_URL` / `ANTHROPIC_MODEL`。）
+
+3. **receiver 转发**：由 receiver 镜像作者按 [`docs/webhook-forward-contract.md`](docs/webhook-forward-contract.md)
+   加两个 env（`BENCH_TRIGGER_URL` / `BENCH_TRIGGER_TOKEN`）并重建镜像；部署侧按
+   `../winter-update-runbook.md` 更新镜像并 `kubectl -n webhook set env` 注入这两个 env。
+
+### 常驻 orchestrator（tmux）
+
+```bash
+scripts/bench-orchestrator.sh --mode http --port 8899 --token <shared-token> \
+  --image harbor.omgwow.ai/<proj>/aigdbench-runner:latest \
+  --secret aigdbench-harness --jobs 16 \
+  --testcases-dir /app/testcases_filtered \
+  --plugin-repo ../agentic-game-development \
+  --auto-release --min-delta 0 --bump patch
+```
+
+- `--mode http`：收 receiver 转发的 `POST /trigger`（`GET /healthz` 探活）。
+- `--auto-release`：**打开**才会真正 bump+push；不加则只对比、打印结论、不动 release（安全默认）。
+- `--min-delta N`：mean_score 至少要涨这么多才算「优于」（默认 0，即严格 > 基线）。
+
+### 无需改 receiver 的 fallback
+
+若 receiver 到本机网络不通、或暂时不改 receiver 源码，用 `--mode watch-logs`：
+orchestrator 直接 tail receiver 的 pod 日志（凭 `pods/log` 权限），对每条 `accepted GitHub
+webhook delivery`（仅 `push` 事件、按 delivery id 去重）触发同一套 bench + 对比 + 发布。
+
+```bash
+scripts/bench-orchestrator.sh --mode watch-logs \
+  --webhook-kubeconfig ~/mc-winter-zhao-kubeconfig --webhook-ns webhook \
+  --image ... --secret aigdbench-harness --plugin-repo ../agentic-game-development --auto-release
+```
+
+### 对比与发布判定
+
+`compare-and-maybe-release.sh` 读取 `agentic-game-development/workflow/benchmark-baseline.json`
+（**仓内文件为准**，同时每次发布会把它作为 release 资产上传做溯源）：
+
+- **无基线**（首次）：以当前插件版本建立基线，**不发布**。
+- **未优于基线**（`delta <= min-delta`）：不动任何东西。
+- **优于基线**：bump 两个 manifest（`.codex-plugin` / `.claude-plugin`）+ 刷新基线 →
+  commit + **push main** → `release-on-bump.yml` 自动打包并发布新 release。
+  Claude Code 订阅了 marketplace 的客户端下次启动即自动拉到新版。
 
 ---
 

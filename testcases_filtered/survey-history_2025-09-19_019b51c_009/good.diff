@@ -1,0 +1,312 @@
+diff --git a/src/combat/actors/actor.gd b/src/combat/actors/actor.gd
+index a0c24dc..dfe1239 100644
+--- a/src/combat/actors/actor.gd
++++ b/src/combat/actors/actor.gd
+@@ -1,40 +1,42 @@
+-## An actor is any sort of class that will run an [Action] during combat.
++## A battle actor is any character or object that performs actions during combat.
++## This could be a player, an enemy, or even special events like traps or timed effects.
+ ##
+ ## Actors provide logic to objects that want to act in combat. An actor is typically applied to a
+ ## given [Battler], though other objects may wish to also make use of actors. For example, a combat
+-## event that deals damage to all battlers on every third turn would make use of a custom Actor,
+-## even though it is not present as a Battler.[/n][/n]
++## event that deals damage to all battlers on every third turn would make use of a custom CombatActor,
++## even though it is not present as a Battler.[br][br]
+ ##
+-## Actors are sorted according to their initiative. Actors with higher initiative will act before
+-## those of lower initiative. Actors act sequentially, according to the logic provided to derived
+-## Actors.[/n][/n]
++## Actors take turns based on their initiative value. Higher initiative means
++## they act earlier in the turn order. Each actor completes their full turn before
++## the next one begins, following whatever logic you define in your custom actor classes.[br][br]
+ ##
+-## [/b]Note:[/b] Actor provides the interface that derived classes will need in order to plug into
+-## the turn queue. For example, player actors will trigger the action selection UI, whereas AI
+-## actors may want to display a wide range of behaviours.
++## [b]Important:[/b] This CombatActor class is like a template that specific actor types extend.
++## For example, a player-controlled actor would show the action menu UI, while an AI enemy
++## might have different attack patterns or decision-making logic.
+ @abstract
+-class_name Actor extends Node2D
++class_name CombatActor extends Node2D
+ 
+-## Emitted whenever the actor's turn - including animations - has finished.
++## Emitted whenever the actor's turn is finished. You should emit this only
++## after all actions and animations are complete.
+ signal turn_finished
+ 
+ ## The name of the node group that will contain all combat Actors.
+-const GROUP: = "_COMBAT_ACTOR_GROUP"
++const GROUP: = "combat_actors"
+ 
+ ## Determines the order in which actors will take their turn. Higher initative actors act first.
+ @export_range(0.0, 1.0, 0.01) var initiative: = 1.0
+ 
+ @export var is_player: = false
+ 
+-## Describes whether or not the Actor has taken a turn during this combat round.
++## Describes whether or not the CombatActor has taken a turn during this combat round.
+ var has_acted_this_round: = false
+ 
+-## Is true if the Actor is currently able to contribute to the flow of combat. Inactive Actors do
++## Is true if the CombatActor is currently able to contribute to the flow of combat. Inactive Actors do
+ ## nothing and will not be used in the turn queue.
+ @export var is_active: = false
+ 
+ 
+-static func sort(a: Actor, b: Actor) -> bool:
++static func sort(a: CombatActor, b: CombatActor) -> bool:
+ 	return a.initiative > b.initiative
+ 
+ 
+@@ -44,7 +46,7 @@ func _ready() -> void:
+ 
+ func start_turn() -> void:
+ 	print(get_parent().name, " starts their turn!")
+-	
++
+ 	await get_tree().create_timer(1.5).timeout
+ 	turn_finished.emit()
+ 
+@@ -54,7 +56,7 @@ func melee_attack() -> void:
+ 
+ 
+ func _to_string() -> String:
+-	var msg: = "%s (Actor)" % name
++	var msg: = "%s (CombatActor)" % name
+ 	if not is_active:
+ 		msg += " - INACTIVE"
+ 	elif has_acted_this_round:
+diff --git a/src/combat/actors/turn_queue.gd b/src/combat/actors/turn_queue.gd
+index 5721889..253f949 100644
+--- a/src/combat/actors/turn_queue.gd
++++ b/src/combat/actors/turn_queue.gd
+@@ -22,13 +22,13 @@ func _ready() -> void:
+ 
+ func start() -> void:
+ 	round_count = 1
+-	
++
+ 	_next_turn.call_deferred()
+ 
+ 
+-func get_actors() -> Array[Actor]:
+-	var actor_list: Array[Actor] = []
+-	actor_list.assign(get_tree().get_nodes_in_group(Actor.GROUP))
++func get_actors() -> Array[CombatActor]:
++	var actor_list: Array[CombatActor] = []
++	actor_list.assign(get_tree().get_nodes_in_group(CombatActor.GROUP))
+ 	return actor_list
+ 
+ 
+@@ -40,13 +40,13 @@ func _next_turn() -> void:
+ 	elif battler_roster.are_battlers_defeated(battler_roster.get_enemy_battlers()):
+ 		finished.emit.call_deferred(true)
+ 		return
+-	
++
+ 	# Check for an active actor. If there are none, it may be that the turn has finished and all
+ 	# actors can have their has_acted_this_turn flag reset.
+ 	var next_actor: = _get_next_actor()
+ 	if not next_actor:
+ 		_reset_has_acted_flag()
+-		
++
+ 		# If there is no actor now, there is a situation where the only remaining Battler's don't
+ 		# have assigned actors. In other words, all controlled actors (player included) are downed.
+ 		# In this case, register as a player loss.
+@@ -54,33 +54,33 @@ func _next_turn() -> void:
+ 		if not next_actor:
+ 			finished.emit(false)
+ 			return
+-		
++
+ 		round_count += 1
+-	
+-	# Connect to the actor's turn_finished signal. The actor is guaranteed to emit the signal, 
++
++	# Connect to the actor's turn_finished signal. The actor is guaranteed to emit the signal,
+ 	# even if it will be freed at the end of this frame.
+ 	# However, we'll call_defer the next turn, since the current actor may have been downed on its
+ 	# turn and we need a frame to process the change.
+ 	next_actor.turn_finished.connect(
+-		(func _on_actor_turn_finished(actor: Actor) -> void: 
+-				actor.has_acted_this_turn = true 
++		(func _on_actor_turn_finished(actor: CombatActor) -> void:
++				actor.has_acted_this_turn = true
+ 				_next_turn.call_deferred()).bind(next_actor),
+ 			CONNECT_ONE_SHOT
+ 	)
+ 	next_actor.start_turn()
+ 
+ 
+-func _get_next_actor() -> Actor:
++func _get_next_actor() -> CombatActor:
+ 	var actors: = get_actors()
+-	actors.sort_custom(Actor.sort)
+-	
++	actors.sort_custom(CombatActor.sort)
++
+ 	var ready_to_act_actors: = actors.filter(
+ 		func _filter_actors(actor: Battler) -> bool:
+ 			return actor.is_active and not actor.has_acted_this_turn
+ 	)
+ 	if ready_to_act_actors.is_empty():
+ 		return null
+-	
++
+ 	return ready_to_act_actors.front()
+ 
+ 
+@@ -91,8 +91,8 @@ func _reset_has_acted_flag() -> void:
+ 
+ func _to_string() -> String:
+ 	var actors: = get_actors()
+-	actors.sort_custom(Actor.sort)
+-	
++	actors.sort_custom(CombatActor.sort)
++
+ 	var msg: = "\n%s (CombatTurnQueue) - round %d" % [name, round_count]
+ 	for actor in actors:
+ 		msg += "\n\t" + actor.to_string()
+diff --git a/src/combat/battlers/battler.gd b/src/combat/battlers/battler.gd
+index f94e995..943a408 100644
+--- a/src/combat/battlers/battler.gd
++++ b/src/combat/battlers/battler.gd
+@@ -41,15 +41,15 @@ const GROUP: = "_COMBAT_BATTLER_GROUP"
+ @export var battler_anim_scene: PackedScene:
+ 	set(value):
+ 		battler_anim_scene = value
+-		
++
+ 		if not is_inside_tree():
+ 			await ready
+-		
++
+ 		# Free an already existing BattlerAnim.
+ 		if anim:
+ 			anim.queue_free()
+ 			anim = null
+-		
++
+ 		# Add the new BattlerAnim class as a child and link it to this Battler instance.
+ 		if battler_anim_scene:
+ 			# Normally we could wrap a check for battler_anim_scene's type (should be BattlerAnim)
+@@ -64,7 +64,7 @@ const GROUP: = "_COMBAT_BATTLER_GROUP"
+ 				new_scene.free()
+ 				battler_anim_scene = null
+ 				return
+-			
++
+ 			add_child(anim)
+ 			var facing: = BattlerAnim.Direction.LEFT if is_player else BattlerAnim.Direction.RIGHT
+ 			anim.setup(self, facing)
+@@ -75,9 +75,9 @@ const GROUP: = "_COMBAT_BATTLER_GROUP"
+ @export var ai_scene: PackedScene:
+ 	set(value):
+ 		ai_scene = value
+-		
++
+ 		if ai_scene != null:
+-			# In the editor, check to make sure that the value set to ai_scene is actually a 
++			# In the editor, check to make sure that the value set to ai_scene is actually a
+ 			# CombatAI bject.
+ 			var new_instance: = ai_scene.instantiate()
+ 			if Engine.is_editor_hint():
+@@ -86,28 +86,28 @@ const GROUP: = "_COMBAT_BATTLER_GROUP"
+ 						" as ai_scene property. Assigned PackedScene is not a CombatAI type!")
+ 					ai_scene = null
+ 				new_instance.free()
+-			
++
+ 			else:
+ 				ai = new_instance
+ 				add_child(ai)
+ 
+-## The [Actor] object that will determine the Battler's combat behavior. A Battler without an Actor
++## The [CombatActor] object that will determine the Battler's combat behavior. A Battler without an CombatActor
+ ## is just a dummy object that will not take turns or perform actions.
+ @export var actor_scene: PackedScene:
+ 	set(value):
+ 		if value == actor_scene:
+ 			return
+-		
++
+ 		actor_scene = value
+-		
++
+ 		if not is_inside_tree():
+ 			await ready
+-		
++
+ 		if actor:
+ 			actor.queue_free()
+ 			actor = null
+ 
+-#TODO: Battler.is_player is redundant. Use that defined by Actor instead.
++#TODO: Battler.is_player is redundant. Use that defined by CombatActor instead.
+ ## Player battlers are controlled by the player.
+ @export var is_player: = false:
+ 	set(value):
+@@ -116,9 +116,9 @@ const GROUP: = "_COMBAT_BATTLER_GROUP"
+ 			var facing: = BattlerAnim.Direction.LEFT if is_player else BattlerAnim.Direction.RIGHT
+ 			anim.direction = facing
+ 
+-## Reference to the Battler's child [Actor], which controls it's combat behaviour.
++## Reference to the Battler's child [CombatActor], which controls it's combat behaviour.
+ ## Note that this value is assigned automatically with reference to [member actor_scene].
+-var actor: Actor = null
++var actor: CombatActor = null
+ 
+ ## Reference to this Battler's child [CombatAI] node, if applicable.
+ var ai: CombatAI = null
+@@ -126,12 +126,12 @@ var ai: CombatAI = null
+ ## Reference to this Battler's child [BattlerAnim] node.
+ var anim: BattlerAnim = null
+ 
+-# TODO: this property belongs with the Actor.
++# TODO: this property belongs with the CombatActor.
+ ## If `false`, the battler will not be able to act.
+ var is_active: bool = true:
+ 	set(value):
+ 		is_active = value
+-		
++
+ 		set_process(is_active)
+ 
+ ## The turn queue will change this property when another battler is acting.
+@@ -164,7 +164,7 @@ var readiness := 0.0:
+ 		if readiness >= 100.0:
+ 			readiness = 100.0
+ 			stats.energy += 1
+-			
++
+ 			ready_to_act.emit()
+ 			set_process(false)
+ 
+@@ -172,12 +172,12 @@ var readiness := 0.0:
+ func _ready() -> void:
+ 	if Engine.is_editor_hint():
+ 		set_process(false)
+-	
++
+ 	else:
+ 		assert(stats, "Battler %s does not have stats assigned!" % name)
+-		
++
+ 		add_to_group(GROUP)
+-		
++
+ 		# Resources are NOT unique, so treat the currently assigned BattlerStats as a prototype.
+ 		# That is, copy what it is now and use the copy, so that the original remains unaltered.
+ 		stats = stats.duplicate()
+@@ -195,7 +195,7 @@ func _process(delta: float) -> void:
+ 
+ func act(action: BattlerAction, targets: Array[Battler] = []) -> void:
+ 	set_process(false)
+-	
++
+ 	stats.energy -= action.energy_cost
+ 
+ 	# action.execute() almost certainly is a coroutine.

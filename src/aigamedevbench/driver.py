@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from typing import Callable, Protocol
 
+from aigamedevbench.harness_events import EventParser
 from aigamedevbench.workspace import apply_patch
 
 
@@ -72,11 +73,16 @@ class CommandHarnessDriver:
                  env: dict[str, str] | None = None,
                  log_name: str | None = None,
                  completion_probe: Callable[[], bool] | None = None,
-                 completion_grace_timeout: float = 10.0):
+                 completion_grace_timeout: float = 10.0,
+                 harness_format: str = "auto"):
         self.cmd_template = cmd_template
         self.timeout = timeout
         self.stall_timeout = stall_timeout
         self.on_line = on_line
+        # How to parse the harness's stdout into structured events for the report:
+        # "auto" (try stream-json per line, fall back to a text heuristic),
+        # "stream-json" (strict), or "text" (heuristic only). See harness_events.
+        self.harness_format = harness_format
         self.log_dir = Path(log_dir) if log_dir is not None else None
         self.env = {str(k): str(v) for k, v in (env or {}).items()}
         self.log_name = log_name
@@ -147,8 +153,14 @@ class CommandHarnessDriver:
         except Exception:
             pass
 
-    def _emit(self, line: str, sink: list[str]) -> None:
+    def _emit(self, line: str, sink: list[str],
+              parser: EventParser | None = None) -> None:
         sink.append(line)
+        if parser is not None:
+            try:
+                parser.feed(line)
+            except Exception:
+                pass  # a parser bug must never abort the run
         if self.on_line is not None:
             try:
                 self.on_line(line)
@@ -178,6 +190,11 @@ class CommandHarnessDriver:
         argv: list[str] = []
         log_path = None
         proc: subprocess.Popen | None = None
+        # Structured-event parser for this run. The driver instance still holds
+        # per-run state (label / last_outcome), so concurrent runs must each use
+        # their OWN driver instance (the CLI builds one per testcase via a
+        # factory); this parser is local to run() regardless.
+        parser = EventParser(self.harness_format)
         try:
             # Inside the try so a malformed template (shlex.split ValueError),
             # an unwritable workspace, or a log-dir mkdir failure is recorded as
@@ -246,7 +263,7 @@ class CommandHarnessDriver:
                     break
                 last_activity = time.perf_counter()
                 line = item.rstrip("\n")
-                self._emit(line, lines)
+                self._emit(line, lines, parser)
                 self._append_log(log_path, line + "\n")
                 if self._is_approval_block(item):
                     blocked_on_approval = True
@@ -305,6 +322,7 @@ class CommandHarnessDriver:
             f"wall_time={wall_time:.3f}\n",
         )
 
+        events = parser.finalize()
         self.last_outcome = {
             "exit_code": exit_code,
             "wall_time": wall_time,
@@ -313,4 +331,15 @@ class CommandHarnessDriver:
             "blocked_on_approval": blocked_on_approval,
             "completed_but_hung": completed_but_hung,
             "log_path": str(log_path) if log_path is not None else None,
+            # Structured record of what the harness did this run, in the same
+            # shape the dashboard renders for survey rows (turns + token count).
+            "ai_agent_context": {
+                "turns": events["turns"],
+                "total_tokens": events["total_tokens"],
+                # Per-turn timing bottleneck: the slowest single turn and the
+                # total measured turn wall-time, so the report/dashboard can show
+                # WHERE the harness spent its time, not just how long overall.
+                "slowest_turn": events.get("slowest_turn"),
+                "total_turn_ms": events.get("total_turn_ms"),
+            },
         }

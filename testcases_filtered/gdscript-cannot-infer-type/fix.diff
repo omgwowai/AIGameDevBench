@@ -1,18 +1,12 @@
 diff --git a/scripts/score_tracker.gd b/scripts/score_tracker.gd
-index 13626e6..a32e25b 100644
+index 8268a52..71f2477 100644
 --- a/scripts/score_tracker.gd
 +++ b/scripts/score_tracker.gd
-@@ -9,10 +9,8 @@ var _scores := [10, 25, 7]
+@@ -9,6 +9,6 @@ var _scores := [10, 25, 7]
  func total_score() -> int:
  	var total := 0
  	for i in range(_scores.size()):
--		# BUG: `_scores[i]` indexes an untyped Array, so the element type is
--		# Variant. Using `:=` here makes the parser fail with
--		# "Cannot infer the type of "value" variable because the value
--		# doesn't have a set type." The whole script then fails to load.
 -		var value := _scores[i]
-+		# FIX: give the variable an explicit type instead of inferring with `:=`
-+		# from an untyped Array element (which is Variant and cannot be inferred).
 +		var value: int = _scores[i]
  		total += value
  	return total

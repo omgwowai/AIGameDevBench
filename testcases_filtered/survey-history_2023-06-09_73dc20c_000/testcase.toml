@@ -1,0 +1,20 @@
+[testcase]
+id = "survey-history_2023-06-09_73dc20c_000"
+category = "architecture"
+source_kind = "folder"
+snapshot = "godot-open-rpg__73dc20c"
+source_repo = "survey:godot-open-rpg (offline snapshot)"
+task = """
+Investigate and fix the defect in the following file(s), making the affected feature behave correctly: project.godot, src/common/music_player/music_player.tscn, src/field/field.gd, src/field/field_cursor.gd, src/field/gameboard/events/event.gd, src/field/gameboard/events/interaction.gd, src/field/gamepieces/controllers/player_controller.gd, src/field/gamepieces/gamepiece.gd.
+"""
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "gated"
+
+[provenance]
+source = "survey-history (migrated to filtered)"
+notes = "Real bug-fix commit from gdquest-demos/godot-open-rpg. Base snapshot = the fix commit's pre-image (buggy state). gated scoring: noop=0, good.diff=1. Snapshot generated on demand by scripts/make_snapshots.py."

@@ -166,7 +166,6 @@ def test_noop_run_has_empty_diff_and_no_artifacts(tmp_path):
     assert result.diff.strip() == ""
     assert (art / "gdb-x" / "changes.diff").read_text(encoding="utf-8").strip() == ""
 
-
 def test_run_uses_fixed_attempt_workspace(tmp_path):
     tc = _folder_testcase(tmp_path)
     attempt_dir = tmp_path / "attempt"
@@ -195,3 +194,52 @@ def test_run_uses_fixed_attempt_workspace(tmp_path):
     assert result.score == 1.0
     assert seen["workspace"] == attempt_dir / "workspace"
     assert (attempt_dir / "workspace" / "TASK.md").read_text(encoding="utf-8") == "task"
+
+
+# --- P0: structured failure_stage + per-stage timings ---
+
+def test_noop_failure_stage_is_no_change(tmp_path):
+    # A run that changed nothing must be labeled no_change even though a py_config
+    # noop passes the L0/L1 gate (no .tscn to reject) and only fails at scoring —
+    # the funnel must distinguish "did no work" from a real capability gap.
+    tc = _folder_testcase(tmp_path)
+    result = run_testcase(None, tc, NoOpDriver(), "noop", config={})
+    assert result.failure_stage == "no_change"
+    assert result.score == 0.0
+
+
+def test_correct_patch_failure_stage_is_none(tmp_path):
+    tc = _folder_testcase(tmp_path)
+    result = run_testcase(None, tc, PatchDriver(_CHAR_PATCH), "patch", config={})
+    # A real change that the verifier scored is stage none (not a pipeline failure).
+    assert result.failure_stage == "none"
+    assert result.score == 1.0
+
+
+def test_gate_failure_stage_is_l0(tmp_path):
+    tc = _folder_testcase(tmp_path)
+    bad_patch = (
+        "diff --git a/broken.gd b/broken.gd\n"
+        "new file mode 100644\n"
+        "--- /dev/null\n"
+        "+++ b/broken.gd\n"
+        "@@ -0,0 +1,3 @@\n"
+        "+extends Node\n"
+        "+func f():\n"
+        "+\tvar x = foo(1, 2\n"
+    )
+    result = run_testcase(None, tc, PatchDriver(bad_patch), "patch", config={})
+    # A changed-but-rejected run is an l0 failure, distinct from no_change.
+    assert result.failure_stage == "l0"
+    assert result.score == 0.0
+
+
+def test_run_records_stage_timings(tmp_path):
+    tc = _folder_testcase(tmp_path)
+    result = run_testcase(None, tc, PatchDriver(_CHAR_PATCH), "patch", config={})
+    t = result.timings
+    # Every pipeline stage is timed so the report can attribute cost, not just
+    # the harness wall_time. All are non-negative numbers.
+    for key in ("import_ms", "l0_ms", "l1_ms", "validation_ms", "verifier_ms", "total_ms"):
+        assert key in t, f"missing timing {key}"
+        assert isinstance(t[key], (int, float)) and t[key] >= 0.0

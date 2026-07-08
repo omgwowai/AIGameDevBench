@@ -1,0 +1,70 @@
+# Per-testcase Kubernetes Job template, rendered by scripts/run_k8s_matrix.sh
+# via `envsubst`. One Job == one testcase; the matrix script fans out N of these
+# and gates how many run at once. Results are read back from pod logs (the
+# entrypoint prints the report between AIGDBENCH_REPORT markers), so no shared
+# PVC is required.
+#
+# Placeholders (all provided by the orchestrator's environment):
+#   ${JOB_NAME} ${NAMESPACE} ${IMAGE} ${TESTCASE} ${DRIVER} ${HARNESS_ID}
+#   ${TIMEOUT} ${GODOT_BINARY} ${TESTCASES_DIR}
+#   ${ACTIVE_DEADLINE} ${CPU_REQ} ${MEM_REQ} ${CPU_LIM} ${MEM_LIM}
+#   ${HARNESS_SECRET}   (name of a Secret with HARNESS_CMD + any API keys; may be empty)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${JOB_NAME}
+  namespace: ${NAMESPACE}
+  labels:
+    app: aigdbench
+    aigdbench/run: "${RUN_ID}"
+    aigdbench/testcase: "${TESTCASE_LABEL}"
+spec:
+  # We do our own retry accounting in the orchestrator; let a Job fail cleanly.
+  backoffLimit: 0
+  # Hard ceiling so a hung harness can't pin a cluster slot forever.
+  activeDeadlineSeconds: ${ACTIVE_DEADLINE}
+  # Auto-clean finished Jobs after collection (orchestrator also deletes).
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: aigdbench
+        aigdbench/run: "${RUN_ID}"
+        aigdbench/testcase: "${TESTCASE_LABEL}"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: runner
+          image: ${IMAGE}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TESTCASE
+              value: "${TESTCASE}"
+            - name: DRIVER
+              value: "${DRIVER}"
+            - name: HARNESS_ID
+              value: "${HARNESS_ID}"
+            - name: TIMEOUT
+              value: "${TIMEOUT}"
+            - name: GODOT_BINARY
+              value: "${GODOT_BINARY}"
+            - name: TESTCASES_DIR
+              value: "${TESTCASES_DIR}"
+            - name: OUT_DIR
+              value: "/out"
+          # HARNESS_CMD and any provider API keys (ANTHROPIC_API_KEY, ...) come
+          # from a Secret when one is named; envFrom is a no-op list otherwise.
+          envFrom: ${ENV_FROM}
+          resources:
+            requests:
+              cpu: "${CPU_REQ}"
+              memory: "${MEM_REQ}"
+            limits:
+              cpu: "${CPU_LIM}"
+              memory: "${MEM_LIM}"
+          volumeMounts:
+            - name: out
+              mountPath: /out
+      volumes:
+        - name: out
+          emptyDir: {}

@@ -345,3 +345,45 @@ def test_load_testcase_detail_missing_testcase_returns_none(tmp_path):
     _write_testcase(tmp_path, "tc-a")
 
     assert load_testcase_detail(tmp_path, "missing") is None
+
+
+def test_repeat_block_surfaces_in_summary_and_detail(tmp_path):
+    # A --repeat run's confidence interval and per-attempt distribution must reach
+    # the dashboard: the run summary carries mean_score_ci95/repeat, and the
+    # per-testcase detail carries the full repeat block.
+    repeat_block = {
+        "n": 4, "mean": 0.5, "std": 0.577, "stderr": 0.288,
+        "ci95": [0.0, 1.0], "pass_at_1": 0.5,
+        "scores": [1.0, 0.0, 1.0, 0.0],
+        "failure_stages": {"none": 2, "no_change": 2},
+    }
+    tc = _tc("tc-flaky", 0.5, repeat=repeat_block)
+    p = tmp_path / "report_repeat.json"
+    p.write_text(json.dumps({
+        "harness": "flaky", "count": 1, "repeat": 4, "mean_score": 0.5,
+        "mean_score_ci95": [0.2, 0.8], "testcases": [tc],
+    }), encoding="utf-8")
+
+    reports = load_reports(tmp_path)
+    summary = build_summary(reports)
+    run = summary["runs"][0]
+    assert run["repeat"] == 4
+    assert run["mean_score_ci95"] == [0.2, 0.8]
+
+    detail = report_detail(reports[0], "tc-flaky", reports_dir=tmp_path)
+    assert detail["repeat"]["n"] == 4
+    assert detail["repeat"]["scores"] == [1.0, 0.0, 1.0, 0.0]
+    assert detail["repeat"]["pass_at_1"] == 0.5
+
+
+def test_report_without_repeat_defaults_gracefully(tmp_path):
+    # A pre-repeat report (no `repeat` key) must still work: run.repeat defaults
+    # to 1, mean_score_ci95 is None, and detail.repeat is None.
+    p = tmp_path / "report_old.json"
+    _write_report(p, "old", [_tc("tc-a", 1.0)])
+    reports = load_reports(tmp_path)
+    run = build_summary(reports)["runs"][0]
+    assert run["repeat"] == 1
+    assert run["mean_score_ci95"] is None
+    detail = report_detail(reports[0], "tc-a", reports_dir=tmp_path)
+    assert detail["repeat"] is None

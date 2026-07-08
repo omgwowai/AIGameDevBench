@@ -2,17 +2,11 @@ diff --git a/scripts/spawner.gd b/scripts/spawner.gd
 index bc65815..a02ad55 100644
 --- a/scripts/spawner.gd
 +++ b/scripts/spawner.gd
-@@ -1,12 +1,11 @@
+@@ -1,8 +1,9 @@
  extends Node2D
- 
--# Spawns goblins. The scene to spawn is currently selected by a hardcoded
--# res:// path string at the call site, which couples this script to a literal
--# asset location.
-+# Spawns goblins. The scene to spawn is referenced through a preloaded constant
-+# instead of a hardcoded res:// path string at the call site.
+
++const GOBLIN_SCENE := preload("res://entities/goblin.tscn")
 +
-+const GOBLIN_SCENE: PackedScene = preload("res://entities/goblin.tscn")
- 
  func spawn_goblin() -> Node:
 -	var goblin_path := "res://entities/goblin.tscn"
 -	var packed: PackedScene = load(goblin_path)

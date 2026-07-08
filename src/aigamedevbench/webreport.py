@@ -41,6 +41,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
                overflow:hidden; }
   .bar-fill { height:100%; }
   .num { text-align:right; color:var(--muted); }
+  .num .ci { color:var(--muted); font-weight:normal; }
   table { border-collapse:collapse; width:100%; }
   th, td { border:1px solid var(--line); padding:5px 7px; text-align:center; }
   th.tc, td.tc { text-align:left; white-space:nowrap; }
@@ -175,6 +176,8 @@ INDEX_HTML = r"""<!DOCTYPE html>
                  padding:6px 10px; }
   details.turn > summary { cursor:pointer; color:var(--fg); }
   details.turn[open] > summary { margin-bottom:6px; }
+  details.turn.turn-bottleneck { border-color:#e5484d; box-shadow:0 0 0 1px #e5484d33; }
+  .bottleneck { color:#e5484d; font-weight:600; font-size:11px; }
   .turn .lbl { color:var(--muted); margin:6px 0 2px; }
   .logbox { background:#0c0e14; border:1px solid var(--line); border-radius:6px;
             padding:10px; max-height:320px; overflow:auto; white-space:pre-wrap;
@@ -313,7 +316,17 @@ function renderOverall() {
   const el = $("#overall");
   if (!runs.length) { el.innerHTML = '<span class="empty">Select a run.</span>'; return; }
   let h = "<h2>Mean score</h2>";
-  for (const r of runs) h += barRow(r.harness, r.mean_score);
+  for (const r of runs) {
+    // With --repeat, show the suite mean ± half-CI and an N badge so a
+    // single-sample run (no variance) is visually distinct from a repeated one.
+    let extra = "";
+    const ci = r.mean_score_ci95;
+    if (r.repeat && r.repeat > 1 && Array.isArray(ci)) {
+      const half = (ci[1] - ci[0]) / 2;
+      extra = ` <small class="ci">±${fmt(half)} · repeat ${r.repeat}</small>`;
+    }
+    h += barRow(r.harness, r.mean_score, extra, ci);
+  }
   // per-category grouped
   const cats = [...new Set(runs.flatMap(r =>
     Object.keys(SUMMARY.categories[r.run_id] || {})))].sort();
@@ -334,11 +347,19 @@ function renderOverall() {
   }
   el.innerHTML = h;
 }
-function barRow(label, score) {
+function barRow(label, score, extra, ci) {
+  // Optional CI whiskers: a translucent band spanning [ci_lo, ci_hi] behind the
+  // fill, so the uncertainty of a repeated run is visible at a glance.
+  let band = "";
+  if (Array.isArray(ci) && (ci[1] - ci[0]) > 1e-9) {
+    const left = (ci[0] || 0) * 100, width = (ci[1] - ci[0]) * 100;
+    band = `<div style="position:absolute;top:0;bottom:0;left:${left}%;width:${width}%;
+      background:rgba(255,255,255,0.18)"></div>`;
+  }
   return `<div class="bar-row"><div>${esc(label)}</div>
-    <div class="bar-track"><div class="bar-fill"
+    <div class="bar-track" style="position:relative">${band}<div class="bar-fill"
       style="width:${(score||0)*100}%;background:${scoreColor(score)||'#333'}"></div></div>
-    <span class="num">${fmt(score)}</span></div>`;
+    <span class="num">${fmt(score)}${extra||""}</span></div>`;
 }
 
 function renderMatrix() {
@@ -381,12 +402,28 @@ function renderTiming() {
     if (t.stalled) badges += `<span class="badge warn">stalled ${t.stalled}</span>`;
     if (t.blocked_on_approval) badges += `<span class="badge warn">blocked ${t.blocked_on_approval}</span>`;
     if (!badges) badges = `<span class="badge ok">clean</span>`;
+    // Failure funnel: count of runs stopped at each pipeline layer. `none` means
+    // the verifier ran (score may still be < 1 — a capability gap, not a stall).
+    const fs = (SUMMARY.failure_stages || {})[r.run_id] || {};
+    let funnel = "";
+    for (const s of ["no_change","harness_error","l0","l1","verifier"]) {
+      if (fs[s]) funnel += `<span class="badge warn">${s} ${fs[s]}</span>`;
+    }
+    if (fs.none) funnel += `<span class="badge ok">ran ${fs.none}</span>`;
+    // Per-stage mean cost (ms): where the pipeline time actually goes.
+    const sm = t.stage_means || {};
+    const stageBits = [];
+    for (const [k,lbl] of [["import_ms","import"],["l0_ms","L0"],["l1_ms","L1"],["verifier_ms","verify"]]) {
+      if (sm[k] != null) stageBits.push(`${lbl} ${fmt(sm[k]/1000,2)}s`);
+    }
+    const stageLine = stageBits.length
+      ? `<div style="margin:0 0 8px 170px;color:var(--muted);font-size:12px">per-stage mean: ${stageBits.join(" · ")}</div>` : "";
     h += `<div class="bar-row"><div>${esc(r.harness)}</div>
       <div class="bar-track"><div class="bar-fill"
         style="width:${((t.total_wall_time||0)/maxTotal)*100}%;background:#3b6ea5"></div></div>
       <span class="num">${fmt(t.total_wall_time,1)}s</span></div>
-      <div style="margin:-2px 0 8px 170px;color:var(--muted)">
-        mean ${fmt(t.mean_wall_time,1)}s ${badges}</div>`;
+      <div style="margin:-2px 0 4px 170px;color:var(--muted)">
+        mean ${fmt(t.mean_wall_time,1)}s ${badges} ${funnel}</div>${stageLine}`;
   }
   el.innerHTML = h;
 }
@@ -413,7 +450,35 @@ async function openDetail(tc, runId) {
     h += `<div style="margin-bottom:6px">score <b>${fmt(detail.score)}</b>
           · ${esc(detail.status)}`;
     if (detail.wall_time != null) h += ` · ${fmt(detail.wall_time,1)}s`;
+    if (detail.failure_stage && detail.failure_stage !== "none")
+      h += ` · <span class="badge warn">${esc(detail.failure_stage)}</span>`;
     h += "</div>";
+    // Per-stage cost for this single run: exposes godot-import / L0 / verifier
+    // time that wall_time (harness only) hides.
+    const tm = detail.timings || {};
+    const bits = [];
+    for (const [k,lbl] of [["import_ms","import"],["l0_ms","L0"],["l1_ms","L1"],["verifier_ms","verify"],["total_ms","total"]]) {
+      if (tm[k] != null) {
+        // Label a skipped import so a near-zero number reads as "elided", not "free".
+        const suffix = (k === "import_ms" && tm.import_skipped) ? " (skipped)" : "";
+        bits.push(`${lbl} ${fmt(tm[k]/1000,2)}s${suffix}`);
+      }
+    }
+    if (bits.length) h += `<div style="margin-bottom:6px;color:var(--muted);font-size:12px">${bits.join(" · ")}</div>`;
+    // Repeat distribution: mini score bars for each attempt + mean/std/CI/pass@1,
+    // so a stochastic harness's variance on THIS testcase is legible.
+    const rp = detail.repeat;
+    if (rp && Array.isArray(rp.scores) && rp.scores.length > 1) {
+      const cells = rp.scores.map(s =>
+        `<span title="${fmt(s)}" style="display:inline-block;width:14px;height:14px;margin:1px;
+          border-radius:2px;background:${scoreColor(s)||'#333'}"></span>`).join("");
+      const ci = rp.ci95 || [rp.mean, rp.mean];
+      h += `<div class="act" style="margin:6px 0"><h3>Repeat (N=${rp.n})</h3>
+        <div>${cells}</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:4px">
+          mean ${fmt(rp.mean)} · std ${fmt(rp.std)} ·
+          95% CI [${fmt(ci[0])}, ${fmt(ci[1])}] · pass@1 ${fmt(rp.pass_at_1)}</div></div>`;
+    }
     if (detail.error) h += `<div class="err">${esc(detail.error)}</div>`;
     if (!detail.checks.length) h += '<div class="empty">no checks</div>';
     for (const c of detail.checks) {
@@ -438,11 +503,20 @@ function renderActivity(detail) {
   let h = "";
   const turns = detail.ai_turns || [];
   if (turns.length) {
+    const slow = detail.slowest_turn || null;
+    const slowTurn = slow ? slow.turn : null;
     h += '<div class="act"><h3>AI activity';
     if (detail.total_tokens) h += ` <small>(${detail.total_tokens} tokens)</small>`;
+    if (detail.total_turn_ms != null) h += ` <small>· ${(detail.total_turn_ms/1000).toFixed(1)}s in turns</small>`;
     h += "</h3>";
     for (const t of turns) {
-      h += `<details class="turn" open><summary>turn ${esc(t.turn)}</summary>`;
+      // Per-turn duration in the summary; the single slowest turn is flagged as
+      // the bottleneck so you can see WHERE the harness spent its time.
+      const isBottleneck = (slowTurn != null && t.turn === slowTurn);
+      const dur = (t.duration_ms != null) ? ` · ${(t.duration_ms/1000).toFixed(1)}s` : "";
+      const flag = isBottleneck ? ' <span class="bottleneck">⚠ bottleneck</span>' : "";
+      h += `<details class="turn${isBottleneck ? ' turn-bottleneck' : ''}" open>` +
+           `<summary>turn ${esc(t.turn)}${dur}${flag}</summary>`;
       if (t.agent_input) h += `<div class="lbl">input</div><div class="logbox">${esc(t.agent_input)}</div>`;
       if (t.agent_output) h += `<div class="lbl">output</div><div class="logbox">${esc(t.agent_output)}</div>`;
       if (t.tool_calls && t.tool_calls.length) {
@@ -920,6 +994,7 @@ def build_summary(reports: list[dict]) -> dict:
     runs = []
     categories: dict[str, dict] = {}
     timing: dict[str, dict] = {}
+    failure_stages: dict[str, dict] = {}
     testcase_ids: set[str] = set()
     matrix: dict[str, dict] = {}
 
@@ -933,9 +1008,15 @@ def build_summary(reports: list[dict]) -> dict:
             "mtime": r.get("_mtime", 0.0),
             "count": r.get("count", len(tcs)),
             "mean_score": r.get("mean_score", 0.0),
+            # Repeat metadata (present when the run used --repeat N): the suite
+            # confidence interval and N, so the UI can show mean ± CI and flag
+            # single-sample runs as having no variance information.
+            "repeat": r.get("repeat", 1),
+            "mean_score_ci95": r.get("mean_score_ci95"),
         })
         categories[run_id] = _category_aggregate(tcs)
         timing[run_id] = _timing_aggregate(tcs)
+        failure_stages[run_id] = _failure_stage_aggregate(tcs)
         for tc in tcs:
             testcase_ids.add(tc["testcase_id"])
 
@@ -954,6 +1035,7 @@ def build_summary(reports: list[dict]) -> dict:
         "matrix": matrix,
         "categories": categories,
         "timing": timing,
+        "failure_stages": failure_stages,
     }
 
 
@@ -977,13 +1059,40 @@ def _category_aggregate(testcases: list[dict]) -> dict:
 def _timing_aggregate(testcases: list[dict]) -> dict:
     walls = [t["wall_time"] for t in testcases if isinstance(t.get("wall_time"), (int, float))]
     total = sum(walls)
+
+    # Per-stage pipeline timings (ms), averaged over the runs that recorded them.
+    # These come from RunResult.timings and expose where the non-harness time
+    # goes (godot import, L0 boot, verifier) — the cost side of the
+    # cost/correctness tradeoff, which wall_time alone hides.
+    stage_keys = ("import_ms", "l0_ms", "l1_ms", "verifier_ms", "total_ms")
+    stage_means: dict[str, float] = {}
+    for key in stage_keys:
+        vals = [t["timings"][key] for t in testcases
+                if isinstance(t.get("timings"), dict)
+                and isinstance(t["timings"].get(key), (int, float))]
+        if vals:
+            stage_means[key] = sum(vals) / len(vals)
+
     return {
         "total_wall_time": total,
         "mean_wall_time": total / len(walls) if walls else 0.0,
         "timed_out": sum(1 for t in testcases if t.get("timed_out")),
         "stalled": sum(1 for t in testcases if t.get("stalled")),
         "blocked_on_approval": sum(1 for t in testcases if t.get("blocked_on_approval")),
+        "stage_means": stage_means,
     }
+
+
+def _failure_stage_aggregate(testcases: list[dict]) -> dict:
+    """Count runs by the pipeline layer that explains their outcome. A failure
+    funnel: no_change / harness_error / l0 / l1 / verifier are losses at each
+    layer; `none` means the verifier ran (score may still be < 1 — a capability
+    gap, not a pipeline failure)."""
+    counts: dict[str, int] = {}
+    for t in testcases:
+        stage = t.get("failure_stage", "none")
+        counts[stage] = counts.get(stage, 0) + 1
+    return counts
 
 
 def load_testcase_catalog(testcases_dir: Path) -> list[dict]:
@@ -1217,7 +1326,12 @@ def report_detail(report: dict, testcase_id: str,
                 "log_text": _read_log_tail(log_path, reports_dir),
                 "ai_turns": ai_turns,
                 "total_tokens": ctx.get("total_tokens") if isinstance(ctx, dict) else None,
+                "slowest_turn": ctx.get("slowest_turn") if isinstance(ctx, dict) else None,
+                "total_turn_ms": ctx.get("total_turn_ms") if isinstance(ctx, dict) else None,
                 "wall_time": tc.get("wall_time"),
+                "failure_stage": tc.get("failure_stage", "none"),
+                "timings": tc.get("timings") or {},
+                "repeat": tc.get("repeat"),
             }
     return None
 

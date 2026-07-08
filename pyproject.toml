@@ -24,6 +24,16 @@ aigdbench = "aigamedevbench.cli:main"
 
 [tool.pytest.ini_options]
 addopts = ["-p", "no:libtmux"]
+norecursedirs = [
+    ".git",
+    ".venv",
+    "artifacts",
+    "build",
+    "dist",
+    "harness-artifacts",
+    "harness-logs",
+    "results",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/aigamedevbench"]

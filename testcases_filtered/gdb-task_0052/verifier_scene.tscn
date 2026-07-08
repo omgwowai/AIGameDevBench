@@ -1,9 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://__VERIFIER_GD__" id="1_vh1nn"]
-[ext_resource type="PackedScene" path="res://scenes/Main.tscn" id="2_7xf98"]
-
-[node name="TestRunner" type="Node"]
-script = ExtResource("1_vh1nn")
-
-[node name="Main" parent="." instance=ExtResource("2_7xf98")]

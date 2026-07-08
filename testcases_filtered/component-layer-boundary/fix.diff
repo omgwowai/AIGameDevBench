@@ -1,18 +1,18 @@
 diff --git a/components/health_component.gd b/components/health_component.gd
-index 6b972c1..8d66935 100644
+index 8ab522e..92fa72e 100644
 --- a/components/health_component.gd
 +++ b/components/health_component.gd
 @@ -1,13 +1,10 @@
 -extends Control
 +extends Node
- 
+
 -const HealthBar := preload("res://ui/health_bar.gd")
 +signal health_changed(ratio: float)
- 
+
  var max_health: int = 100
  var health: int = 100
 -var _bar = null
- 
+
  func take_damage(amount: int) -> void:
  	health = clampi(health - amount, 0, max_health)
 -	if _bar == null:

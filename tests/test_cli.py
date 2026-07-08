@@ -319,3 +319,199 @@ def test_run_command_driver_requires_cmd(tmp_path, monkeypatch):
     ])
     assert result.exit_code == 0
     assert "harness-cmd" in result.output.lower()
+
+
+def _folder_case(tcs, cid: str, base: int = 50, expected: int = 60):
+    tc = tcs / cid; tc.mkdir(parents=True)
+    (tc / "testcase.toml").write_text(f"""
+[testcase]
+id = "{cid}"
+category = "intent_translation"
+source_kind = "folder"
+task = "set attack"
+
+[verifier]
+type = "py_config"
+entry = "expected.json"
+
+[scoring]
+mode = "fields"
+""", encoding="utf-8")
+    (tc / "expected.json").write_text(json.dumps({"fields": [
+        {"name": "attack", "aliases": ["attack"], "files_glob": "**/*.json",
+         "expected": expected, "tol": 1e-6, "base": base, "must_differ_from_base": True},
+    ]}), encoding="utf-8")
+    baseline = tc / "baseline"; (baseline / "data").mkdir(parents=True)
+    (baseline / "data" / "char.json").write_text(
+        json.dumps({"attack": base}) + "\n", encoding="utf-8")
+
+
+def _run_report(tcs, report, jobs, cmd):
+    runner = CliRunner()
+    result = runner.invoke(main, [
+        "run", "--testcases-dir", str(tcs), "--driver", "command",
+        "--harness-cmd", cmd, "--harness", "fake", "--timeout", "60",
+        "--log-dir", str(tcs.parent / f"logs{jobs}"),
+        "--report", str(report), "--jobs", str(jobs),
+    ])
+    assert result.exit_code == 0, result.output
+    return json.loads(report.read_text(encoding="utf-8"))
+
+
+def test_parallel_run_matches_serial(tmp_path):
+    # --jobs 4 must produce identical per-testcase results (and order) to --jobs 1:
+    # the whole point of the driver-per-testcase refactor is deterministic
+    # parallelism, not a race that changes scores.
+    tcs = tmp_path / "testcases"
+    for i in range(6):
+        _folder_case(tcs, f"case-{i:04d}")
+    script = ("import pathlib, json; "
+              "p=pathlib.Path('data/char.json'); "
+              "p.write_text(json.dumps({'attack': 60})+chr(10))")
+    cmd = f'{sys.executable} -c "{script}"'
+
+    serial = _run_report(tcs, tmp_path / "serial.json", 1, cmd)
+    parallel = _run_report(tcs, tmp_path / "parallel.json", 4, cmd)
+
+    def key(rep):
+        return [(t["testcase_id"], t["score"], t["failure_stage"])
+                for t in rep["testcases"]]
+    assert key(serial) == key(parallel)
+    assert serial["mean_score"] == parallel["mean_score"] == 1.0
+    # Order is preserved (input order), not completion order.
+    assert [t["testcase_id"] for t in parallel["testcases"]] == \
+        [f"case-{i:04d}" for i in range(6)]
+
+
+def test_command_report_carries_ai_agent_context(tmp_path):
+    # A stream-json harness must surface structured turns/tokens in the report so
+    # the dashboard activity view lights up for our own runs (not just survey).
+    tcs = tmp_path / "testcases"
+    _folder_case(tcs, "case-events")
+    # A fake harness in its own script file: editing the file AND printing a
+    # stream-json event. A file avoids embedding JSON's double-quotes in the
+    # --harness-cmd template (shlex would mangle nested quotes).
+    harness_py = tmp_path / "fake_harness.py"
+    harness_py.write_text(
+        "import pathlib, json\n"
+        "pathlib.Path('data/char.json').write_text(json.dumps({'attack': 60}) + '\\n')\n"
+        "event = {'type': 'assistant', 'message': {"
+        "'content': [{'type': 'tool_use', 'name': 'Edit', "
+        "'input': {'file_path': 'data/char.json'}}], "
+        "'usage': {'input_tokens': 10, 'output_tokens': 5}}}\n"
+        "print(json.dumps(event))\n",
+        encoding="utf-8",
+    )
+    cmd = f'{sys.executable} {str(harness_py).replace(chr(92), "/")}'
+    rep = _run_report(tcs, tmp_path / "ev.json", 1, cmd)
+    tc0 = rep["testcases"][0]
+    assert tc0["score"] == 1.0, tc0
+    assert "ai_agent_context" in tc0
+    ctx = tc0["ai_agent_context"]
+    assert ctx["total_tokens"] == 15
+    assert ctx["turns"] and ctx["turns"][0]["tool_calls"] == ["Edit(data/char.json)"]
+
+
+def test_compare_cli_reports_significance(tmp_path):
+    # compare must align two reports on shared testcases and print a paired diff
+    # with a p-value; here A strictly dominates B, so it should read significant.
+    def _rep(path, harness, scores):
+        tcs = [{"testcase_id": f"t{i}", "category": "behavior_logic", "score": s}
+               for i, s in enumerate(scores)]
+        path.write_text(json.dumps({
+            "harness": harness, "count": len(tcs),
+            "mean_score": sum(scores) / len(scores), "testcases": tcs,
+        }), encoding="utf-8")
+
+    a = tmp_path / "a.json"; b = tmp_path / "b.json"
+    _rep(a, "alpha", [1.0, 1.0, 1.0, 1.0, 1.0])
+    _rep(b, "beta", [0.0, 0.0, 0.0, 0.0, 0.0])
+    runner = CliRunner()
+    result = runner.invoke(main, [
+        "compare", "--report-a", str(a), "--report-b", str(b),
+        "--iters", "1000", "--seed", "0",
+    ])
+    assert result.exit_code == 0, result.output
+    assert "alpha" in result.output and "beta" in result.output
+    assert "5 shared testcase" in result.output
+    assert "significant" in result.output
+    assert "favors alpha" in result.output
+
+
+def test_compare_cli_no_common_testcases(tmp_path):
+    def _rep(path, harness, ids):
+        tcs = [{"testcase_id": i, "category": "behavior_logic", "score": 1.0} for i in ids]
+        path.write_text(json.dumps({"harness": harness, "count": len(tcs),
+                                    "mean_score": 1.0, "testcases": tcs}), encoding="utf-8")
+    a = tmp_path / "a.json"; b = tmp_path / "b.json"
+    _rep(a, "alpha", ["x", "y"])
+    _rep(b, "beta", ["p", "q"])
+    result = CliRunner().invoke(main, ["compare", "--report-a", str(a), "--report-b", str(b)])
+    assert result.exit_code == 0
+    assert "No common testcases" in result.output
+
+
+def _flaky_harness(tmp_path, counter):
+    """A fake harness whose success alternates by call count: it increments a
+    shared counter file and only sets attack=60 on ODD-numbered calls, so over N
+    attempts exactly ceil(N/2) pass. Deterministic distribution to assert on."""
+    h = tmp_path / "flaky_harness.py"
+    h.write_text(
+        "import pathlib, json\n"
+        f"c = pathlib.Path(r'{counter}'.replace(chr(92), '/'))\n"
+        "n = int(c.read_text()) if c.exists() else 0\n"
+        "n += 1\n"
+        "c.write_text(str(n))\n"
+        "if n % 2 == 1:\n"
+        "    pathlib.Path('data/char.json').write_text(json.dumps({'attack': 60}) + '\\n')\n",
+        encoding="utf-8",
+    )
+    return f'{sys.executable} {str(h).replace(chr(92), "/")}'
+
+
+def test_repeat_builds_distribution_and_mean_score(tmp_path):
+    # --repeat 4 must attach a `repeat` block with the per-attempt scores and set
+    # the record's score to their mean, so a stochastic harness is measurable.
+    tcs = tmp_path / "testcases"
+    _folder_case(tcs, "case-flaky")
+    counter = tmp_path / "count.txt"
+    cmd = _flaky_harness(tmp_path, counter)
+    runner = CliRunner()
+    report = tmp_path / "rep.json"
+    result = runner.invoke(main, [
+        "run", "--testcases-dir", str(tcs), "--driver", "command",
+        "--harness-cmd", cmd, "--harness", "flaky", "--timeout", "60",
+        "--log-dir", str(tmp_path / "logs"),
+        "--report", str(report), "--repeat", "4",
+    ])
+    assert result.exit_code == 0, result.output
+    data = json.loads(report.read_text(encoding="utf-8"))
+    assert data["repeat"] == 4
+    tc0 = data["testcases"][0]
+    rpt = tc0["repeat"]
+    assert rpt["n"] == 4
+    assert len(rpt["scores"]) == 4
+    # Odd calls (1st, 3rd) pass -> 2 of 4 -> mean 0.5.
+    assert sorted(rpt["scores"]) == [0.0, 0.0, 1.0, 1.0]
+    assert tc0["score"] == 0.5 == rpt["mean"]
+    assert rpt["pass_at_1"] == 0.5
+    assert rpt["std"] > 0.0
+    # The suite CI is written at the top level too.
+    assert "mean_score_ci95" in data
+    # Failure funnel counts every attempt, so the two no-change attempts show.
+    assert rpt["failure_stages"].get("no_change") == 2
+
+
+def test_repeat_one_is_backward_compatible(tmp_path):
+    # --repeat 1 must produce the exact same record shape as before: no `repeat`
+    # block, score is the single attempt's score.
+    tcs = tmp_path / "testcases"
+    _folder_case(tcs, "case-single")
+    script = ("import pathlib, json; "
+              "pathlib.Path('data/char.json').write_text(json.dumps({'attack':60})+chr(10))")
+    cmd = f'{sys.executable} -c "{script}"'
+    data = _run_report(tcs, tmp_path / "one.json", 1, cmd)
+    assert data.get("repeat") == 1
+    tc0 = data["testcases"][0]
+    assert "repeat" not in tc0
+    assert tc0["score"] == 1.0

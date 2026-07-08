@@ -1,0 +1,20 @@
+[testcase]
+id = "survey-history_2023-08-21_9cbd293_003"
+category = "architecture"
+source_kind = "folder"
+snapshot = "godot-open-rpg__9cbd293"
+source_repo = "survey:godot-open-rpg (offline snapshot)"
+task = """
+Investigate and fix the defect in the following file(s), making the affected feature behave correctly: .gitattributes, .gitignore, CHANGELOG.md, CREDITS.md, LICENSE, README.md, addons/dialogic/Editor/CharacterEditor/char_edit_p_section_exports.gd, addons/dialogic/Editor/CharacterEditor/char_edit_p_section_exports.tscn.
+"""
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "gated"
+
+[provenance]
+source = "survey-history (migrated to filtered)"
+notes = "Real bug-fix commit from gdquest-demos/godot-open-rpg. Base snapshot = the fix commit's pre-image (buggy state). gated scoring: noop=0, good.diff=1. Snapshot generated on demand by scripts/make_snapshots.py."

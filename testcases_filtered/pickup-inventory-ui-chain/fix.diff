@@ -1,49 +1,21 @@
 diff --git a/scripts/hud_label.gd b/scripts/hud_label.gd
-index 37774f1..59e0840 100644
 --- a/scripts/hud_label.gd
 +++ b/scripts/hud_label.gd
-@@ -1,14 +1,8 @@
- extends Label
- class_name HudLabel
- 
--# Displays the inventory count. Must connect to the Inventory's
--# inventory_changed signal and update its text to str(new_count).
--#
--# BASELINE (buggy): bind() does nothing, so the label never updates.
--
+@@ -6,4 +6,4 @@
  func bind(inventory: Inventory) -> void:
--	# TODO: connect inventory.inventory_changed to _on_inventory_changed.
 -	pass
 +	inventory.inventory_changed.connect(_on_inventory_changed)
- 
+
  func _on_inventory_changed(new_count: int) -> void:
- 	text = str(new_count)
 diff --git a/scripts/inventory.gd b/scripts/inventory.gd
-index 25015f7..d7bcd17 100644
 --- a/scripts/inventory.gd
 +++ b/scripts/inventory.gd
-@@ -1,21 +1,17 @@
- extends Node
- class_name Inventory
- 
--# Holds a count of collected items. add_item() must increase the count and emit
--# inventory_changed(new_count). collect_pickup(id) records a pickup but must be
--# idempotent per id (collecting the same pickup id twice does nothing).
--#
--# BASELINE (buggy): no signal emitted; collect_pickup is NOT idempotent.
--
- signal inventory_changed(new_count: int)
- 
- var count: int = 0
- var _seen_ids: Array = []
- 
+@@ -10,5 +10,8 @@
  func add_item() -> void:
--	# TODO: increment count and emit inventory_changed(count).
  	count += 1
 +	inventory_changed.emit(count)
- 
+
  func collect_pickup(id: int) -> void:
--	# TODO: ignore ids already collected; otherwise record and add_item().
 +	if _seen_ids.has(id):
 +		return
 +	_seen_ids.append(id)

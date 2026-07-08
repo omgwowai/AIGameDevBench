@@ -1,0 +1,20 @@
+[testcase]
+id = "survey-history_2026-01-26_1406822_013"
+category = "architecture"
+source_kind = "folder"
+snapshot = "godot-open-rpg__1406822"
+source_repo = "survey:godot-open-rpg (offline snapshot)"
+task = """
+Investigate and fix the defect in the following file(s), making the affected feature behave correctly: overworld/maps/town/battles/test_combat_arena.tscn, src/combat/battlers/battler.gd, src/combat/combat_ai_random.gd, src/combat/ui/action_menu/ui_action_button.gd, src/combat/ui/action_menu/ui_action_menu.gd, src/combat/ui/cursors/ui_battler_target_cursor.gd, src/combat/ui/ui_combat.gd, src/combat/ui/ui_combat.tscn.
+"""
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "gated"
+
+[provenance]
+source = "survey-history (migrated to filtered)"
+notes = "Real bug-fix commit from gdquest-demos/godot-open-rpg. Base snapshot = the fix commit's pre-image (buggy state). gated scoring: noop=0, good.diff=1. Snapshot generated on demand by scripts/make_snapshots.py."

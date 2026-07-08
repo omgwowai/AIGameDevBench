@@ -81,11 +81,20 @@ def test_command_driver_records_outcome(tmp_path):
         "blocked_on_approval",
         "completed_but_hung",
         "log_path",
+        "ai_agent_context",
     }
     assert o["exit_code"] == 0
     assert o["timed_out"] is False
     assert o["wall_time"] >= 0.0
     assert Path(o["log_path"]).exists()
+    # The event parser always populates a context block (turns may be empty for
+    # a harness that emits no recognisable events).
+    assert set(o["ai_agent_context"]) == {
+        "turns",
+        "total_tokens",
+        "slowest_turn",
+        "total_turn_ms",
+    }
 
 
 def test_command_driver_nonzero_exit_does_not_raise(tmp_path):

@@ -1,0 +1,6 @@
+{
+  "snapshot": "godot-open-rpg__1406822",
+  "repo_url": "https://github.com/gdquest-demos/godot-open-rpg",
+  "base_ref": "1406822",
+  "note": "base_ref is the fix commit (pre-image is its tree); good.diff applies cleanly on it and is the golden fix."
+}

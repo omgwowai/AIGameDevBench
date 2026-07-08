@@ -2,35 +2,15 @@ diff --git a/scripts/equipment.gd b/scripts/equipment.gd
 index fd6a981..8a6be11 100644
 --- a/scripts/equipment.gd
 +++ b/scripts/equipment.gd
-@@ -1,24 +1,16 @@
- extends Node
- class_name Equipment
- 
--# Equips one item per slot and tracks the total attack bonus.
--# Contract:
--#   - equip(slot, bonus): equips into `slot`. If something is already in that
--#     slot, its bonus is removed first (no stale bonus), then the new bonus is
--#     applied. total_bonus reflects the sum of currently-equipped slots.
--#   - unequip(slot): removes whatever is in that slot and its bonus.
--#   - equipping the same slot twice must NOT double-count (the old bonus is
--#     replaced, not added on top).
--#
--# BASELINE: unimplemented stubs.
--
- var total_bonus: int = 0
--var _slots: Dictionary = {}  # slot -> bonus
-+var _slots: Dictionary = {}
- 
+@@ -8,5 +8,10 @@ var _slots: Dictionary = {}  # slot -> bonus
  func equip(slot: String, bonus: int) -> void:
--	# TODO: replace any existing bonus in this slot, then apply the new one.
 -	pass
 +	if _slots.has(slot):
 +		total_bonus -= _slots[slot]
 +	_slots[slot] = bonus
 +	total_bonus += bonus
- 
+
  func unequip(slot: String) -> void:
--	# TODO: remove the slot's bonus.
 -	pass
 +	if _slots.has(slot):
 +		total_bonus -= _slots[slot]
@@ -39,29 +19,8 @@ diff --git a/scripts/inventory.gd b/scripts/inventory.gd
 index ec6ac95..3c8488e 100644
 --- a/scripts/inventory.gd
 +++ b/scripts/inventory.gd
-@@ -1,30 +1,24 @@
- extends Node
- class_name Inventory
- 
--# A slot-limited, stacking inventory.
--# Contract:
--#   - capacity is the max number of distinct SLOTS (stacks), not total items.
--#   - add(item_id, qty): if a stack for item_id exists, increase its quantity
--#     (no new slot). Otherwise, if a free slot exists, create a new stack.
--#     If full and the item is not already stacked, return false and add nothing.
--#     Returns true if anything was added.
--#   - total_quantity() returns the sum of all stack quantities.
--#   - slot_count() returns the number of occupied slots.
--#
--# BASELINE: unimplemented stubs.
--
- @export var capacity: int = 3
- 
--var _stacks: Dictionary = {}  # item_id -> quantity
-+var _stacks: Dictionary = {}
- 
- func add(item_id: String, qty: int) -> bool:
--	# TODO: implement stacking + capacity per the contract.
+@@ -8,11 +8,17 @@ func add(item_id: String, qty: int) -> bool:
+-	# TODO: implement
 -	return false
 +	if _stacks.has(item_id):
 +		_stacks[item_id] += qty
@@ -70,7 +29,7 @@ index ec6ac95..3c8488e 100644
 +		return false
 +	_stacks[item_id] = qty
 +	return true
- 
+
  func total_quantity() -> int:
 -	# TODO
 -	return 0
@@ -78,7 +37,7 @@ index ec6ac95..3c8488e 100644
 +	for q in _stacks.values():
 +		t += q
 +	return t
- 
+
  func slot_count() -> int:
 -	# TODO
 -	return 0

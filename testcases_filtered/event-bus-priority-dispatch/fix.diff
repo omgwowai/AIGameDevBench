@@ -1,33 +1,14 @@
 diff --git a/scripts/event_bus.gd b/scripts/event_bus.gd
-index 214693d..22a164a 100644
 --- a/scripts/event_bus.gd
 +++ b/scripts/event_bus.gd
-@@ -1,38 +1,37 @@
- extends Node
- class_name EventBus
- 
--# A priority-ordered event bus.
--# Contract:
--#   - subscribe(id: String, priority: int): register a subscriber identified by
--#     id with the given priority. Higher priority is dispatched FIRST. Ties are
--#     dispatched in subscription (insertion) order. Re-subscribing an existing
--#     id updates it to the new priority.
--#   - unsubscribe(id): remove a subscriber; it must never be dispatched again.
--#   - publish(): clear dispatch_log, then append each current subscriber's id to
--#     dispatch_log in dispatch order (priority desc, ties by insertion).
--#   - publish_removing(remove_id): same as publish(), but remove_id is
--#     unsubscribed BEFORE dispatch begins, so it must not appear in the log and
--#     every other subscriber must still be dispatched in the correct order
--#     (i.e. removal must not corrupt the iteration).
--#
--# BASELINE: unimplemented.
--
+@@ -3,20 +3,35 @@
+
  var dispatch_log: Array = []
- 
+
 -var _subs: Array = []   # array of {"id":String, "priority":int}
 +var _subs: Array = []   # array of {"id":String, "priority":int, "seq":int}
 +var _seq: int = 0
- 
+
  func subscribe(id: String, priority: int) -> void:
 -	# TODO
 -	pass
@@ -37,7 +18,7 @@ index 214693d..22a164a 100644
 +			return
 +	_subs.append({"id": id, "priority": priority, "seq": _seq})
 +	_seq += 1
- 
+
  func unsubscribe(id: String) -> void:
 -	# TODO
 -	pass
@@ -52,14 +33,14 @@ index 214693d..22a164a 100644
 +			return a["priority"] > b["priority"]
 +		return a["seq"] < b["seq"])
 +	return arr
- 
+
  func publish() -> void:
 -	# TODO
 -	pass
 +	dispatch_log = []
 +	for s in _ordered():
 +		dispatch_log.append(s["id"])
- 
+
  func publish_removing(remove_id: String) -> void:
 -	# TODO
 -	pass

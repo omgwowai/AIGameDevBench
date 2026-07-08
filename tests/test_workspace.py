@@ -4,7 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from aigamedevbench.workspace import isolated_workspace, folder_workspace, apply_patch
+from aigamedevbench.workspace import (
+    isolated_workspace, folder_workspace, apply_patch, _normalize_hunk_blank_lines,
+)
 from aigamedevbench.git_ops import git_run
 
 
@@ -107,3 +109,79 @@ def test_folder_workspace_missing_dir(tmp_path):
     with pytest.raises(FileNotFoundError):
         with folder_workspace(tmp_path / "nope"):
             pass
+
+
+# --- blank-context-line normalization (empty hunk lines -> " ") ---
+
+def test_normalize_hunk_blank_lines_fixes_empty_context():
+    # A blank context line emitted as "" (no leading space) is invalid; it must
+    # become " ". +/-/space lines and all headers are left untouched.
+    patch = (
+        "diff --git a/f.gd b/f.gd\n"
+        "--- a/f.gd\n"
+        "+++ b/f.gd\n"
+        "@@ -1,3 +1,3 @@\n"
+        " extends Node\n"
+        "\n"                        # <-- empty context line (the bug)
+        "-var x = 1\n"
+        "+var x = 2\n"
+    )
+    out = _normalize_hunk_blank_lines(patch)
+    lines = out.split("\n")
+    # The blank context line is now a single space; real content is unchanged.
+    assert " extends Node" in lines
+    assert lines[lines.index(" extends Node") + 1] == " "
+    assert "-var x = 1" in lines
+    assert "+var x = 2" in lines
+
+
+def test_normalize_leaves_headers_and_wellformed_lines_untouched():
+    patch = (
+        "diff --git a/f.gd b/f.gd\n"
+        "index abc..def 100644\n"
+        "--- a/f.gd\n"
+        "+++ b/f.gd\n"
+        "@@ -1 +1 @@\n"
+        "-a\n"
+        "+b\n"
+    )
+    # No blank hunk lines -> identical output (idempotent on well-formed patches).
+    assert _normalize_hunk_blank_lines(patch) == patch
+
+
+def test_normalize_does_not_touch_blank_lines_outside_hunks():
+    # A blank line between the header block and a hunk (not inside a hunk body)
+    # must not be turned into " ".
+    patch = (
+        "diff --git a/f.gd b/f.gd\n"
+        "--- a/f.gd\n"
+        "+++ b/f.gd\n"
+        "@@ -1 +1 @@\n"
+        "-a\n"
+        "+b\n"
+    )
+    assert _normalize_hunk_blank_lines(patch) == patch
+
+
+def test_apply_patch_succeeds_with_empty_context_lines(tmp_path):
+    # End-to-end: a diff whose blank context lines lost their leading space (as
+    # LLM/editor-produced patches often do) must still apply. Without the
+    # normalization git rejects it with "patch does not apply".
+    baseline = tmp_path / "baseline"
+    (baseline / "scripts").mkdir(parents=True)
+    # A file WITH a blank line in the middle, so the patch needs a blank context line.
+    (baseline / "scripts" / "main.gd").write_text(
+        "extends Node\n\nvar x = 1\n", encoding="utf-8")
+    patch = (
+        "diff --git a/scripts/main.gd b/scripts/main.gd\n"
+        "--- a/scripts/main.gd\n"
+        "+++ b/scripts/main.gd\n"
+        "@@ -1,3 +1,3 @@\n"
+        " extends Node\n"
+        "\n"                        # empty context line for the blank middle line
+        "-var x = 1\n"
+        "+var x = 2\n"
+    )
+    with folder_workspace(baseline) as ws:
+        apply_patch(ws, patch)  # must not raise
+        assert "var x = 2" in (ws / "scripts" / "main.gd").read_text(encoding="utf-8")

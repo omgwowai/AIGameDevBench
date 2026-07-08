@@ -1,20 +1,8 @@
 diff --git a/scripts/ability.gd b/scripts/ability.gd
-index 706a536..646d851 100644
+index 1264fbd..e3730aa 100644
 --- a/scripts/ability.gd
 +++ b/scripts/ability.gd
-@@ -1,23 +1,22 @@
- extends Node
- class_name Ability
- 
--# An ability with a cooldown. After use(), it must not be usable again until
-+# An ability with a cooldown. After use(), it cannot be used again until
- # `cooldown` seconds have elapsed (advanced via tick()).
--#
--# BASELINE (unimplemented): use() does nothing to gate re-use and can_use()
--# always returns true, so the ability can fire every frame.
- 
- @export var cooldown: float = 1.0
- 
+@@ -7,10 +7,14 @@ class_name Ability
  var _time_remaining: float = 0.0
  
  func can_use() -> bool:
@@ -22,14 +10,12 @@ index 706a536..646d851 100644
 +	return _time_remaining <= 0.0
  
  func use() -> bool:
--	# TODO: only succeed when off cooldown, and start the cooldown on success.
 +	if not can_use():
 +		return false
 +	_time_remaining = cooldown
  	return true
  
  func tick(delta: float) -> void:
--	# TODO: advance the cooldown timer.
 -	pass
 +	if _time_remaining > 0.0:
 +		_time_remaining = max(0.0, _time_remaining - delta)

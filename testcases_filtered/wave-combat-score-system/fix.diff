@@ -1,10 +1,8 @@
 diff --git a/scripts/enemy.gd b/scripts/enemy.gd
+index 9a6db3f..d475a3a 100644
 --- a/scripts/enemy.gd
 +++ b/scripts/enemy.gd
-@@ -10,5 +10,10 @@ var hp: int = 10
- var state: String = "alive"
- 
- func take_damage(n: int) -> void:
+@@ -12,3 +12,10 @@ func take_damage(n: int) -> void:
 -	# TODO: implement
 -	pass
 +	if state == "dead":
@@ -15,12 +13,10 @@ diff --git a/scripts/enemy.gd b/scripts/enemy.gd
 +		state = "dead"
 +		died.emit(self)
 diff --git a/scripts/game_controller.gd b/scripts/game_controller.gd
+index 1adabf7..6a228b2 100644
 --- a/scripts/game_controller.gd
 +++ b/scripts/game_controller.gd
-@@ -15,13 +15,43 @@ var won: bool = false
- var _enemies: Array = []
- 
- func start() -> void:
+@@ -18,11 +18,41 @@ func start() -> void:
 -	# TODO: implement
 -	pass
 +	current_wave = 0
@@ -50,7 +46,7 @@ diff --git a/scripts/game_controller.gd b/scripts/game_controller.gd
 +	else:
 +		won = true
 +		game_won.emit()
- 
+
  func alive_count() -> int:
 -	# TODO
 -	return 0
@@ -59,7 +55,7 @@ diff --git a/scripts/game_controller.gd b/scripts/game_controller.gd
 +		if e.state != "dead":
 +			c += 1
 +	return c
- 
+
  func kill_one() -> void:
 -	# TODO: implement
 -	pass
