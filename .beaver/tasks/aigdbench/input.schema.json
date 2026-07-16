@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/omgwowai/AIGameDevBench/blob/main/.beaver/tasks/aigdbench/input.schema.json",
+  "title": "aigdbench TaskPackage input (spec/v1)",
+  "description": "Input contract read from /in/input.json by .beaver/tasks/aigdbench/run.sh. Matches the {driver, testcase} shape already documented for the beaver-godot binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["driver"],
+  "properties": {
+    "driver": {
+      "type": "string",
+      "enum": ["noop", "patch"],
+      "description": "noop runs the unmodified baseline (contract: mean_score 0.00); patch applies the testcase's own fix.diff golden fix (contract: mean_score 1.00 for a healthy testcase)."
+    },
+    "testcase": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*$",
+      "default": "collision-layer-precise-edit",
+      "description": "Bare id of a testcases/<id>/ directory in this repo (no path separators, no leading dot). Defaults to collision-layer-precise-edit, a self-contained, verified-healthy (noop=0.00, patch=1.00) folder-type case, when omitted."
+    }
+  },
+  "examples": [
+    { "driver": "noop" },
+    { "driver": "patch", "testcase": "collision-layer-precise-edit" }
+  ]
+}

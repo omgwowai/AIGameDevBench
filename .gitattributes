@@ -1,0 +1,5 @@
+# .beaver/tasks/aigdbench/run.sh is exec'd directly (argv: [bash, ...]) by a
+# BeaverHub TaskPackage runtime -- a CRLF-mangled shebang line breaks `bash`
+# on the Linux runtime this TaskPackage actually targets. Force LF regardless
+# of a contributor's local core.autocrlf setting.
+.beaver/tasks/aigdbench/run.sh text eol=lf

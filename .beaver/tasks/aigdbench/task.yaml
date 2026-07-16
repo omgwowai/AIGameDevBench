@@ -1,0 +1,70 @@
+# BeaverHub TaskPackage — aigdbench (ADR-0068 / TPK-3 TaskPackageV1)
+#
+# This is the OWNING-REPO half of the beaver-godot binding published in
+# BeaverHub's catalog (images/beavers.yaml, source_repo: omgwowai/AIGameDevBench,
+# task aigdbench). Per ADR-0068 (BeaverHub): "a Beaver carries no business
+# semantics, a TaskPackage carries no runtime detail" — this file is the
+# business-owned execution unit; it declares the GENERIC runtime shape it
+# needs (binaries + capability slugs) and defers all engine/OS provisioning to
+# whatever runtime BeaverHub dispatches it onto (today: the beaver-godot image;
+# the ADR-0068 target: a generic "godot" runtime carrying no source_repo).
+#
+# Shape mirrors BeaverHub's own conformance fixtures
+# (examples/task-minimal, task-with-credentials, task-repo-test,
+# task-with-artifacts in the BeaverHub repo) field-for-field.
+#
+# Value-free (BeaverHub ADR-0003/0018): generic capability slugs, an argv
+# (never a shell string), repo-relative and /out-rooted paths, a duration —
+# never a secret value, a host address, or a literal host path.
+apiVersion: beaverhub.dev/task/v1
+kind: TaskPackage
+metadata:
+  name: aigdbench
+  version: "1"
+spec:
+  runtime:
+    requires:
+      # binary NAME -> version constraint. `godot` is a generic game-engine
+      # binary name (not a business capability) — confirmed against BeaverHub's
+      # own images/beaver-godot/Dockerfile, which bakes headless Godot 4.6.3;
+      # this repo's own dev/test evidence (see docs/beaverhub-taskpackage.md)
+      # used 4.6.2 successfully, so ">=4.6" is the declared floor.
+      binaries:
+        python3: ">=3.10"
+        godot: ">=4.6"
+        git: ">=2.30"
+      # Generic capability slugs only (no business-named `supports_*`, per
+      # ADR-0068 §3/§4). `workspace.repo`: the entrypoint must run from inside
+      # a checkout of THIS repo (it scores against the repo's own bundled
+      # testcases/ corpus — no external PVC, no NO-BAKE indirection).
+      # `artifacts.write`: the entrypoint saves a diff + changed-file copies
+      # under /out/artifacts alongside the result envelope.
+      #
+      # Deliberately NOT declared: network.egress. This TaskPackage is
+      # offline/no-secret end to end (matches the existing beaver-godot
+      # description.md claim); see docs/beaverhub-taskpackage.md "Known gaps"
+      # for the one consequence of that choice (the runtime must already have
+      # `pip install .` of this repo done — run.sh does not fetch packages).
+      capabilities: [workspace.repo, artifacts.write]
+  entrypoint:
+    # argv the runtime execs directly — NOT a shell string.
+    argv: [bash, .beaver/tasks/aigdbench/run.sh]
+  input:
+    schema: .beaver/tasks/aigdbench/input.schema.json
+  output:
+    # Both a result envelope and an artifacts tree, both /out-rooted.
+    # domainKind is OPAQUE to BeaverHub (ADR-0068 §4 rule 5) — it never parses
+    # mean_score/checks; it only sees this run's exit-class.
+    result: /out/result.json
+    artifacts: /out/artifacts
+    domainKind: aigamedevbench.result/v1
+  # No credentials: aigdbench is a pure offline scorer (headless Godot +
+  # read-only testcase corpus bundled in this repo's own checkout); it makes
+  # no network call and needs no secret.
+  credentials: []
+  # A single-testcase headless Godot run is fast (single digits of seconds in
+  # local dev evidence); 30m matches the profile BeaverHub's own
+  # docs/beaverhub/profile-beaver-godot.example.yaml example used
+  # (activeDeadlineSeconds: 1800) and leaves headroom for a cold Godot import
+  # pass on a first-time run.
+  timeout: 30m

@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/omgwowai/AIGameDevBench/blob/main/.beaver/tasks/aigdbench/result.schema.json",
+  "title": "aigdbench TaskPackage result (domainKind aigamedevbench.result/v1)",
+  "description": "Result envelope written to /out/result.json by .beaver/tasks/aigdbench/run.sh. Opaque to BeaverHub (ADR-0068 SS4 rule 5) -- only this repo's own consumers (dashboard, CI provider, an operator) interpret mean_score/checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["testcase", "driver", "status", "exit_code", "mean_score", "stdout_path", "stderr_path"],
+  "properties": {
+    "testcase": {
+      "type": "string",
+      "description": "The testcase id that was scored (echoes input.testcase, or the schema default when omitted)."
+    },
+    "driver": {
+      "type": "string",
+      "enum": ["noop", "patch"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failed"],
+      "description": "Derived from the scorer process's own exit code (0 -> success, non-zero -> failed) -- never from mean_score. A correctly-measured noop=0.00 run is status=success."
+    },
+    "exit_code": {
+      "type": "integer",
+      "description": "The aigdbench CLI's verbatim process exit code."
+    },
+    "mean_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "0..1 checkpoint-weighted score for the single scored testcase, or null if the report could not be parsed (see status/exit_code for why)."
+    },
+    "checks": {
+      "type": "array",
+      "description": "Per-checkpoint verifier detail, when the CLI's run report included one (folder/git testcases with a godot_scene_assert or similar checkpoints verifier).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "passed"],
+        "properties": {
+          "name": { "type": "string" },
+          "passed": { "type": "boolean" },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "stdout_path": {
+      "type": "string",
+      "description": "/out-rooted path to the captured aigdbench CLI stdout."
+    },
+    "stderr_path": {
+      "type": "string",
+      "description": "/out-rooted path to the captured aigdbench CLI stderr."
+    }
+  }
+}
