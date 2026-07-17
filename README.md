@@ -21,6 +21,7 @@ harness 的改动由自动验证器打分。核心契约：**什么都不做必�
 - [脚本一览](#脚本一览scripts)
 - [Webhook 自动触发](#webhook-自动触发pr-opened--gated-候选--自动合并发布)
 - [运行测试](#运行测试)
+- [开发者文档](#开发者文档) — 架构 · 原理 · 关键路由（[`docs/dev.md`](docs/dev.md)）
 
 ---
 
@@ -739,3 +740,11 @@ scripts/bench-orchestrator.sh --mode watch-logs \
 ```bash
 pytest
 ```
+
+---
+
+## 开发者文档
+
+面向开发者的完整参考——整体架构、一次评测的生命周期、testcase 数据模型、
+driver / 验证器 / L0-L1 门、dashboard 与 webhook 链路、k8s/本地矩阵执行，
+以及**关键路由与代码路径速查**，见 [`docs/dev.md`](docs/dev.md)。
