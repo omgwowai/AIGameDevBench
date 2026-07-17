@@ -1,0 +1,28 @@
+[testcase]
+id = "survey-stardive_26f37eb_retaliation-offender"
+category = "behavior_logic"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__15c57f2"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+In this tavern sim, a guard is supposed to retaliate against whoever starts a fight. When a `combat_started` game event fires nearby, the guard's event reaction (attack_started_guard_reaction) forces the `attack_npc` behavior. The bug: event_listener (res://scripts/components/event_listener.gd) forces that behavior with an EMPTY params dictionary — it never tells the runner WHO to hit. `attack_npc`'s target_query is TargetType.NEAREST_NPC, so with no explicit target the runner falls back to the physically nearest NPC. The result is the guard punching an innocent bystander who happens to be standing closest, instead of the offender who actually started the combat.
+
+Fix it so the forced retaliation aims at the offender named in the event payload:
+- Read the offender from the payload (its `actor`, falling back to `source`); only a valid NPC counts.
+- When the reaction forces an NPC-targeting behavior (target_query.target_type == NEAREST_NPC), pin the offender's id as an explicit `target_npc_id` in the forced params passed to brain.force_behavior — the same path the LLM uses — so the runner targets the culprit rather than picking nearest.
+- If there is no valid offender, or the offender is the guard itself (its own event echoing back), skip the reaction rather than degrading into "attack the nearest person".
+After the fix, `guard.brain.forced_params.get(&"target_npc_id")` must equal the offender's id, and a self-triggered event must not force any behavior.
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:26f37eb"
+bad_case_type = "B1"
+notes = "Real behavior-logic fix from stardive_kugutsushi (commit 26f37eb). Baseline (parent 15c57f2) forces attack_npc with empty params, so the guard's retaliation falls back to NEAREST_NPC and hits the nearest bystander instead of the offender in the payload. Adapted from the fix's own regression test tools/test_combat.gd::_test_guard_targets_offender. Snapshot generated on demand by scripts/make_snapshots.py."

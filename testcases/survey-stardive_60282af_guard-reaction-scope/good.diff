@@ -1,0 +1,57 @@
+diff --git a/autoload/DataCatalog.gd b/autoload/DataCatalog.gd
+index 103f783..6e18713 100644
+--- a/autoload/DataCatalog.gd
++++ b/autoload/DataCatalog.gd
+@@ -207,7 +207,9 @@ func get_reactions_for_event(event_id: StringName) -> Array[EventReactionDef]:
+ 	var result: Array[EventReactionDef] = []
+ 	for reaction in event_reactions.get(event_id, []):
+ 		var reaction_def := reaction as EventReactionDef
+-		if reaction_def != null:
++		# Non-global reactions are only applied to NPCs that opt in through their
++		# profile's event_reaction_ids, not broadcast to everyone in range.
++		if reaction_def != null and reaction_def.is_global:
+ 			result.append(reaction_def)
+ 	return result
+ 
+@@ -1137,6 +1139,7 @@ func _event_reaction_from_config(data: Dictionary) -> EventReactionDef:
+ 	reaction.interrupt_priority = int(data.get("interrupt_priority", 0))
+ 	reaction.forced_behavior_id = _sn(data.get("forced_behavior_id", ""))
+ 	reaction.memory_duration = float(data.get("memory_duration", 0.0))
++	reaction.is_global = bool(data.get("global", true))
+ 	return reaction
+ 
+ func _has_event_reaction_config(data: Dictionary) -> bool:
+diff --git a/configs/ai_catalog/events.json b/configs/ai_catalog/events.json
+index 9a6cc25..65d2eb7 100644
+--- a/configs/ai_catalog/events.json
++++ b/configs/ai_catalog/events.json
+@@ -307,6 +307,7 @@
+ 		"reaction_id": "attack_started_guard_reaction",
+ 		"event_id": "combat_started",
+ 		"feel": "{detail}",
++		"global": false,
+ 		"conditions": [
+ 			{
+ 				"type": "EVENT_DISTANCE_LESS_THAN",
+@@ -321,6 +322,7 @@
+ 		"reaction_id": "theft_guard_reaction",
+ 		"event_id": "steal_succeeded",
+ 		"feel": "{detail}",
++		"global": false,
+ 		"conditions": [
+ 			{
+ 				"type": "EVENT_DISTANCE_LESS_THAN",
+diff --git a/scripts/resources/event_reaction_def.gd b/scripts/resources/event_reaction_def.gd
+index 724d230..374f994 100644
+--- a/scripts/resources/event_reaction_def.gd
++++ b/scripts/resources/event_reaction_def.gd
+@@ -9,3 +9,9 @@ class_name EventReactionDef
+ @export var interrupt_priority := 0
+ @export var forced_behavior_id: StringName = &""
+ @export var memory_duration := 0.0
++# When true (default) the reaction is broadcast to every NPC in range via
++# DataCatalog.get_reactions_for_event (used by danger/performance ambient cues).
++# Set false for reactions that must only fire for NPCs whose profile explicitly
++# lists them in event_reaction_ids (e.g. the guard-only combat/theft response),
++# otherwise the whole crowd inherits the forced behavior.
++@export var is_global := true

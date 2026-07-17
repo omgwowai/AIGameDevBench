@@ -1,0 +1,29 @@
+[testcase]
+id = "survey-stardive_afda272_rescue-state-gating"
+category = "behavior_logic"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__ee84ed2"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+In this tavern sim, when an NPC is knocked out (gains the incapacitating `stunned` buff) other NPCs are supposed to be able to come to the rescue. The `rescue_npc` behavior (res://configs/ai_catalog/behaviors.json) is a global behavior whose target_query resolves the NEAREST_NPC carrying the `stunned` buff, and its whole point is that rescue availability binds to that fainted/incapacitated STATE — anyone should be able to come help, not only NPCs who happen to be standing right next to the victim.
+
+Two things are broken:
+- The rescue is over-gated by distance. `rescue_npc`'s target_query has `max_distance = 500.0`, so a would-be rescuer standing farther than 500px from a stunned NPC never sees `rescue_npc` as a valid candidate (TargetResolver.NEAREST_NPC drops the target on distance). Rescue should be gated on the stunned state, not proximity — widen the reach so a distant NPC still gets the rescue option while someone is stunned.
+- Going down is silent. When an NPC gains an incapacitating buff, `_on_buff_added` (res://scripts/actors/npc.gd) updates local visuals but never tells the world, so nearby NPCs are never interrupted to reconsider and come help. Emit an `npc_incapacitated` world event (via EventBus.emit_game_event) from `_on_buff_added` when the NPC goes down, carrying the fallen NPC as source/actor so it can drive a rethink.
+
+The observable contract: while a victim is `stunned`, a valid `rescue_npc` candidate must be offered to another NPC regardless of distance, and the moment the victim goes down an `npc_incapacitated` event must be broadcast on the EventBus.
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:afda272"
+bad_case_type = "B1"
+notes = "Real behavior-logic fix from stardive_kugutsushi (commit afda272, '修复WS backend解析失败(契约+编码) / 救助选项与晕倒状态强绑定'). Baseline (parent ee84ed2) over-gates rescue_npc on distance (max_distance 500) and never broadcasts npc_incapacitated. Adapted from the RESCUE-STATE half of the fix's regression test tools/test_ws_rescue.gd (_has_rescue_candidate + npc_incapacitated broadcast). The test's WS-backend-contract/encoding half needs a live websocket and is NOT headless-testable, so it is intentionally omitted. Snapshot generated on demand by scripts/make_snapshots.py."
+bad_diff = "bad.diff"

@@ -1,0 +1,75 @@
+diff --git a/scripts/components/event_listener.gd b/scripts/components/event_listener.gd
+index 074a04b..698ecd0 100644
+--- a/scripts/components/event_listener.gd
++++ b/scripts/components/event_listener.gd
+@@ -31,12 +31,27 @@ func _on_game_event(event_id: StringName, payload: Dictionary) -> void:
+ 
+ 	var context := {&"payload": payload}
+ 	var source_node := payload.get(&"source", payload.get("source", null)) as Node
++	# The offender behind this event (attacker / thief). Reactions that force an
++	# NPC-targeting behavior (guard → attack_npc) must aim at THIS node, not fall
++	# back to "nearest NPC" — otherwise the guard punches whoever happens to be
++	# closest (a bystander) instead of the culprit.
++	var offender := _event_offender(payload)
+ 	for reaction in reactions:
+ 		if not ConditionChecker.check_all(owner_npc, source_node, reaction.conditions, context):
+ 			var failed_reason := ConditionChecker.get_failed_reason(owner_npc, source_node, reaction.conditions, context)
+ 			AiDebug.log(owner_npc, "Event", "ignore %s: %s" % [String(event_id), failed_reason], 0.5)
+ 			continue
+ 
++		# A forced retaliatory behavior needs a valid, non-self target. If the
++		# offender is me (I'm the one who just attacked/stole and my own event
++		# echoed back) or the offender is unresolved, skip this reaction — don't
++		# let it degrade into "attack the nearest person".
++		var forced_targets_npc := _reaction_forces_npc_target(reaction)
++		if forced_targets_npc:
++			if offender == null or offender == owner_npc:
++				AiDebug.log(owner_npc, "Event", "skip %s: no valid offender to retaliate against" % String(event_id), 0.5)
++				continue
++
+ 		var interrupted_now := false
+ 		if reaction.interrupt_current_behavior and owner_npc.runner.can_interrupt(reaction.interrupt_priority):
+ 			AiDebug.log(owner_npc, "Event", "interrupt for %s priority=%d" % [String(event_id), reaction.interrupt_priority])
+@@ -46,10 +61,40 @@ func _on_game_event(event_id: StringName, payload: Dictionary) -> void:
+ 		if reaction.forced_behavior_id != &"":
+ 			var behavior := DataCatalog.get_behavior(reaction.forced_behavior_id)
+ 			if behavior != null:
+-				AiDebug.log(owner_npc, "Event", "force behavior=%s" % String(reaction.forced_behavior_id))
+-				owner_npc.brain.force_behavior(behavior)
++				var forced_params := {}
++				if forced_targets_npc and offender != null and offender.profile != null:
++					# Pin the culprit as the explicit target so the runner's
++					# _resolve_target_for_behavior honors it (same path the LLM
++					# uses via target_npc_id) instead of picking nearest NPC.
++					forced_params[&"target_npc_id"] = String(offender.profile.npc_id)
++				AiDebug.log(owner_npc, "Event", "force behavior=%s target=%s" % [
++					String(reaction.forced_behavior_id),
++					String(forced_params.get(&"target_npc_id", "nearest"))
++				])
++				owner_npc.brain.force_behavior(behavior, forced_params)
+ 
+ 		if interrupted_now:
+ 			owner_npc.brain.request_rethink(StringName("event_interrupt:%s" % String(event_id)))
+ 		else:
+ 			owner_npc.brain.request_rethink(StringName("event:%s" % String(event_id)))
++
++# The NPC responsible for an event (attacker / thief), read from the payload's
++# actor (falling back to source). Only NPCs count; a freed reference resolves to
++# null so callers can skip the reaction safely.
++func _event_offender(payload: Dictionary) -> NPC:
++	var value = payload.get(&"actor", payload.get("actor", null))
++	if typeof(value) != TYPE_OBJECT or not is_instance_valid(value) or not (value is NPC):
++		value = payload.get(&"source", payload.get("source", null))
++	if typeof(value) == TYPE_OBJECT and is_instance_valid(value) and value is NPC:
++		return value as NPC
++	return null
++
++# True when the reaction forces a behavior whose target_query resolves to an NPC
++# (e.g. attack_npc). Such reactions require an explicit offender to aim at.
++func _reaction_forces_npc_target(reaction: EventReactionDef) -> bool:
++	if reaction == null or reaction.forced_behavior_id == &"":
++		return false
++	var behavior := DataCatalog.get_behavior(reaction.forced_behavior_id)
++	if behavior == null or behavior.target_query == null:
++		return false
++	return behavior.target_query.target_type == TargetQueryDef.TargetType.NEAREST_NPC

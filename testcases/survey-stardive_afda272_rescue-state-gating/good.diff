@@ -1,0 +1,178 @@
+diff --git a/autoload/LLMClient.gd b/autoload/LLMClient.gd
+index 620207f..7cc6dc7 100644
+--- a/autoload/LLMClient.gd
++++ b/autoload/LLMClient.gd
+@@ -91,6 +91,15 @@ func call_actor(npc: NPC, fast_input: Dictionary) -> String:
+ 	var npc_id := ""
+ 	if npc != null and npc.profile != null:
+ 		npc_id = String(npc.profile.npc_id)
++	# The WS backend contract (docs/LLM_Interface.md.txt) reads the flat
++	# perceived_options list; keep the grouped perceived_objects too, but
++	# without the flat list the server sees zero options and always waits.
++	if not fast_input.has("perceived_options"):
++		var flat: Array[Dictionary] = []
++		for option in _collect_fast_input_options(fast_input):
++			flat.append(option)
++		fast_input = fast_input.duplicate()
++		fast_input["perceived_options"] = flat
+ 	var package := {
+ 		"method": "call",
+ 		"payload": {
+@@ -127,6 +136,16 @@ func send_update(updates: Array) -> void:
+ 	if _init_completed and not _init_ok:
+ 		AiDebug.warn(null, "LLM", "skip update because startup init failed", 1.0)
+ 		return
++	# Same contract shim as call_actor: updates with grouped perceived_objects
++	# also carry the flat perceived_options list the backend expects.
++	for update_value in updates:
++		if update_value is Dictionary:
++			var update: Dictionary = update_value
++			if update.has("perceived_objects") and not update.has("perceived_options"):
++				var flat: Array[Dictionary] = []
++				for option in _collect_fast_input_options(update):
++					flat.append(option)
++				update["perceived_options"] = flat
+ 	var batch_id := "upd_%d_%d" % [Time.get_ticks_msec(), randi_range(1000, 9999)]
+ 	var package := {
+ 		"method": "update",
+@@ -277,11 +296,28 @@ func _flush_outbox() -> void:
+ 		_mark_update_sent(package)
+ 
+ func _send_package(package: Dictionary) -> void:
+-	var error := _socket.send_text(JSON.stringify(package))
++	# ASCII-escape non-ASCII characters (\uXXXX): the backend has mangled raw
++	# UTF-8 Chinese before (responses echoed our names as mojibake), and a
++	# pure-ASCII wire payload is immune to server-side decode mistakes.
++	var error := _socket.send_text(_ascii_escape_json(JSON.stringify(package)))
+ 	if error != OK:
+ 		AiDebug.warn(null, "LLM", "ws send failed method=%s error=%d" % [String(package.get("method", "")), error], 1.0)
+ 		LLMRuntimeTrace.record_socket_event("send_failed", "method=%s error=%d" % [String(package.get("method", "")), error])
+ 
++static func _ascii_escape_json(text: String) -> String:
++	var out := ""
++	for i in text.length():
++		var code := text.unicode_at(i)
++		if code < 0x80:
++			out += text[i]
++		elif code > 0xFFFF:
++			# Encode as UTF-16 surrogate pair escapes.
++			var v := code - 0x10000
++			out += "\\u%04x\\u%04x" % [0xD800 | (v >> 10), 0xDC00 | (v & 0x3FF)]
++		else:
++			out += "\\u%04x" % code
++	return out
++
+ func _mark_call_sent(package: Dictionary) -> void:
+ 	if String(package.get("method", "")) != "call":
+ 		return
+@@ -317,6 +353,10 @@ func _mark_update_sent(package: Dictionary) -> void:
+ func _read_packets() -> void:
+ 	while _socket.get_available_packet_count() > 0:
+ 		var text := _socket.get_packet().get_string_from_utf8()
++		if text.find("�") >= 0:
++			# Server-side encoding damage (UTF-8 replacement chars in payload).
++			AiDebug.warn(null, "LLM", "ws response contains mojibake (server encoding issue)", 5.0)
++			LLMRuntimeTrace.record_socket_event("mojibake_response", text.left(300))
+ 		var parsed = JSON.parse_string(text)
+ 		if not (parsed is Dictionary):
+ 			AiDebug.warn(null, "LLM", "ws invalid json response=%s" % text.left(120), 1.0)
+@@ -634,8 +674,9 @@ func _openrouter_system_prompt(npc_id: String, fast_input: Dictionary) -> String
+ 			result.append(String(line))
+ 	return "\n".join(result)
+ 
+-# Flatten behavior options out of perceived_objects (grouped by provider);
+-# falls back to the legacy flat perceived_options for older snapshots.
++# Flatten behavior options out of perceived_objects (grouped by provider),
++# re-attaching the providing object's name as the option target; falls back
++# to the legacy flat perceived_options for older snapshots.
+ func _collect_fast_input_options(fast_input: Dictionary) -> Array[Dictionary]:
+ 	var result: Array[Dictionary] = []
+ 	var objects_value = fast_input.get("perceived_objects", [])
+@@ -643,12 +684,17 @@ func _collect_fast_input_options(fast_input: Dictionary) -> Array[Dictionary]:
+ 		for object_value in objects_value:
+ 			if not (object_value is Dictionary):
+ 				continue
+-			var behaviors_value = (object_value as Dictionary).get("behaviors", [])
++			var object: Dictionary = object_value
++			var object_name := String(object.get("name", ""))
++			var behaviors_value = object.get("behaviors", [])
+ 			if not (behaviors_value is Array):
+ 				continue
+ 			for option_value in behaviors_value:
+ 				if option_value is Dictionary:
+-					result.append(option_value)
++					var option: Dictionary = (option_value as Dictionary).duplicate(true)
++					if not option.has("target"):
++						option["target"] = object_name
++					result.append(option)
+ 	if result.is_empty():
+ 		var options_value = fast_input.get("perceived_options", [])
+ 		if options_value is Array:
+diff --git a/configs/ai_catalog/behaviors.json b/configs/ai_catalog/behaviors.json
+index 141f8f9..53d1572 100644
+--- a/configs/ai_catalog/behaviors.json
++++ b/configs/ai_catalog/behaviors.json
+@@ -1788,11 +1788,11 @@
+     ],
+     "target_query": {
+       "target_type": "NEAREST_NPC",
+-      "max_distance": 500.0,
++      "max_distance": 99999.0,
+       "required_buff_id": "stunned"
+     },
+     "is_global": true,
+-    "base_score": 3.0,
++    "base_score": 3.5,
+     "base_success_chance": 1.0,
+     "max_success_chance": 1.0,
+     "move_to_target_enabled": true,
+diff --git a/configs/ai_catalog/events.json b/configs/ai_catalog/events.json
+index 30750f2..4d0af69 100644
+--- a/configs/ai_catalog/events.json
++++ b/configs/ai_catalog/events.json
+@@ -191,5 +191,22 @@
+   {
+     "event_id": "performance_started",
+     "feel": "{detail}"
++  },
++  {
++    "reaction_id": "npc_incapacitated_reaction",
++    "event_id": "npc_incapacitated",
++    "feel": "有人晕倒在地上了，需要有人过去救助",
++    "conditions": [
++      {
++        "type": "EVENT_DISTANCE_LESS_THAN",
++        "value": 900.0
++      }
++    ],
++    "interrupt_current_behavior": true,
++    "interrupt_priority": 120
++  },
++  {
++    "event_id": "npc_incapacitated",
++    "feel": "{detail}"
+   }
+ ]
+\ No newline at end of file
+diff --git a/scripts/actors/npc.gd b/scripts/actors/npc.gd
+index 19293f7..29fc3a8 100644
+--- a/scripts/actors/npc.gd
++++ b/scripts/actors/npc.gd
+@@ -162,6 +162,17 @@ func _on_buff_added(buff_id: StringName, _source_key: String) -> void:
+ 	hide_speech_bubble()
+ 	_apply_incapacitated_visual(true)
+ 	AiDebug.log(self, "Buff", "incapacitated by %s" % String(buff_id), 0.0)
++	# Going down is a world event: NPCs in range get interrupted into a
++	# rethink (events.json npc_incapacitated_reaction) and will see rescue_npc.
++	var fallen_name := profile.display_name if profile != null else String(name)
++	EventBus.emit_game_event(&"npc_incapacitated", {
++		&"source": self,
++		&"actor": self,
++		&"actor_name": fallen_name,
++		&"position": global_position,
++		&"involved_npcs": [self],
++		&"detail": "%s 晕倒在地上动弹不得，需要有人过去救助" % fallen_name
++	})
+ 
+ func _on_buff_removed(buff_id: StringName, _source_key: String) -> void:
+ 	if not _is_incapacitating_buff(buff_id):

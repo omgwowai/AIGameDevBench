@@ -1,0 +1,46 @@
+[testcase]
+id = "survey-stardive_84039a5_alms-item-transfer"
+category = "behavior_logic"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__1d83e11"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+In this tavern sim, an NPC can beg from another NPC (an awaiting_alms broadcast
+directed at the giver), and the giver can respond with give_alms/refuse_alms.
+When the giver gives alms, the chosen item (default one coin) is supposed to move
+from the giver's inventory into the beggar's inventory.
+
+The directed give_alms candidate is built with params that carry a LIVE beggar
+NPC object reference (res://scripts/components/npc_brain.gd,
+_directed_broadcast_params -> {"beggar": broadcaster, ...}). That object cannot
+survive the LLM JSON round-trip, so by the time the model's chosen give_alms step
+comes back and is popped in _pop_sequence_entry, the beggar reference is gone.
+_complete_give_alms (res://scripts/components/behavior_runner.gd) then calls
+_pending_alms_beggar(), gets null, and returns early — no item is transferred and
+no alms_given event fires. Begging and alms-giving are visually acknowledged but
+the item never actually changes hands.
+
+Fix it so the beggar reference survives the round-trip, mirroring the existing
+reply-context flow:
+- Stash the give_alms/refuse_alms candidate params (including the live beggar
+  reference) when the directed candidate is built.
+- When the chosen give_alms/refuse_alms behavior starts, merge that stashed
+  context back into the behavior params (letting the model's own params, e.g.
+  item_id/speech, override on top) before completion runs.
+Giving alms must transfer the item from the giver to the beggar and emit an
+alms_given event that involves the beggar.
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:84039a5"
+bad_case_type = "B1"
+notes = "Real behavior-logic fix from stardive_kugutsushi (commit 84039a5, '修复运行时人设编辑不生效 + NPC乞讨施舍物品不转移'). Baseline (parent 1d83e11) never restores the live beggar reference dropped across the LLM round-trip, so give_alms transfers no item. This case targets the alms-transfer half (the cleanly observable one). Adapted from the fix's own regression test tools/test_alms_transfer.gd. Snapshot generated on demand by scripts/make_snapshots.py."
+bad_diff = "bad.diff"
