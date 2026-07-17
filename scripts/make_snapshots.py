@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -57,6 +58,14 @@ def _ensure_clone(url: str, cache_dir: Path) -> Path:
     return dest
 
 
+# Editor-only test-framework addons that some repos vendor. They declare many
+# `class_name`s but are never referenced by the game's runtime scenes, so they
+# only bloat the snapshot and — because they don't all compile headlessly —
+# leave the global class cache incomplete, which trips the godot_scene_assert
+# import-cache guard. Strip them from snapshots; the game runs fine without them.
+_STRIP_ADDONS = ("addons/gut", "addons/gdUnit4")
+
+
 def _make_snapshot(repo: Path, ref: str, out_dir: Path) -> None:
     """Export `ref`'s tree into out_dir (no .git). Uses git archive piped to tar."""
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -68,6 +77,11 @@ def _make_snapshot(repo: Path, ref: str, out_dir: Path) -> None:
     p2.communicate()
     if p2.returncode != 0 or p1.wait() != 0:
         raise RuntimeError(f"archive/extract failed for {ref}")
+    # Drop editor-only test addons that would leave the class cache incomplete.
+    for rel in _STRIP_ADDONS:
+        addon_dir = out_dir / rel
+        if addon_dir.is_dir():
+            shutil.rmtree(addon_dir, ignore_errors=True)
 
 
 def main() -> int:

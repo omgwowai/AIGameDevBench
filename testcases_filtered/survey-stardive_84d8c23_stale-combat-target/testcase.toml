@@ -1,0 +1,28 @@
+[testcase]
+id = "survey-stardive_84d8c23_stale-combat-target"
+category = "behavior_logic"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__df2194f"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+NPCs in this tavern sim sometimes attack the wrong target. When an NPC is already in_combat with someone (call them X), the combat system stashes opponent=X into the brain's _pending_combat_context_params so the reference survives an LLM round-trip. But if the LLM then decides to attack a DIFFERENT, explicitly named target (params carry target_npc_id=Y), the stale opponent=X leaks through: _merge_combat_context_params (res://scripts/components/npc_brain.gd) copies the stash onto the merged params, and _combat_opponent() (res://scripts/components/behavior_runner.gd) prefers params.opponent — so the blow lands on X instead of the LLM's chosen Y.
+
+Fix it so an explicit target_npc_id always wins over a stale stashed opponent:
+- In _merge_combat_context_params, when the incoming params carry a non-empty explicit target_npc_id, do NOT inject the stashed opponent.
+- In _combat_opponent, when the params name an explicit target and current_target is a valid NPC (already resolved from target_npc_id), return current_target rather than any stashed opponent.
+The attack must land on the LLM's named victim, and the previously-stashed opponent must be left untouched.
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:84d8c23"
+bad_case_type = "B1"
+notes = "Real behavior-logic fix from stardive_kugutsushi (commit 84d8c23). Baseline (parent df2194f) attacks a stale stashed opponent instead of the LLM's explicit target_npc_id. Adapted from the fix's own regression test tools/test_combat.gd::_test_explicit_target_overrides_stale_opponent. Snapshot generated on demand by scripts/make_snapshots.py."
+bad_diff = "bad.diff"

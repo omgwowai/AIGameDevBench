@@ -1,0 +1,27 @@
+[testcase]
+id = "survey-stardive_39f9033_rethink-sideeffect-gating"
+category = "behavior_logic"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__d742363"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+NPCs in this tavern sim ask an LLM what to do each think. The model's raw response can carry both an action `sequence` AND persistent side effects: `favorability_changes` (relationships), a `goal_board` (the NPC's long-term goal), and `memories`. In NPCBrain._apply_llm_result (res://scripts/components/npc_brain.gd) these persistent side effects are committed BEFORE the response is validated. So when the LLM returns a half-broken response — a sequence that parses but names no behavior that actually exists in DataCatalog — the NPC still writes the model's favorability, goal, and memory reasoning before bouncing to the local fallback. Those states feed every later think, so one invalid response permanently pollutes the NPC.
+
+Fix _apply_llm_result so persistent side effects are gated on response validity:
+- A response is valid when it is an intentional `wait` OR when its parsed sequence contains at least one behavior that exists in DataCatalog (add a check such as _sequence_has_known_behavior). A sequence that is empty or names only unknown/hallucinated behavior ids is NOT valid.
+- For an INVALID response, skip favorability_changes, goal_board, and memories entirely, then fall back to the local decision (when allow_local_fallback) — persistent state must be left untouched.
+- For a VALID response (wait, or a real sequence), still apply all three side effects as before. A `wait` decision must also apply its favorability/goal side effects (read them from the raw fast_response, not the collapsed decision).
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:39f9033"
+bad_case_type = "B1"
+notes = "Real behavior-logic fix from stardive_kugutsushi (commit 39f9033, 'P0-2 rethink 优先级合并 + P0-3 副作用门控'). Baseline (parent d742363) commits LLM favorability/goal/memory side effects before validating the action sequence, so an invalid response (no real behavior) permanently pollutes relationships, the goal board, and memory. Adapted from the fix's own regression test tools/test_llm_sideeffect_gating.gd. Snapshot generated on demand by scripts/make_snapshots.py."

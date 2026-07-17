@@ -1,0 +1,65 @@
+diff --git a/scripts/components/behavior_runner.gd b/scripts/components/behavior_runner.gd
+index 5f69d77..d81224a 100644
+--- a/scripts/components/behavior_runner.gd
++++ b/scripts/components/behavior_runner.gd
+@@ -1199,6 +1199,12 @@ func _complete_steal_success() -> void:
+ # The other combatant, resolved from params (restored by the brain from the
+ # in_combat buff context) or from the current target when initiating.
+ func _combat_opponent() -> NPC:
++	# When the LLM named an explicit target, current_target was resolved from it
++	# (_resolve_target_for_behavior honors target_npc_id). Trust that over any
++	# stashed `opponent`, which may be a stale reference from a prior combat
++	# snapshot — otherwise the attack lands on the wrong NPC.
++	if _has_explicit_npc_target_param() and current_target is NPC and is_instance_valid(current_target):
++		return current_target as NPC
+ 	var value = current_params.get(&"opponent", current_params.get("opponent", null))
+ 	if value is NPC and is_instance_valid(value):
+ 		return value as NPC
+@@ -1206,6 +1212,12 @@ func _combat_opponent() -> NPC:
+ 		return current_target as NPC
+ 	return null
+ 
++func _has_explicit_npc_target_param() -> bool:
++	for key in [&"target_npc_id", "target_npc_id"]:
++		if current_params.has(key) and str(current_params.get(key, "")).strip_edges() != "":
++			return true
++	return false
++
+ func _effective_athletic(npc: NPC) -> float:
+ 	if npc == null or npc.stats == null:
+ 		return 30.0
+diff --git a/scripts/components/npc_brain.gd b/scripts/components/npc_brain.gd
+index d2c5d96..e5afb08 100644
+--- a/scripts/components/npc_brain.gd
++++ b/scripts/components/npc_brain.gd
+@@ -1068,15 +1068,30 @@ func _merge_alms_context_params(value) -> Dictionary:
+ 
+ # Restore the opponent/pleader reference the LLM couldn't carry, then let the
+ # model's own params (speech, item choices) override on top.
++# IMPORTANT: if the LLM named an explicit target (target_npc_id), it chose a
++# *fresh* opponent — the stashed opponent belongs to a previous combat snapshot
++# and MUST NOT be injected, or the attack lands on the wrong NPC (the runner
++# resolves current_target from target_npc_id and _combat_opponent() would
++# otherwise prefer the stale stashed opponent). See _combat_opponent().
+ func _merge_combat_context_params(value) -> Dictionary:
+ 	var merged := _pending_combat_context_params.duplicate()
+ 	if value is Dictionary:
+ 		var params: Dictionary = value
++		if _params_have_explicit_npc_target(params):
++			merged.erase(&"opponent")
++			merged.erase("opponent")
+ 		for key in params.keys():
+ 			merged[key] = params[key]
+ 	_pending_combat_context_params = {}
+ 	return merged
+ 
++# True when the LLM's params carry a non-empty explicit target NPC id/name.
++func _params_have_explicit_npc_target(params: Dictionary) -> bool:
++	for key in [&"target_npc_id", "target_npc_id"]:
++		if params.has(key) and str(params.get(key, "")).strip_edges() != "":
++			return true
++	return false
++
+ func _get_dialogue_wait_remaining() -> float:
+ 	if _dialogue_wait_until_msec <= 0:
+ 		return 0.0

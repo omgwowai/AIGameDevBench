@@ -1,0 +1,28 @@
+[testcase]
+id = "survey-stardive_ee84ed2_stage-shout-broadcast"
+category = "behavior_logic"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__423dcec"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+In this tavern sim an NPC can climb on stage and perform (perform_on_stage), and passers-by can come watch (watch_performance). But the show is silently ignored: when a performer starts a show — or shouts for tips mid-performance (_beg_for_tips) — nothing is broadcast to the world, so nearby NPCs busy with other low-priority behaviors are never notified and never reconsider coming over to watch. The stage stays empty.
+
+Make a stage show an attention-grabbing world event so bystanders in earshot react:
+- When a performance starts (res://scripts/components/behavior_runner.gd, _start_interaction for perform_on_stage), broadcast a `performance_started` game event via EventBus (payload carrying source/actor/position/involved_npcs/detail).
+- When the performer shouts for tips (_beg_for_tips), broadcast a `performance_shout` game event with the shout text.
+- Register event reactions in res://configs/ai_catalog/events.json for `performance_started` and `performance_shout` that, for NPCs within earshot (EVENT_DISTANCE_LESS_THAN), interrupt the current behavior (interrupt_current_behavior) so those bystanders are forced into a rethink.
+The result: a nearby NPC doing a low-priority behavior (e.g. wander) gets interrupted when a show begins, instead of ignoring it.
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:ee84ed2"
+bad_case_type = "B1"
+notes = "Real behavior-logic fix from stardive_kugutsushi (commit ee84ed2, parent 423dcec). Baseline never broadcasts a world event when a stage show starts / shouts, so nearby bystanders are never interrupted to rethink and the performance is ignored. good.diff is the golden fix (behavior_runner.gd emits performance_started / performance_shout; events.json adds distance-gated interrupt reactions; behaviors.json/events.json whitespace-normalized by the tool). Adapted from the fix's own regression test tools/test_stage_show.gd (the bystander interrupt assertion). Snapshot generated on demand by scripts/make_snapshots.py."

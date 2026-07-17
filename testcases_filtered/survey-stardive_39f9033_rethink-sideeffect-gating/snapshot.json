@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__d742363",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "d742363325be4a1df4a4ba81d0878c4eb381002b",
+  "note": "base_ref is the pre-image (parent) of fix commit 39f9033 — buggy state where NPCBrain._apply_llm_result() commits persistent LLM side effects (favorability / goal board / memories) BEFORE the response is judged valid, so a half-broken response whose sequence names no real behavior still pollutes relationships, the goal board, and memory. good.diff is the golden fix (P0-2 rethink priority merge + P0-3 side-effect gating). Private repo: initial clone needs auth; runs offline afterwards."
+}
