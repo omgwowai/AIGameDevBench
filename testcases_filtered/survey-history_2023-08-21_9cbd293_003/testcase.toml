@@ -5,7 +5,7 @@ source_kind = "folder"
 snapshot = "godot-open-rpg__9cbd293"
 source_repo = "survey:godot-open-rpg (offline snapshot)"
 task = """
-Investigate and fix the defect in the following file(s), making the affected feature behave correctly: .gitattributes, .gitignore, CHANGELOG.md, CREDITS.md, LICENSE, README.md, addons/dialogic/Editor/CharacterEditor/char_edit_p_section_exports.gd, addons/dialogic/Editor/CharacterEditor/char_edit_p_section_exports.tscn.
+The gamepiece controllers under src/field/gamepieces/controllers/ are inconsistent about the member that holds the controller's owning Gamepiece. Some code refers to a field named `_focus` (and handlers named `_on_focus_arriving` / `_on_focus_arrived`) while the surrounding code expects `_gamepiece` (with `_on_gamepiece_arriving` / `_on_gamepiece_arrived`). Reconcile them so the controllers consistently use the `_gamepiece` member and the matching handler names, and gamepiece movement/pathfinding works. Affected files: src/field/gamepieces/controllers/gamepiece_controller.gd, src/field/gamepieces/controllers/path_loop_ai_controller.gd, src/field/gamepieces/controllers/player_controller.gd.
 """
 
 [verifier]
@@ -17,4 +17,4 @@ mode = "gated"
 
 [provenance]
 source = "survey-history (migrated to filtered)"
-notes = "Real bug-fix commit from gdquest-demos/godot-open-rpg. Base snapshot = the fix commit's pre-image (buggy state). gated scoring: noop=0, good.diff=1. Snapshot generated on demand by scripts/make_snapshots.py."
+notes = "Real bug-fix commit from gdquest-demos/godot-open-rpg (_focus -> _gamepiece rename across the 3 field controllers). Base snapshot = the fix commit's pre-image (buggy state). gated scoring: noop=0, good.diff=1. must_change_one_of tightened from the auto-mined 454-file commit range to the 3 files good.diff actually touches; task text rewritten to describe the real defect (the auto-mined text listed unrelated junk files). Snapshot generated on demand by scripts/make_snapshots.py."

@@ -9,13 +9,12 @@ const ENEMY_SCRIPT_PATH := "res://scripts/enemy.gd"
 const ENEMY_TEXTURE_PATH := "res://assets/sprites/towerDefense_tile245.png"
 const TARGET_TEXTURE_PATH := "res://assets/sprites/icon.svg"
 
+# Scored checkpoints are task-discriminating only. The scene-structure checks
+# (Main / NavigationRegion2D / NavigationPolygon / Enemy / CharacterBody2D /
+# enemy script attached) already hold in the baseline, so they gate the run as
+# silent guards but are NOT scored — otherwise a no-op leaks partial credit for
+# scaffolding it never touched.
 const CHECKPOINTS := [
-	"main_present",
-	"nav_region_present",
-	"nav_polygon_assigned",
-	"enemy_present",
-	"enemy_is_characterbody2d",
-	"enemy_script_attached",
 	"navigation_node_present",
 	"nav_agent_present",
 	"nav_agent_corridor",
@@ -64,32 +63,22 @@ func _emit() -> void:
 	get_tree().quit()
 
 func run_validation() -> void:
+	# Scaffolding guards (not scored): these all hold in the baseline. If a harness
+	# broke the scene structure, bail so every task checkpoint fails (score 0).
 	var main_node := get_node_or_null("Main")
-	if not _record("main_present", main_node != null, "Main node not found",
-			"Main node", "null"):
+	if main_node == null:
 		return _emit()
-
 	var nav_region := main_node.get_node_or_null("NavigationRegion2D")
-	if not _record("nav_region_present", nav_region != null and nav_region is NavigationRegion2D,
-			"NavigationRegion2D missing under Main", "NavigationRegion2D", "null/wrong type"):
+	if not (nav_region != null and nav_region is NavigationRegion2D):
 		return _emit()
-	if not _record("nav_polygon_assigned", nav_region.navigation_polygon != null,
-			"NavigationRegion2D must have a NavigationPolygon assigned",
-			"a NavigationPolygon", "null"):
+	if nav_region.navigation_polygon == null:
 		return _emit()
-
 	var enemy := main_node.get_node_or_null("Enemy")
-	if not _record("enemy_present", enemy != null, "Enemy node not found",
-			"Enemy node", "null"):
+	if enemy == null:
 		return _emit()
-	if not _record("enemy_is_characterbody2d", enemy is CharacterBody2D,
-			"Enemy must be CharacterBody2D", "CharacterBody2D", enemy.get_class()):
+	if not (enemy is CharacterBody2D):
 		return _emit()
-
-	if not _record("enemy_script_attached",
-			enemy.script != null and enemy.script.resource_path == ENEMY_SCRIPT_PATH,
-			"Enemy must have res://scripts/enemy.gd attached", ENEMY_SCRIPT_PATH,
-			"null" if enemy.script == null else enemy.script.resource_path):
+	if not (enemy.script != null and enemy.script.resource_path == ENEMY_SCRIPT_PATH):
 		return _emit()
 
 	var nav_root := enemy.get_node_or_null("Navigation")
