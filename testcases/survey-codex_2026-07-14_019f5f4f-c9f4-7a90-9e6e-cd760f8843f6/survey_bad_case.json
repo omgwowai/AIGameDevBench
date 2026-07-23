@@ -1,0 +1,202 @@
+{
+  "schema": "survey.bad_case.testcase.v1",
+  "testcase_id": "survey-codex_2026-07-14_019f5f4f-c9f4-7a90-9e6e-cd760f8843f6",
+  "source_repo": "C:\\Users\\WinterZhao\\GodotAvatarVideoGen",
+  "baseline_ref": "40151931d50b01451f8d2baab35df5a03c1a426b",
+  "repro_ref": null,
+  "bad_ref": null,
+  "good_ref": null,
+  "baseline_resolution_error": "session has no commits; using HEAD as baseline",
+  "expected": {
+    "bad_case_type": "unclassified",
+    "notes": "rounds_to_resolution=5",
+    "original_l0_pass": null,
+    "original_l1_pass": null,
+    "original_l0_details": [],
+    "original_l1_details": [],
+    "original_human_intervention_ratio": 0.0,
+    "original_rounds_to_resolution": 5,
+    "must_change_one_of": [],
+    "minimum_changed_files": 1
+  },
+  "hidden_oracle": {
+    "good_diff_file": "good.diff"
+  },
+  "bench_record": {
+    "testcase_id": "codex_2026-07-14_019f5f4f-c9f4-7a90-9e6e-cd760f8843f6",
+    "harness": "codex",
+    "category": "survey:unclassified",
+    "l0_l1_pass": true,
+    "score": 0.0,
+    "verifier_result": {
+      "score": 0.0,
+      "status": "fail",
+      "category": "survey:unclassified",
+      "error": "rounds_to_resolution=5",
+      "checks": [
+        {
+          "name": "bad_case_detected",
+          "passed": false,
+          "detail": "rounds_to_resolution=5",
+          "expected": "none",
+          "actual": "unclassified"
+        },
+        {
+          "name": "human_intervention_ratio",
+          "passed": true,
+          "detail": "",
+          "expected": "<= 0.40",
+          "actual": 0.0
+        },
+        {
+          "name": "rounds_to_resolution",
+          "passed": false,
+          "detail": "",
+          "expected": "<= 4",
+          "actual": 5
+        }
+      ]
+    },
+    "diff": "",
+    "artifacts_path": null,
+    "ai_agent_context": {
+      "harness": "codex",
+      "transcript_session_id": null,
+      "transcript_match_confidence": null,
+      "transcript_path": "C:\\Users\\WinterZhao\\.codex\\sessions\\2026\\07\\14\\rollout-2026-07-14T14-28-12-019f5f4f-c9f4-7a90-9e6e-cd760f8843f6.jsonl",
+      "codex_session_id": "019f5f4f-c9f4-7a90-9e6e-cd760f8843f6",
+      "total_tokens": 3686772,
+      "filtered_to_commits": [],
+      "filtered_turns": null,
+      "turns": [
+        {
+          "turn": 1,
+          "agent_input": "能否基于comfyUI做一套跨ue和godot可用的ai生成工作流？支持游戏运行时把图片和视频拖入游戏，获得AI GEN信息，并进行生成",
+          "agent_output": "我先查看现有项目结构和引擎侧代码，确认目前的 Godot/UE 接入点、运行时拖拽能力以及已有的 ComfyUI 约定，再给出可落地的跨引擎方案并开始实现适合当前仓库的部分。\n仓库里已经有一部分关键基础：Godot 侧存在媒体检查器与 AI 生成元数据模块，ComfyUI 侧已有图像、视频和多模态节点。下一步我在核对它们是否已经覆盖“拖入媒体 → 解析生成信息 → 复用工作流生成”，以及哪些部分需要抽成 UE/Godot 共用协议。\n现状已经明确：当前 Godot 原型能在运行时接收文件拖入，并解析 PNG 的 ComfyUI/A1111 元数据及视频容器标签；但还没有把解析出的 workflow 参数化后提交给 ComfyUI，也没有 UE 适配层。跨引擎实现应把 ComfyUI 前面增加一个统一的 Runtime Bridge，而不是让两套引擎各自依赖 Python 节点。\n可以。推荐采用“ComfyUI 后端 + 独立 Runtime Bridge + UE/Godot 轻量 SDK”的结构。\n**现有基础**\n仓库已具备部分 Godot 原型：\n- 运行时文件拖入：[media_inspector.gd](C:/Users/WinterZhao/GodotAvatarVideoGen/scripts/media_inspector.gd:32)\n- PNG ComfyUI/A1111 元数据解析：[media_metadata.gd](C:/Users/WinterZhao/GodotAvatarVideoGen/scripts/media_metadata.gd:85)\n- 视频容器元数据解析：[media_metadata.gd](C:/Users/WinterZhao/GodotAvatarVideoGen/scripts/media_metadata.gd:308)\n- 生图、生视频和多模态 ComfyUI 自定义节点\n目前缺少的是：ComfyUI 任务提交、标准化 AI GEN 协议、生成 UI 和 UE 适配层。\n**推荐架构**\n[code: 7 lines, ...]",
+          "tool_calls": [
+            "wait:{\"cell_id\":\"3\",\"yield_time_ms\":10000,\"max_tokens\":20000}"
+          ]
+        },
+        {
+          "turn": 2,
+          "agent_input": "这样做和直接在godot里实现ai gen框架的优劣分别是什么",
+          "agent_output": "两种方案的核心差异是：**工作流编排放在 ComfyUI 服务端，还是放在 Godot 客户端**。\n| 维度 | ComfyUI + Runtime Bridge | Godot 内直接实现 |\n|---|---|---|\n| 工作流迭代 | 修改工作流即可上线，客户端通常不用更新 | 修改流程往往要改 GDScript、重新打包 |\n| 模型/节点生态 | 可直接使用 ComfyUI 节点、ControlNet、LoRA、视频节点 | 每个模型和供应商都要单独适配 |\n| UE/Godot 共用 | 两端共用 HTTP 协议和工作流 | UE 需要再实现一套 C++/Blueprint 版本 |\n| 客户端体积 | SDK 很轻，推理依赖在服务端 | 云 API 模式较轻；本地推理会引入大型原生依赖 |\n| UI 集成 | 游戏只负责参数界面、预览和进度 | 与 Godot UI、资源系统结合更直接 |\n| 性能 | 多一层服务，但相对 AI 推理耗时通常很小 | 少一次转发，简单请求略快 |\n| 部署复杂度 | 需要维护 ComfyUI、Bridge、模型和任务队列 | 只调用云 API 时部署更简单 |",
+          "tool_calls": []
+        },
+        {
+          "turn": 3,
+          "agent_input": "选择混合方案的话，现在需要新增哪些模块功能？",
+          "agent_output": "基于当前仓库，混合方案需要补充五层模块。现有的 Godot 媒体解析、Provider 客户端和 ComfyUI 自定义节点可以继续复用。\n**1. 共享协议层**\n新增 `AI GEN Manifest` 标准，保证 UE、Godot、Bridge 使用同一种数据结构：\n- 提示词、模型、seed、尺寸、时长等参数\n- workflow ID、版本和原始 ComfyUI workflow\n- 输入/输出资源及 SHA-256\n- 生成服务、任务 ID、时间\n- 模型和自定义节点依赖\n- schema 版本及兼容策略\n建议文件：",
+          "tool_calls": []
+        },
+        {
+          "turn": 4,
+          "agent_input": "https://github.com/omgwowai/agentic-game-development 研究下如何下载/使用/更新这一插件",
+          "agent_output": "我会先核对该仓库的安装结构、支持的 AI 编码工具、插件清单和更新机制，再结合你当前的 Codex 环境整理成可直接执行的下载、使用与升级步骤。\n仓库当前最新提交是 2026-07-16 发布的 `v0.1.3`。它不是 Godot 编辑器插件，而是一套面向 Codex、Claude Code 等编码代理的“游戏开发技能插件”，包含 Godot 截图验证、UE Remote Control/Commandlet、调试、测试驱动和计划执行工作流。\n我还会核对当前机器的 Codex 插件目录和版本识别方式，避免照搬仓库 README 后得到错误安装路径；该仓库同时支持 Claude Code Marketplace 与 Codex release 包，两者安装机制不同。\n有一个本机相关的关键点：当前 `CODEX_HOME` 环境变量未设置，所以直接运行仓库脚本会默认安装到“当前目录”，而不是 `C:\\Users\\WinterZhao\\.codex\\plugins`。在这台机器上应显式传入 `-Dest`，否则 Codex 不会发现插件。\n安装脚本的 dry-run 已验证：最新版为 `0.1.3`，本机尚未安装，正确目标目录是 `C:\\Users\\WinterZhao\\.codex\\plugins\\agentic-game-development-superpowers`。Windows 还启用了 PowerShell 脚本执行限制，因此命令需要对单次进程使用 `-ExecutionPolicy Bypass`，不必修改系统级策略。\n为了确认 README 中的 Codex 安装方式在当前 `codex-cli 0.144.4` 上确实可识别，我会先安装到 `C:\\tmp` 的隔离测试目录，不修改你的实际 `~/.codex`。这也能验证 release 包结构和安装后的发现方式。\n隔离测试发现一个兼容性问题：release 同步脚本能正确解压 `v0.1.3`，但当前 Codex 的 `plugin list` 不把单纯复制到 `$CODEX_HOME/plugins` 的目录登记为已安装插件。接下来需要验证它能否直接读取仓库的 Claude marketplace 清单；如果不能，当前 Codex 应优先使用兼容的本地 marketplace 包装，而不是只复制目录。\n当前 Codex 原生安装已在隔离环境验证成功，并且能兼容仓库里的 `.claude-plugin/marketplace.json`。因此对你这台机器，最简方案不是 release 同步脚本，而是使用 `codex plugin marketplace add`、`codex plugin add` 和 `marketplace upgrade`；同步脚本可作为旧版 Codex/其他 agent 的兼容方案。\n已研究并在隔离环境完成安装、发现和更新验证。\n**结论**\n这是一个 Codex/Claude Code 的游戏开发技能插件，不是 Godot 编辑器插件。当前最新版为 [`v0.1.3`](https://github.com/omgwowai/agentic-game-development/releases/tag/v0.1.3)，包含：\n- Godot/Unreal 游戏开发测试规范\n- TDD、系统化调试、计划执行\n- Godot 截图验证工具\n- UE Remote Control/Commandlet 适配器\n- 代码审查、Git worktree、完成前验证\n- SessionStart hook，自动注入技能使用规则\n**推荐安装**",
+          "tool_calls": [
+            "wait:{\"cell_id\":\"13\",\"yield_time_ms\":10000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"17\",\"yield_time_ms\":10000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"18\",\"yield_time_ms\":10000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"20\",\"yield_time_ms\":10000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"24\",\"yield_time_ms\":10000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"26\",\"yield_time_ms\":10000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"28\",\"yield_time_ms\":10000,\"max_tokens\":30000}",
+            "wait:{\"cell_id\":\"29\",\"yield_time_ms\":1000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"31\",\"yield_time_ms\":1000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"32\",\"yield_time_ms\":1000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"33\",\"yield_time_ms\":1000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"34\",\"yield_time_ms\":1000,\"max_tokens\":20000}"
+          ]
+        },
+        {
+          "turn": 5,
+          "agent_input": "应用到真实codex里把！",
+          "agent_output": "我现在把 GitHub marketplace 注册到真实 Codex 配置，安装并启用 `agentic-game-development-superpowers`，随后核对版本和加载状态。不会修改当前 Godot 项目。\n已安装到真实 Codex：\n- 插件：`agentic-game-development-superpowers`\n- 版本：`0.1.3`\n- 状态：已安装、已启用\n- 路径：`C:\\Users\\WinterZhao\\.codex\\plugins\\cache\\agentic-game-dev\\...`\n重新启动 Codex或新建会话后生效。首次遇到 hook 信任提示时确认即可。",
+          "tool_calls": []
+        }
+      ]
+    },
+    "survey_session": {
+      "session_id": "codex_2026-07-14_019f5f4f-c9f4-7a90-9e6e-cd760f8843f6",
+      "harness": "codex",
+      "config": {},
+      "bad_case_type": "unclassified",
+      "auto_detected": true,
+      "confidence": "low",
+      "notes": "rounds_to_resolution=5",
+      "prompts": [
+        {
+          "turn": 1,
+          "user_message": "能否基于comfyUI做一套跨ue和godot可用的ai生成工作流？支持游戏运行时把图片和视频拖入游戏，获得AI GEN信息，并进行生成",
+          "assistant_summary": "我先查看现有项目结构和引擎侧代码，确认目前的 Godot/UE 接入点、运行时拖拽能力以及已有的 ComfyUI 约定，再给出可落地的跨引擎方案并开始实现适合当前仓库的部分。\n仓库里已经有一部分关键基础：Godot 侧存在媒体检查器与 AI 生成元数据模块，ComfyUI 侧已有图像、视频和多模态节点。下一步我在核对它们是否已经覆盖“拖入媒体 → 解析生成信息 → 复用工作流生成”，以及哪些部分需要抽成 UE/Godot 共用协议。\n现状已经明确：当前 Godot 原型能在运行时接收文件拖入，并解析 PNG 的 ComfyUI/A1111 元数据及视频容器标签；但还没有把解析出的 workflow 参数化后提交给 ComfyUI，也没有 UE 适配层。跨引擎实现应把 ComfyUI 前面增加一个统一的 Runtime Bridge，而不是让两套引擎各自依赖 Python 节点。\n可以。推荐采用“ComfyUI 后端 + 独立 Runtime Bridge + UE/Godot 轻量 SDK”的结构。\n**现有基础**\n仓库已具备部分 Godot 原型：\n- 运行时文件拖入：[media_inspector.gd](C:/Users/WinterZhao/GodotAvatarVideoGen/scripts/media_inspector.gd:32)\n- PNG ComfyUI/A1111 元数据解析：[media_metadata.gd](C:/Users/WinterZhao/GodotAvatarVideoGen/scripts/media_metadata.gd:85)\n- 视频容器元数据解析：[media_metadata.gd](C:/Users/WinterZhao/GodotAvatarVideoGen/scripts/media_metadata.gd:308)\n- 生图、生视频和多模态 ComfyUI 自定义节点\n目前缺少的是：ComfyUI 任务提交、标准化 AI GEN 协议、生成 UI 和 UE 适配层。\n**推荐架构**\n[code: 7 lines, ...]",
+          "tool_calls": [
+            "wait:{\"cell_id\":\"3\",\"yield_time_ms\":10000,\"max_tokens\":20000}"
+          ]
+        },
+        {
+          "turn": 2,
+          "user_message": "这样做和直接在godot里实现ai gen框架的优劣分别是什么",
+          "assistant_summary": "两种方案的核心差异是：**工作流编排放在 ComfyUI 服务端，还是放在 Godot 客户端**。\n| 维度 | ComfyUI + Runtime Bridge | Godot 内直接实现 |\n|---|---|---|\n| 工作流迭代 | 修改工作流即可上线，客户端通常不用更新 | 修改流程往往要改 GDScript、重新打包 |\n| 模型/节点生态 | 可直接使用 ComfyUI 节点、ControlNet、LoRA、视频节点 | 每个模型和供应商都要单独适配 |\n| UE/Godot 共用 | 两端共用 HTTP 协议和工作流 | UE 需要再实现一套 C++/Blueprint 版本 |\n| 客户端体积 | SDK 很轻，推理依赖在服务端 | 云 API 模式较轻；本地推理会引入大型原生依赖 |\n| UI 集成 | 游戏只负责参数界面、预览和进度 | 与 Godot UI、资源系统结合更直接 |\n| 性能 | 多一层服务，但相对 AI 推理耗时通常很小 | 少一次转发，简单请求略快 |\n| 部署复杂度 | 需要维护 ComfyUI、Bridge、模型和任务队列 | 只调用云 API 时部署更简单 |",
+          "tool_calls": []
+        },
+        {
+          "turn": 3,
+          "user_message": "选择混合方案的话，现在需要新增哪些模块功能？",
+          "assistant_summary": "基于当前仓库，混合方案需要补充五层模块。现有的 Godot 媒体解析、Provider 客户端和 ComfyUI 自定义节点可以继续复用。\n**1. 共享协议层**\n新增 `AI GEN Manifest` 标准，保证 UE、Godot、Bridge 使用同一种数据结构：\n- 提示词、模型、seed、尺寸、时长等参数\n- workflow ID、版本和原始 ComfyUI workflow\n- 输入/输出资源及 SHA-256\n- 生成服务、任务 ID、时间\n- 模型和自定义节点依赖\n- schema 版本及兼容策略\n建议文件：",
+          "tool_calls": []
+        },
+        {
+          "turn": 4,
+          "user_message": "https://github.com/omgwowai/agentic-game-development 研究下如何下载/使用/更新这一插件",
+          "assistant_summary": "我会先核对该仓库的安装结构、支持的 AI 编码工具、插件清单和更新机制，再结合你当前的 Codex 环境整理成可直接执行的下载、使用与升级步骤。\n仓库当前最新提交是 2026-07-16 发布的 `v0.1.3`。它不是 Godot 编辑器插件，而是一套面向 Codex、Claude Code 等编码代理的“游戏开发技能插件”，包含 Godot 截图验证、UE Remote Control/Commandlet、调试、测试驱动和计划执行工作流。\n我还会核对当前机器的 Codex 插件目录和版本识别方式，避免照搬仓库 README 后得到错误安装路径；该仓库同时支持 Claude Code Marketplace 与 Codex release 包，两者安装机制不同。\n有一个本机相关的关键点：当前 `CODEX_HOME` 环境变量未设置，所以直接运行仓库脚本会默认安装到“当前目录”，而不是 `C:\\Users\\WinterZhao\\.codex\\plugins`。在这台机器上应显式传入 `-Dest`，否则 Codex 不会发现插件。\n安装脚本的 dry-run 已验证：最新版为 `0.1.3`，本机尚未安装，正确目标目录是 `C:\\Users\\WinterZhao\\.codex\\plugins\\agentic-game-development-superpowers`。Windows 还启用了 PowerShell 脚本执行限制，因此命令需要对单次进程使用 `-ExecutionPolicy Bypass`，不必修改系统级策略。\n为了确认 README 中的 Codex 安装方式在当前 `codex-cli 0.144.4` 上确实可识别，我会先安装到 `C:\\tmp` 的隔离测试目录，不修改你的实际 `~/.codex`。这也能验证 release 包结构和安装后的发现方式。\n隔离测试发现一个兼容性问题：release 同步脚本能正确解压 `v0.1.3`，但当前 Codex 的 `plugin list` 不把单纯复制到 `$CODEX_HOME/plugins` 的目录登记为已安装插件。接下来需要验证它能否直接读取仓库的 Claude marketplace 清单；如果不能，当前 Codex 应优先使用兼容的本地 marketplace 包装，而不是只复制目录。\n当前 Codex 原生安装已在隔离环境验证成功，并且能兼容仓库里的 `.claude-plugin/marketplace.json`。因此对你这台机器，最简方案不是 release 同步脚本，而是使用 `codex plugin marketplace add`、`codex plugin add` 和 `marketplace upgrade`；同步脚本可作为旧版 Codex/其他 agent 的兼容方案。\n已研究并在隔离环境完成安装、发现和更新验证。\n**结论**\n这是一个 Codex/Claude Code 的游戏开发技能插件，不是 Godot 编辑器插件。当前最新版为 [`v0.1.3`](https://github.com/omgwowai/agentic-game-development/releases/tag/v0.1.3)，包含：\n- Godot/Unreal 游戏开发测试规范\n- TDD、系统化调试、计划执行\n- Godot 截图验证工具\n- UE Remote Control/Commandlet 适配器\n- 代码审查、Git worktree、完成前验证\n- SessionStart hook，自动注入技能使用规则\n**推荐安装**",
+          "tool_calls": [
+            "wait:{\"cell_id\":\"13\",\"yield_time_ms\":10000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"17\",\"yield_time_ms\":10000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"18\",\"yield_time_ms\":10000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"20\",\"yield_time_ms\":10000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"24\",\"yield_time_ms\":10000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"26\",\"yield_time_ms\":10000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"28\",\"yield_time_ms\":10000,\"max_tokens\":30000}",
+            "wait:{\"cell_id\":\"29\",\"yield_time_ms\":1000,\"max_tokens\":10000}",
+            "wait:{\"cell_id\":\"31\",\"yield_time_ms\":1000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"32\",\"yield_time_ms\":1000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"33\",\"yield_time_ms\":1000,\"max_tokens\":20000}",
+            "wait:{\"cell_id\":\"34\",\"yield_time_ms\":1000,\"max_tokens\":20000}"
+          ]
+        },
+        {
+          "turn": 5,
+          "user_message": "应用到真实codex里把！",
+          "assistant_summary": "我现在把 GitHub marketplace 注册到真实 Codex 配置，安装并启用 `agentic-game-development-superpowers`，随后核对版本和加载状态。不会修改当前 Godot 项目。\n已安装到真实 Codex：\n- 插件：`agentic-game-development-superpowers`\n- 版本：`0.1.3`\n- 状态：已安装、已启用\n- 路径：`C:\\Users\\WinterZhao\\.codex\\plugins\\cache\\agentic-game-dev\\...`\n重新启动 Codex或新建会话后生效。首次遇到 hook 信任提示时确认即可。",
+          "tool_calls": []
+        }
+      ],
+      "system_context": {
+        "transcript_format": "codex-jsonl",
+        "transcript_path": "C:\\Users\\WinterZhao\\.codex\\sessions\\2026\\07\\14\\rollout-2026-07-14T14-28-12-019f5f4f-c9f4-7a90-9e6e-cd760f8843f6.jsonl",
+        "codex_session_id": "019f5f4f-c9f4-7a90-9e6e-cd760f8843f6",
+        "cwd": "C:\\Users\\WinterZhao\\GodotAvatarVideoGen",
+        "originator": "codex-tui",
+        "cli_version": "0.144.4",
+        "model_provider": "openai",
+        "total_tokens": 3686772
+      },
+      "changed_files": [],
+      "commits": [],
+      "timestamps": {
+        "started": "2026-07-14T06:28:12.471Z",
+        "ended": "2026-07-16T05:40:19.768Z"
+      },
+      "verification": null,
+      "outcome": {
+        "first_pass_success": false,
+        "rounds_to_resolution": 5,
+        "ai_lines_changed": 0,
+        "human_lines_changed": 0,
+        "human_intervention_ratio": 0.0,
+        "token_cost": 3686772,
+        "session_duration_minutes": 2832.1216166666663
+      }
+    }
+  }
+}

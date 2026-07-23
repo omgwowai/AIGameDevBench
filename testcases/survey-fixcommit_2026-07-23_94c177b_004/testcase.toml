@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-fixcommit_2026-07-23_94c177b_004"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "80dc58ca8e15e70113cc49179c3ccc8400287ed5"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "Complete the original Survey bad-case task touching the relevant files: scenes/videoGen.tscn, scenes/videoScriptGen.tscn, scripts/core/app_state.gd, scripts/core/generation_service.gd, scripts/llm/tokenrouter_llm.gd, scripts/media/ffmpeg_util.gd, scripts/screens/avatar_gen.gd, scripts/screens/edit_gen.gd. Original failure notes: fix commit 94c177b: feat: 视频并行任务/分镜两层结构/kimi-k3/多选拼接 + 相关修复 (#15)\n\nRegression target: avoid the original Survey bad case (A1): fix commit 94c177b: feat: 视频并行任务/分镜两层结构/kimi-k3/多选拼接 + 相关修复 (#15)"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "fixcommit_2026-07-23_94c177b_004"
+bad_case_type = "A1"
+captured_harness = "git-history"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

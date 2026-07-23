@@ -1,0 +1,226 @@
+diff --git a/project.godot b/project.godot
+index cabb8d6..4323d43 100644
+--- a/project.godot
++++ b/project.godot
+@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.3")
+ 
+ [autoload]
+ 
++Log="*res://scripts/core/log_util.gd"
+ AppState="*res://scripts/core/app_state.gd"
+ StoragePaths="*res://scripts/core/storage_paths.gd"
+ SessionLog="*res://scripts/core/session_log.gd"
+diff --git a/scripts/core/log_util.gd b/scripts/core/log_util.gd
+index ced4c1b..3104717 100644
+--- a/scripts/core/log_util.gd
++++ b/scripts/core/log_util.gd
+@@ -1,12 +1,11 @@
+-extends RefCounted
+-class_name Log
++extends Node
+ 
+-# Tiny static facade over the SessionLog autoload so any script — including RefCounted
+-# helpers with no scene-tree access — can emit diagnostic logs in one line:
++# Tiny facade over the SessionLog autoload so any script can emit diagnostic logs
++# in one line:
+ #   Log.warn("FfmpegUtil.resolve", "ffmpeg not found", {"tried": path})
+ # Safe no-op if SessionLog isn't registered (e.g. --check-only).
+ 
+-static func _sl():
++func _sl():
+ 	var loop := Engine.get_main_loop()
+ 	if loop != null and loop.has_method("get_root"):
+ 		var root = loop.root
+@@ -15,13 +14,13 @@ static func _sl():
+ 	return null
+ 
+ 
+-static func info(where: String, message: String, detail: Dictionary = {}) -> void:
++func info(where: String, message: String, detail: Dictionary = {}) -> void:
+ 	var sl = _sl()
+ 	if sl != null:
+ 		sl.info(where, message, detail)
+ 
+ 
+-static func warn(where: String, message: String, detail: Dictionary = {}) -> void:
++func warn(where: String, message: String, detail: Dictionary = {}) -> void:
+ 	var sl = _sl()
+ 	if sl != null:
+ 		sl.warn(where, message, detail)
+@@ -29,7 +28,7 @@ static func warn(where: String, message: String, detail: Dictionary = {}) -> voi
+ 		push_warning("[%s] %s" % [where, message])
+ 
+ 
+-static func error(where: String, message: String, detail: Dictionary = {}) -> void:
++func error(where: String, message: String, detail: Dictionary = {}) -> void:
+ 	var sl = _sl()
+ 	if sl != null:
+ 		sl.error(where, message, detail)
+diff --git a/scripts/llm/tokenrouter_image.gd b/scripts/llm/tokenrouter_image.gd
+index bed6655..1797e99 100644
+--- a/scripts/llm/tokenrouter_image.gd
++++ b/scripts/llm/tokenrouter_image.gd
+@@ -25,6 +25,7 @@ const CONFIG_PATH := "user://tencent_kling_config.json"
+ const DEFAULT_IMAGE_PATH := "/v1/images/generations"
+ const DEFAULT_MODEL := "gemini-2.5-flash-image"  # Nano Banana; override via image_model
+ const IMAGE_DIR := "pipeline_keyframes"
++const CredentialsScript := preload("res://scripts/core/credentials.gd")
+ 
+ var config: Dictionary = {}
+ var gen_request: HTTPRequest
+@@ -52,7 +53,7 @@ func _load_config() -> Dictionary:
+ 	var merged: Dictionary = { "base_url": "http://161.118.219.11:8081" }
+ 	_merge_json_file(merged, SHARED_CONFIG_PATH)
+ 	_merge_json_file(merged, CONFIG_PATH)
+-	merged["client_key"] = Credentials.get_token()
++	merged["client_key"] = CredentialsScript.get_token()
+ 	return merged
+ 
+ 
+diff --git a/scripts/llm/tokenrouter_llm.gd b/scripts/llm/tokenrouter_llm.gd
+index 291a6b7..19892f6 100644
+--- a/scripts/llm/tokenrouter_llm.gd
++++ b/scripts/llm/tokenrouter_llm.gd
+@@ -28,6 +28,7 @@ const MESSAGES_PATH := "/v1/messages"          # anthropic protocol
+ const CHAT_PATH := "/v1/chat/completions"      # openai protocol
+ const DEFAULT_MODEL := "claude-opus-4-8"
+ const ANTHROPIC_VERSION := "2023-06-01"
++const CredentialsScript := preload("res://scripts/core/credentials.gd")
+ 
+ var config: Dictionary = {}
+ var request_node: HTTPRequest
+@@ -53,7 +54,7 @@ func _load_config() -> Dictionary:
+ 	var merged: Dictionary = { "base_url": "http://161.118.219.11:8081" }
+ 	_merge_json_file(merged, SHARED_CONFIG_PATH)
+ 	_merge_json_file(merged, CONFIG_PATH)
+-	merged["client_key"] = Credentials.get_token()
++	merged["client_key"] = CredentialsScript.get_token()
+ 	return merged
+ 
+ 
+diff --git a/scripts/providers/jd_seedance_client.gd b/scripts/providers/jd_seedance_client.gd
+index 1874fc0..dd1c086 100644
+--- a/scripts/providers/jd_seedance_client.gd
++++ b/scripts/providers/jd_seedance_client.gd
+@@ -9,6 +9,8 @@ signal status_changed(status: String, task: Dictionary)
+ signal video_ready(record: Dictionary)
+ signal generation_failed(message: String, record: Dictionary)
+ 
++const CredentialsScript := preload("res://scripts/core/credentials.gd")
++
+ const SHARED_CONFIG_PATH := "res://config/jd_seedance_config.json"
+ const USER_CONFIG_PATH := "user://jd_seedance_config.json"
+ const HISTORY_PATH := "user://jd_seedance_history.jsonl"
+@@ -91,7 +93,7 @@ func load_config() -> Dictionary:
+ 	var merged: Dictionary = DEFAULT_CONFIG.duplicate(true)
+ 	_merge_json_file(merged, SHARED_CONFIG_PATH)
+ 	_merge_json_file(merged, USER_CONFIG_PATH)
+-	merged["app_key"] = Credentials.get_token()
++	merged["app_key"] = CredentialsScript.get_token()
+ 	return merged
+ 
+ 
+@@ -162,7 +164,7 @@ func generate_video(prompt: String) -> bool:
+ 
+ 	var app_key: String = str(config.get("app_key", "")).strip_edges()
+ 	if app_key.is_empty():
+-		_emit_failure("缺少 token。请在 %s 里填写 token。" % Credentials.get_file_path(), {})
++		_emit_failure("缺少 token。请在 %s 里填写 token。" % CredentialsScript.get_file_path(), {})
+ 		return false
+ 
+ 	started_msec = Time.get_ticks_msec()
+diff --git a/scripts/providers/tencent_kling_client.gd b/scripts/providers/tencent_kling_client.gd
+index 6f2670d..89d4634 100644
+--- a/scripts/providers/tencent_kling_client.gd
++++ b/scripts/providers/tencent_kling_client.gd
+@@ -13,6 +13,7 @@ signal video_ready(record: Dictionary)
+ signal generation_failed(message: String, record: Dictionary)
+ 
+ const Gateway := preload("res://scripts/providers/tokenrouter_gateway.gd")
++const CredentialsScript := preload("res://scripts/core/credentials.gd")
+ 
+ const SHARED_CONFIG_PATH := "res://config/tencent_kling_config.json"
+ const USER_CONFIG_PATH := "user://tencent_kling_config.json"
+@@ -74,7 +75,7 @@ func load_config() -> Dictionary:
+ 	var merged: Dictionary = DEFAULT_CONFIG.duplicate(true)
+ 	_merge_json_file(merged, SHARED_CONFIG_PATH)
+ 	_merge_json_file(merged, USER_CONFIG_PATH)
+-	merged["client_key"] = Credentials.get_token()
++	merged["client_key"] = CredentialsScript.get_token()
+ 	return merged
+ 
+ 
+@@ -184,7 +185,7 @@ func generate_video(prompt: String) -> bool:
+ 	var base_url: String = str(config.get("base_url", "")).strip_edges()
+ 	var client_key: String = str(config.get("client_key", "")).strip_edges()
+ 	if base_url.is_empty() or client_key.is_empty():
+-		_emit_failure("缺少 token。请在 %s 里填写 token。" % Credentials.get_file_path(), {})
++		_emit_failure("缺少 token。请在 %s 里填写 token。" % CredentialsScript.get_file_path(), {})
+ 		return false
+ 
+ 	started_msec = Time.get_ticks_msec()
+diff --git a/start.bat b/start.bat
+new file mode 100644
+index 0000000..8388eed
+--- /dev/null
++++ b/start.bat
+@@ -0,0 +1,59 @@
++@echo off
++setlocal
++
++set "PROJECT_DIR=%~dp0"
++if "%PROJECT_DIR:~-1%"=="\" set "PROJECT_DIR=%PROJECT_DIR:~0,-1%"
++pushd "%PROJECT_DIR%" >nul
++
++if not exist "project.godot" (
++  echo project.godot was not found in:
++  echo %PROJECT_DIR%
++  echo.
++  pause
++  exit /b 1
++)
++
++if defined GODOT_EXE (
++  if exist "%GODOT_EXE%" goto run_project
++  echo GODOT_EXE is set, but the file does not exist:
++  echo %GODOT_EXE%
++  echo.
++)
++
++for %%G in (godot.exe godot4.exe godot4.7.exe Godot_v4.7-stable_win64.exe Godot_v4.7-stable_mono_win64.exe Godot_v4.6.3-stable_win64.exe Godot_v4.6.3-stable_mono_win64.exe) do (
++  where.exe %%G >nul 2>nul
++  if not errorlevel 1 (
++    set "GODOT_EXE=%%G"
++    goto run_project
++  )
++)
++
++for /f "delims=" %%G in ('dir /b /s "%LOCALAPPDATA%\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_*\Godot*.exe" 2^>nul') do (
++  set "GODOT_EXE=%%G"
++  goto run_project
++)
++
++for /f "delims=" %%G in ('dir /b /s "%PROJECT_DIR%\..\Godot*\Godot*.exe" 2^>nul') do (
++  set "GODOT_EXE=%%G"
++  goto run_project
++)
++
++echo Godot was not found.
++echo.
++echo Set GODOT_EXE to your Godot executable, or add the Godot folder to PATH, then run it again.
++echo.
++pause
++exit /b 1
++
++:run_project
++echo Starting Avatar Video Generator...
++"%GODOT_EXE%" --path "%PROJECT_DIR%" %*
++set "EXIT_CODE=%ERRORLEVEL%"
++popd >nul
++if not "%EXIT_CODE%"=="0" (
++  echo.
++  echo Godot exited with code %EXIT_CODE%.
++  echo.
++  pause
++)
++exit /b %EXIT_CODE%

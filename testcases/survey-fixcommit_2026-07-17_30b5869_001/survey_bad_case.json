@@ -1,0 +1,164 @@
+{
+  "schema": "survey.bad_case.testcase.v1",
+  "testcase_id": "survey-fixcommit_2026-07-17_30b5869_001",
+  "source_repo": "C:\\Users\\WinterZhao\\GodotAvatarVideoGen",
+  "baseline_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+  "repro_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+  "bad_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+  "good_ref": "30b5869bbe31bcf8e8afd5e66e71186205a7511e",
+  "baseline_resolution_error": null,
+  "expected": {
+    "bad_case_type": "A1",
+    "notes": "fix commit 30b5869: fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)",
+    "original_l0_pass": null,
+    "original_l1_pass": null,
+    "original_l0_details": [],
+    "original_l1_details": [],
+    "original_human_intervention_ratio": 0.0,
+    "original_rounds_to_resolution": 2,
+    "must_change_one_of": [
+      "scripts/core/generation_service.gd",
+      "scripts/core/storage_paths.gd",
+      "scripts/llm/tokenrouter_image.gd",
+      "scripts/llm/tokenrouter_llm.gd",
+      "scripts/media/ffmpeg_util.gd",
+      "scripts/providers/jd_seedance_client.gd",
+      "scripts/providers/tencent_kling_client.gd",
+      "scripts/screens/video_gen.gd",
+      "scripts/storage/data_api.gd",
+      "scripts/ui/ai_panel.gd"
+    ],
+    "minimum_changed_files": 1
+  },
+  "hidden_oracle": {
+    "good_ref": "30b5869bbe31bcf8e8afd5e66e71186205a7511e",
+    "good_diff_file": "good.diff",
+    "good_changed_files": [
+      "run.bat",
+      "scripts/core/generation_service.gd",
+      "scripts/core/storage_paths.gd",
+      "scripts/llm/tokenrouter_image.gd",
+      "scripts/llm/tokenrouter_llm.gd",
+      "scripts/media/ffmpeg_util.gd",
+      "scripts/providers/jd_seedance_client.gd",
+      "scripts/providers/tencent_kling_client.gd",
+      "scripts/screens/video_gen.gd",
+      "scripts/storage/data_api.gd",
+      "scripts/ui/ai_panel.gd"
+    ],
+    "history_mining_strategy": "fix_commit_parent"
+  },
+  "bench_record": {
+    "testcase_id": "fixcommit_2026-07-17_30b5869_001",
+    "harness": "git-history",
+    "category": "survey:A1",
+    "l0_l1_pass": true,
+    "score": 0.0,
+    "verifier_result": {
+      "score": 0.0,
+      "status": "fail",
+      "category": "survey:A1",
+      "error": "fix commit 30b5869: fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)",
+      "checks": [
+        {
+          "name": "bad_case_detected",
+          "passed": false,
+          "detail": "fix commit 30b5869: fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)",
+          "expected": "none",
+          "actual": "A1"
+        },
+        {
+          "name": "human_intervention_ratio",
+          "passed": true,
+          "detail": "",
+          "expected": "<= 0.40",
+          "actual": 0.0
+        },
+        {
+          "name": "rounds_to_resolution",
+          "passed": true,
+          "detail": "",
+          "expected": "<= 4",
+          "actual": 2
+        }
+      ]
+    },
+    "diff": "",
+    "artifacts_path": null,
+    "ai_agent_context": {
+      "harness": "git-history",
+      "transcript_session_id": null,
+      "transcript_match_confidence": null,
+      "transcript_path": null,
+      "codex_session_id": null,
+      "total_tokens": null,
+      "filtered_to_commits": [
+        "30b5869"
+      ],
+      "filtered_turns": null,
+      "turns": []
+    },
+    "survey_session": {
+      "session_id": "fixcommit_2026-07-17_30b5869_001",
+      "harness": "git-history",
+      "config": {},
+      "bad_case_type": "A1",
+      "auto_detected": true,
+      "confidence": "low",
+      "notes": "fix commit 30b5869: fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)",
+      "prompts": [],
+      "system_context": {
+        "source": "git-history-fix",
+        "baseline_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+        "bad_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+        "good_ref": "30b5869bbe31bcf8e8afd5e66e71186205a7511e",
+        "good_commit_timestamp": "2026-07-17T20:04:45+08:00",
+        "good_changed_files": [
+          "run.bat",
+          "scripts/core/generation_service.gd",
+          "scripts/core/storage_paths.gd",
+          "scripts/llm/tokenrouter_image.gd",
+          "scripts/llm/tokenrouter_llm.gd",
+          "scripts/media/ffmpeg_util.gd",
+          "scripts/providers/jd_seedance_client.gd",
+          "scripts/providers/tencent_kling_client.gd",
+          "scripts/screens/video_gen.gd",
+          "scripts/storage/data_api.gd",
+          "scripts/ui/ai_panel.gd"
+        ],
+        "fix_commit_subject": "fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)",
+        "oracle_level": "diff_only",
+        "history_mining_strategy": "fix_commit_parent"
+      },
+      "changed_files": [
+        "scripts/core/generation_service.gd",
+        "scripts/core/storage_paths.gd",
+        "scripts/llm/tokenrouter_image.gd",
+        "scripts/llm/tokenrouter_llm.gd",
+        "scripts/media/ffmpeg_util.gd",
+        "scripts/providers/jd_seedance_client.gd",
+        "scripts/providers/tencent_kling_client.gd",
+        "scripts/screens/video_gen.gd",
+        "scripts/storage/data_api.gd",
+        "scripts/ui/ai_panel.gd"
+      ],
+      "commits": [
+        "30b5869"
+      ],
+      "timestamps": {
+        "started": "2026-07-17T20:04:45+08:00",
+        "ended": "2026-07-17T20:04:45+08:00"
+      },
+      "verification": null,
+      "outcome": {
+        "first_pass_success": false,
+        "rounds_to_resolution": 2,
+        "ai_lines_changed": 0,
+        "human_lines_changed": 0,
+        "human_intervention_ratio": 0.0,
+        "token_cost": 0,
+        "session_duration_minutes": 0.0
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-codex_2026-07-20_019f7d38-cc0f-77a0-8181-3ea4e76cf961"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "40151931d50b01451f8d2baab35df5a03c1a426b"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "本项目中内置ai助手所能进行的操作集是哪些？是在哪里/如何进行限制/执行的？\n\nFollow-up user turns from the original session:\n- 在config里新增人设原子标签库，内容是价值观\n- 自我/奉献，节俭/浪费，物质/精神，稳定/风险，乐观/悲观，忍耐/放弃，坦诚/权变，自我定义/外部认可，平等互惠/等级权威，关系/原则，进取/现状\n思考层\n抽象/具体，发散/严谨，利益/感受，决断/犹豫，细节/宏观，自省/埋怨，主动/被动，开放/保守，敏锐/迟钝\n情绪层\n波动/稳定，焦虑/松弛，外露/内敛，积极/消极\n行动层\n效率/拖沓，主动/被动，细节/宏观，稳定/干扰，表里一致/表里不一，直白表达/迂回表达\n- 设计人设时支持根据当前所有的短语组生成一组标签，也作为人设的一部分存储。\n- 人设ui里支持直接设置名字，默认为人设+时间戳。视频ui层对于生成的中间视频/未拼接也要存在assets/video，打开路径要对应当前视频的存储路径而非文档。\n\nRegression target: avoid the original Survey bad case (unclassified): rounds_to_resolution=5"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "codex_2026-07-20_019f7d38-cc0f-77a0-8181-3ea4e76cf961"
+bad_case_type = "unclassified"
+captured_harness = "codex"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

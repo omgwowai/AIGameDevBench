@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-codex_2026-07-14_019f5f4f-c9f4-7a90-9e6e-cd760f8843f6"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "40151931d50b01451f8d2baab35df5a03c1a426b"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "能否基于comfyUI做一套跨ue和godot可用的ai生成工作流？支持游戏运行时把图片和视频拖入游戏，获得AI GEN信息，并进行生成\n\nFollow-up user turns from the original session:\n- 这样做和直接在godot里实现ai gen框架的优劣分别是什么\n- 选择混合方案的话，现在需要新增哪些模块功能？\n- https://github.com/omgwowai/agentic-game-development 研究下如何下载/使用/更新这一插件\n- 应用到真实codex里把！\n\nRegression target: avoid the original Survey bad case (unclassified): rounds_to_resolution=5"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "codex_2026-07-14_019f5f4f-c9f4-7a90-9e6e-cd760f8843f6"
+bad_case_type = "unclassified"
+captured_harness = "codex"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

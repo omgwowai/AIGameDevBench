@@ -1,0 +1,146 @@
+{
+  "schema": "survey.bad_case.testcase.v1",
+  "testcase_id": "survey-fixcommit_2026-07-17_3491083_000",
+  "source_repo": "C:\\Users\\WinterZhao\\GodotAvatarVideoGen",
+  "baseline_ref": "d492fff71ab399f10796064086de43baae480ab7",
+  "repro_ref": "d492fff71ab399f10796064086de43baae480ab7",
+  "bad_ref": "d492fff71ab399f10796064086de43baae480ab7",
+  "good_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+  "baseline_resolution_error": null,
+  "expected": {
+    "bad_case_type": "A1",
+    "notes": "fix commit 3491083: fix: 修复 Godot 冷启动脚本加载 (#7)",
+    "original_l0_pass": null,
+    "original_l1_pass": null,
+    "original_l0_details": [],
+    "original_l1_details": [],
+    "original_human_intervention_ratio": 0.0,
+    "original_rounds_to_resolution": 2,
+    "must_change_one_of": [
+      "scripts/core/log_util.gd",
+      "scripts/llm/tokenrouter_image.gd",
+      "scripts/llm/tokenrouter_llm.gd",
+      "scripts/providers/jd_seedance_client.gd",
+      "scripts/providers/tencent_kling_client.gd"
+    ],
+    "minimum_changed_files": 1
+  },
+  "hidden_oracle": {
+    "good_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+    "good_diff_file": "good.diff",
+    "good_changed_files": [
+      "project.godot",
+      "scripts/core/log_util.gd",
+      "scripts/llm/tokenrouter_image.gd",
+      "scripts/llm/tokenrouter_llm.gd",
+      "scripts/providers/jd_seedance_client.gd",
+      "scripts/providers/tencent_kling_client.gd",
+      "start.bat"
+    ],
+    "history_mining_strategy": "fix_commit_parent"
+  },
+  "bench_record": {
+    "testcase_id": "fixcommit_2026-07-17_3491083_000",
+    "harness": "git-history",
+    "category": "survey:A1",
+    "l0_l1_pass": true,
+    "score": 0.0,
+    "verifier_result": {
+      "score": 0.0,
+      "status": "fail",
+      "category": "survey:A1",
+      "error": "fix commit 3491083: fix: 修复 Godot 冷启动脚本加载 (#7)",
+      "checks": [
+        {
+          "name": "bad_case_detected",
+          "passed": false,
+          "detail": "fix commit 3491083: fix: 修复 Godot 冷启动脚本加载 (#7)",
+          "expected": "none",
+          "actual": "A1"
+        },
+        {
+          "name": "human_intervention_ratio",
+          "passed": true,
+          "detail": "",
+          "expected": "<= 0.40",
+          "actual": 0.0
+        },
+        {
+          "name": "rounds_to_resolution",
+          "passed": true,
+          "detail": "",
+          "expected": "<= 4",
+          "actual": 2
+        }
+      ]
+    },
+    "diff": "",
+    "artifacts_path": null,
+    "ai_agent_context": {
+      "harness": "git-history",
+      "transcript_session_id": null,
+      "transcript_match_confidence": null,
+      "transcript_path": null,
+      "codex_session_id": null,
+      "total_tokens": null,
+      "filtered_to_commits": [
+        "3491083"
+      ],
+      "filtered_turns": null,
+      "turns": []
+    },
+    "survey_session": {
+      "session_id": "fixcommit_2026-07-17_3491083_000",
+      "harness": "git-history",
+      "config": {},
+      "bad_case_type": "A1",
+      "auto_detected": true,
+      "confidence": "low",
+      "notes": "fix commit 3491083: fix: 修复 Godot 冷启动脚本加载 (#7)",
+      "prompts": [],
+      "system_context": {
+        "source": "git-history-fix",
+        "baseline_ref": "d492fff71ab399f10796064086de43baae480ab7",
+        "bad_ref": "d492fff71ab399f10796064086de43baae480ab7",
+        "good_ref": "3491083e7894be8ef975b9ebbb118a38d68b3b04",
+        "good_commit_timestamp": "2026-07-17T19:55:42+08:00",
+        "good_changed_files": [
+          "project.godot",
+          "scripts/core/log_util.gd",
+          "scripts/llm/tokenrouter_image.gd",
+          "scripts/llm/tokenrouter_llm.gd",
+          "scripts/providers/jd_seedance_client.gd",
+          "scripts/providers/tencent_kling_client.gd",
+          "start.bat"
+        ],
+        "fix_commit_subject": "fix: 修复 Godot 冷启动脚本加载 (#7)",
+        "oracle_level": "diff_only",
+        "history_mining_strategy": "fix_commit_parent"
+      },
+      "changed_files": [
+        "scripts/core/log_util.gd",
+        "scripts/llm/tokenrouter_image.gd",
+        "scripts/llm/tokenrouter_llm.gd",
+        "scripts/providers/jd_seedance_client.gd",
+        "scripts/providers/tencent_kling_client.gd"
+      ],
+      "commits": [
+        "3491083"
+      ],
+      "timestamps": {
+        "started": "2026-07-17T19:55:42+08:00",
+        "ended": "2026-07-17T19:55:42+08:00"
+      },
+      "verification": null,
+      "outcome": {
+        "first_pass_success": false,
+        "rounds_to_resolution": 2,
+        "ai_lines_changed": 0,
+        "human_lines_changed": 0,
+        "human_intervention_ratio": 0.0,
+        "token_cost": 0,
+        "session_duration_minutes": 0.0
+      }
+    }
+  }
+}

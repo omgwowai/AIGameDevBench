@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-fixcommit_2026-07-21_419126b_003"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "807c3e0d311546e4bfa25f2f93464df0e4899413"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "Complete the original Survey bad-case task touching the relevant files: scripts/screens/video_gen.gd. Original failure notes: fix commit 419126b: fix: 恢复视频分镜独立生成开关 (#13)\n\nRegression target: avoid the original Survey bad case (A1): fix commit 419126b: fix: 恢复视频分镜独立生成开关 (#13)"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "fixcommit_2026-07-21_419126b_003"
+bad_case_type = "A1"
+captured_harness = "git-history"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

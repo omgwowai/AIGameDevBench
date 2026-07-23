@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-fixcommit_2026-07-23_4015193_006"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "4bb62ea350e654657b1e410dbf24b22fd9119971"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "Complete the original Survey bad-case task touching the relevant files: scripts/providers/jd_seedance_client.gd, scripts/providers/seedance_client.gd, scripts/providers/tencent_kling_client.gd. Original failure notes: fix commit 4015193: fix: 视频下载超时与 API 超时解耦，避免大文件/跨境下载失败\n\nRegression target: avoid the original Survey bad case (A1): fix commit 4015193: fix: 视频下载超时与 API 超时解耦，避免大文件/跨境下载失败"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "fixcommit_2026-07-23_4015193_006"
+bad_case_type = "A1"
+captured_harness = "git-history"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

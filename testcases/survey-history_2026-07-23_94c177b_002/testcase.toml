@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-history_2026-07-23_94c177b_002"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "80dc58ca8e15e70113cc49179c3ccc8400287ed5"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "Complete the original Survey bad-case task touching the relevant files: \"docs/AI/350/247/206/351/242/221/347/224/237/346/210/220Prompt/346/240/274/345/274/217.md\", \"references//350/247/206/351/242/221/347/264/240/346/235/220/344/270/216/350/204/232/346/234/254/347/264/242/345/274/225.md\", \"references/01_/345/260/221/347/210/267/345/222/214/346/210/221_/347/262/276/351/200/211/347/211/207/346/256/265/344/270/216/345/256/214/346/225/264/345/234/272/346/231/257/350/204/232/346/234/254.md\", \"references/02_/350/241/250/347/231/275/346/210/220/345/212/237_/345/256/214/346/225/264/350/204/232/346/234/254.md\", \"references/03_/346/210/277/344/272/247/350/257/201/345/220/215/345/255/227/346/230/257/344/275/240_/345/256/214/346/225/264/350/204/232/346/234/254.md\", \"references/04_/345/211/203/351/241/273/345/210/200/345/210/256/350/205/213/346/257/233_/345/256/214/346/225/264/350/204/232/346/234/254.md\", \"references/05_Tomodachi_/345/256/214/346/225/264/350/204/232/346/234/254.md\", \"references/SCRIPTS_/350/247/206/351/242/221/347/224/237/346/210/220/350/204/232/346/234/254/346/217/217/350/277/260.md\". Original failure notes: L0 fail: L0 crash: scenes/videoGen.tscn: SCRIPT ERROR: Parse Error: Identifier \"Palette\" not declared in the current scope.; L0 crash: scenes/videoGen.tscn: SCRIPT ERROR: Parse Error: Identifier \"Palette\" not declared in the current scope.; L0 crash: scenes/videoGen.tscn: SCRIPT ERROR: Parse Error: Identifier \"Palette\" not declared in the current scope.; fixed by 4bb62ea\n\nRegression target: avoid the original Survey bad case (A1): L0 fail: L0 crash: scenes/videoGen.tscn: SCRIPT ERROR: Parse Error: Identifier \"Palette\" not declared in the current scope.; L0 crash: scenes/videoGen.tscn: SCRIPT ERROR: Parse Error: Identifier \"Palette\" not declared in the current scope.; L0 crash: scenes/videoGen.tscn: SCRIPT ERROR: Parse Error: Identifier \"Palette\" not declared in the current scope.; fixed by 4bb62ea"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "history_2026-07-23_94c177b_002"
+bad_case_type = "A1"
+captured_harness = "git-history"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

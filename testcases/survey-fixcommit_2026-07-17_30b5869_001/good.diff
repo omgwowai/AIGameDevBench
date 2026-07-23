@@ -1,0 +1,203 @@
+diff --git a/run.bat b/run.bat
+index 1efd766..779ac30 100644
+--- a/run.bat
++++ b/run.bat
+@@ -1,35 +1,73 @@
+ @echo off
+-REM 清空 Godot 缓存并启动游戏 runtime。
+-REM 切换 Godot 版本后（例如 4.7 缓存被 4.6.x 打开）务必用它清缓存，避免
+-REM "Failed to load script ... Parse error / does not inherit from Node" 之类的报错。
++REM Launch the game runtime. Cache is NOT cleared by default (fast start).
++REM Cache-clear policy:
++REM   * auto on Godot version change (old cache is incompatible -> rmdir .godot)
++REM   * force manually:  run.bat clean
++REM This avoids "Failed to load script ... Parse error / does not inherit from Node"
++REM (stale-cache issues, e.g. a 4.7 cache opened by 4.6.x) without re-importing every run.
+ 
+ setlocal enabledelayedexpansion
+ cd /d "%~dp0"
+ 
+-REM --- 1) 定位 Godot 可执行 ---
+-REM 优先环境变量 GODOT；否则找 PATH 上的 godot；否则用常见安装位置。
++REM --- 1) Locate the Godot executable ---
++REM Prefer env var GODOT; else godot on PATH; else a common install location.
+ set "GODOT=%GODOT%"
+ if not defined GODOT (
+     where godot >nul 2>&1 && set "GODOT=godot"
+ )
+ if not defined GODOT if exist "D:\Godot\godot\bin\godot.exe" set "GODOT=D:\Godot\godot\bin\godot.exe"
+ if not defined GODOT (
+-    echo 未找到 Godot 可执行文件。
+-    echo 请把 godot 加入 PATH，或设置环境变量 GODOT 指向 godot.exe，例如：
++    echo Godot executable not found.
++    echo Add godot to PATH, or set env var GODOT to godot.exe, e.g.:
+     echo     set GODOT=D:\Godot\godot\bin\godot.exe
+     pause
+     exit /b 1
+ )
+ 
+-REM --- 2) 清空缓存 ---
+-if exist ".godot" (
+-    echo 正在清空缓存 .godot ...
+-    rmdir /s /q ".godot"
++REM --- 2) Read current Godot version (via temp file to avoid for/f quoting pitfalls) ---
++set "GODOT_VER="
++set "_VTMP=%TEMP%\_godot_ver_%RANDOM%.txt"
++"%GODOT%" --headless --version > "%_VTMP%" 2>nul
++if exist "%_VTMP%" (
++    for /f "usebackq delims=" %%v in ("%_VTMP%") do if not defined GODOT_VER set "GODOT_VER=%%v"
++    del "%_VTMP%" >nul 2>&1
+ )
+ 
+-REM --- 3) 启动游戏 runtime（直接跑主场景，不进编辑器）---
+-echo 使用 Godot: %GODOT%
+-echo 启动游戏 runtime ...
++REM --- 3) Decide whether to clear the cache ---
++set "DO_CLEAN="
++set "VERFILE=.godot\.godot_version"
++if /i "%~1"=="clean" set "DO_CLEAN=1"
++if not defined DO_CLEAN (
++    if exist "%VERFILE%" (
++        set "LAST_VER="
++        for /f "usebackq delims=" %%v in ("%VERFILE%") do set "LAST_VER=%%v"
++        if not "!LAST_VER!"=="%GODOT_VER%" (
++            echo Godot version changed: !LAST_VER!  -^>  %GODOT_VER%
++            set "DO_CLEAN=1"
++        )
++    )
++)
++
++if defined DO_CLEAN (
++    if exist ".godot" (
++        echo Clearing cache .godot ...
++        rmdir /s /q ".godot"
++    )
++)
++
++REM --- 4) Rebuild cache if missing (first run / just cleared). Pure runtime does NOT
++REM     rebuild .godot; without it, resource/script-class loading breaks, so seed it once.
++if not exist ".godot\global_script_class_cache.cfg" (
++    echo Rebuilding cache ^(import resources + register script classes^) ...
++    "%GODOT%" --headless --editor --quit >nul 2>&1
++)
++
++REM Record this version for next-run comparison (no trailing newline/space).
++if exist ".godot" ( <nul set /p "=%GODOT_VER%" > "%VERFILE%" )
++
++REM --- 5) Launch the game runtime (main scene; not the editor) ---
++echo Using Godot: %GODOT%  ^(%GODOT_VER%^)
++echo Launching game runtime ...
+ "%GODOT%" --path "%~dp0."
+ 
+ endlocal
+diff --git a/scripts/core/generation_service.gd b/scripts/core/generation_service.gd
+index 4881e9f..d5348c9 100644
+--- a/scripts/core/generation_service.gd
++++ b/scripts/core/generation_service.gd
+@@ -1,4 +1,5 @@
+ extends Node
++const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Autoload `GenerationService`. Owns the provider client instances and runs video-generation
+ # jobs OUTSIDE any scene, so switching tabs (which destroys/rebuilds the videoGen scene) does
+diff --git a/scripts/core/storage_paths.gd b/scripts/core/storage_paths.gd
+index 7f13e44..e0a2d2e 100644
+--- a/scripts/core/storage_paths.gd
++++ b/scripts/core/storage_paths.gd
+@@ -1,4 +1,5 @@
+ extends Node
++const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Autoload `StoragePaths`. Central authority for WHERE library items are read from and
+ # written to, per DevGuide's "hash the ow token, split into folders by hash, id+timestamp".
+diff --git a/scripts/llm/tokenrouter_image.gd b/scripts/llm/tokenrouter_image.gd
+index 1797e99..a721b90 100644
+--- a/scripts/llm/tokenrouter_image.gd
++++ b/scripts/llm/tokenrouter_image.gd
+@@ -1,5 +1,7 @@
+ extends Node
+ class_name TokenRouterImage
++const Log := preload("res://scripts/core/log_util.gd")
++const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # Generates images through the local TokenRouter using an OpenAI-compatible endpoint.
+ #   POST {base_url}/v1/images/generations
+diff --git a/scripts/llm/tokenrouter_llm.gd b/scripts/llm/tokenrouter_llm.gd
+index 19892f6..fe7ed0f 100644
+--- a/scripts/llm/tokenrouter_llm.gd
++++ b/scripts/llm/tokenrouter_llm.gd
+@@ -1,5 +1,7 @@
+ extends Node
+ class_name TokenRouterLLM
++const Log := preload("res://scripts/core/log_util.gd")
++const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # Calls LLMs through the local TokenRouter, routing by PROTOCOL:
+ #   • anthropic (Claude family) → POST {base_url}/v1/messages
+diff --git a/scripts/media/ffmpeg_util.gd b/scripts/media/ffmpeg_util.gd
+index 231a24e..af79d01 100644
+--- a/scripts/media/ffmpeg_util.gd
++++ b/scripts/media/ffmpeg_util.gd
+@@ -1,5 +1,6 @@
+ extends RefCounted
+ class_name FfmpegUtil
++const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Shared ffmpeg helpers: locate the binary, trim a clip, concatenate clips. Used by the
+ # Step 5 edit editor; the pipeline has its own inline copy (kept to avoid regressions).
+diff --git a/scripts/providers/jd_seedance_client.gd b/scripts/providers/jd_seedance_client.gd
+index dd1c086..b3672d7 100644
+--- a/scripts/providers/jd_seedance_client.gd
++++ b/scripts/providers/jd_seedance_client.gd
+@@ -1,5 +1,7 @@
+ extends Node
+ class_name JDSeedanceClient
++const Log := preload("res://scripts/core/log_util.gd")
++const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # JD Cloud 灵境 (Lingjing) Seedance 2.0-fast client.
+ # Signal contract matches SeedanceClient / TencentKlingClient so the UI treats all
+diff --git a/scripts/providers/tencent_kling_client.gd b/scripts/providers/tencent_kling_client.gd
+index 89d4634..0b2cf44 100644
+--- a/scripts/providers/tencent_kling_client.gd
++++ b/scripts/providers/tencent_kling_client.gd
+@@ -1,5 +1,7 @@
+ extends Node
+ class_name TencentKlingClient
++const Log := preload("res://scripts/core/log_util.gd")
++const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # Tencent VOD AIGC video client, routed through TokenRouter (not direct to Tencent).
+ # TokenRouter co-signs and forwards to Tencent VOD, injecting SubAppId server-side,
+diff --git a/scripts/screens/video_gen.gd b/scripts/screens/video_gen.gd
+index 8a11e8b..165f0b9 100644
+--- a/scripts/screens/video_gen.gd
++++ b/scripts/screens/video_gen.gd
+@@ -1,4 +1,5 @@
+ extends Control
++const Log := preload("res://scripts/core/log_util.gd")
+ 
+ const SeedanceClientScript := preload("res://scripts/providers/seedance_client.gd")
+ const TencentKlingClientScript := preload("res://scripts/providers/tencent_kling_client.gd")
+diff --git a/scripts/storage/data_api.gd b/scripts/storage/data_api.gd
+index 1d638df..665be8b 100644
+--- a/scripts/storage/data_api.gd
++++ b/scripts/storage/data_api.gd
+@@ -1,5 +1,6 @@
+ extends RefCounted
+ class_name DataApi
++const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Open data interface: a single facade for creating/updating profiles, scripts (and their
+ # generation configs), and requesting video generation. Both the editor UIs and the AI
+diff --git a/scripts/ui/ai_panel.gd b/scripts/ui/ai_panel.gd
+index 71b966f..4183df0 100644
+--- a/scripts/ui/ai_panel.gd
++++ b/scripts/ui/ai_panel.gd
+@@ -1,5 +1,6 @@
+ extends CanvasLayer
+ class_name AiPanel
++const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Reusable AI assistant overlay. A floating "AI" button sits bottom-right of any host page;
+ # clicking it opens a chat panel. The user chats in natural language; the LLM is instructed

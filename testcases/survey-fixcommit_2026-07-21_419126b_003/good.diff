@@ -1,0 +1,43 @@
+diff --git a/README.md b/README.md
+index 25eb446..9007e40 100644
+--- a/README.md
++++ b/README.md
+@@ -116,6 +116,7 @@ export GODOT=/Applications/Godot.app/Contents/MacOS/Godot
+ 选 **Provider**：**腾讯云可灵 (Kling)** 或 **JD-seedance fast**。
+ 
+ - **腾讯云可灵 — 多模型并行批量**：模型区是一个勾选列表，每个模型带自己的**版本**下拉。勾选任意多个模型 → 点生成，它们用**同一套 Prompt / 参数 / 参考素材**并行各出一条视频。右侧「批量结果」逐行显示状态，每行完成后可单独 ▶ 播放，首个完成的自动预览。
++- **分镜独立生成**：导入结构化脚本后可勾选该开关；关闭时整段一次生成，开启时逐镜串联，并把上一镜末帧作为下一镜首帧（需要单模型与 ffmpeg）。
+ - **JD-seedance fast**：单条生成，有「JD 模式」下拉（自动 / 文生视频 / 图生视频·首尾帧 / 多模态参考）。
+ - **参考素材**：可加图片 / 视频 / 音频（能力随 Provider 不同）。给素材命名后，在 Prompt 里用 `@名称` 引用。
+   - 腾讯可灵：参考素材经 `FileInfos` 传递，**仅在服务端用 SV/VS 模型时真正生效**；可设 `Usage`（首帧 FirstFrame / 参考 Reference）。公网 URL 直接可用；本地文件会先上传再引用。
+diff --git a/scripts/screens/video_gen.gd b/scripts/screens/video_gen.gd
+index a0484f5..ce68057 100644
+--- a/scripts/screens/video_gen.gd
++++ b/scripts/screens/video_gen.gd
+@@ -617,12 +617,6 @@ func _build_ui() -> void:
+ 	script_name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ 	name_row.add_child(script_name_label)
+ 
+-	# 分镜独立生成开关：默认关 = 整段一次生成；开 = 各分镜按首尾帧串行生成后拼接。
+-	# storyboard_split_check = CheckBox.new()
+-	# storyboard_split_check.text = "分镜独立生成（按首尾帧串行，末帧接下一镜首帧）"
+-	# storyboard_split_check.tooltip_text = "关：把脚本作为一个 Prompt 一次生成整段视频。\n开：逐个分镜生成，上一镜的末帧作为下一镜的首帧，最后拼接成片（需单模型 + ffmpeg）。"
+-	# storyboard_split_check.button_pressed = false
+-	# left.add_child(storyboard_split_check)
+ 
+ 	var setting_title := Label.new()
+ 	setting_title.text = "视频设定 Prompt"
+@@ -679,6 +673,13 @@ func _build_ui() -> void:
+ 	advanced_button.toggled.connect(_on_advanced_toggled)
+ 	left.add_child(advanced_button)
+ 
++	# 分镜独立生成开关：默认关 = 整段一次生成；开 = 各分镜按首尾帧串行生成后拼接。
++	storyboard_split_check = CheckBox.new()
++	storyboard_split_check.text = "分镜独立生成（按首尾帧串行，末帧接下一镜首帧）"
++	storyboard_split_check.tooltip_text = "关：把脚本作为一个 Prompt 一次生成整段视频。\n开：逐个分镜生成，上一镜的末帧作为下一镜的首帧，最后拼接成片（需单模型 + ffmpeg）。"
++	storyboard_split_check.button_pressed = false
++	left.add_child(storyboard_split_check)
++
+ 	advanced_box = VBoxContainer.new()
+ 	advanced_box.add_theme_constant_override("separation", 6)
+ 	advanced_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL

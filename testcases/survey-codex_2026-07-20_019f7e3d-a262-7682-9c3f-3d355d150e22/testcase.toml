@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-codex_2026-07-20_019f7e3d-a262-7682-9c3f-3d355d150e22"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "40151931d50b01451f8d2baab35df5a03c1a426b"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "{\"detail\":{\"duration\":15,\"prompt_len\":0,\"provider\":\"腾讯云可灵 (Kling)\",\"refs\":0},\"level\":\"info\",\"message\":\"点击生成\",\"session\":\"7f80006c\",\"ts\":\"2026-07-20 14:23:03\",\"where\":\"videoGen\"}\n{\"detail\":{\"items\":1,\"provider\":0},\"level\":\"info\",\"message\":\"启动批量生成\",\"session\":\"7f80006c\",\"ts\":\"2026-07-20 14:23:03\",\"where\":\"GenService.batch\"}\n{\"detail\":{\"message\":\"Prompt is empty.\",\"task_id\":\"\"},\"level\":\"error\",\"message\":\"生成失败\",\"session\":\"7f80006c\",\"ts\":\"2026-07-20 14:23:03\",\"where\":\"TencentKling\"}\n\nFollow-up user turns from the original session:\n- func _on_open_folder_pressed() 的abs path应为视频存储的默认路径 assets/个人哈希/videos\n- videoGen界面默认模型改为seedance 2.0\n- 脚本生成界面也要像人设界面一样支持手动修改名字 默认 脚本+时间戳；在脚本生成界面新增脚本后处理界面，支持根据prompt使用大模型对脚本进行修改；在视频生成界面prompt旁新增视频设定prompt栏，在生成视频时和脚本进行拼接作为llm输入文本，点击生成时显示完整的llm 输入prompt；所有ui界面里的文本都要可选择/可复制；进一步处理mac上文本显示不规范的问题，目前还有。\n- 整理一下今天所有的修改，准备提交commit合入\n- push提pr，整理一份今日新增的核心功能\n- 切换到远端的main分支\n- commit 并提交pr到远端。\n- tencent云的seedance api是否支持同时传入首尾帧和参考图\n- 脚本也要支持分享复制到剪贴板复制、粘贴读入\n- 1. 少爷和我 - 上下级颠倒 - 霸总下级+怂包上级 https://www.bilibili.com/video/BV1KZ7Q6TEjy/?spm_id_from=333.337.search-card.all.click\n    2. 表白成功 https://www.bilibili.com/video/BV1AgKr6gEnw/?spm_id_from=333.337.search-card.all.click 0:53 - 1:17\n    3. 房产证名字是你 https://www.bilibili.com/video/BV1o14y1M7Ko/?spm_id_from=333.337.search-card.all.click 1:47 - 2:07\n    4. 隐瞒的事被发现 - 剃须刀刮腋毛 2:28 - 2:43\n    5. Tomodachi - https://www.bilibili.com/video/BV1VHVN66EN6/?spm_id_from=333.337.search-card.all.click 13:46 - 14:54 截取对应的视频片段到references目录下\n- 第五条是这个 https://www.bilibili.com/video/BV15HLJ69ErZ/?spm_id_from=333.337.search-card.all.click&vd_source=dcc60437b911d01ac3dfb25458e02012\n- 对这些视频生成相应的完整脚本-包含细节和动作，对第一个视频抽取若干个连贯的有表现力的15s视频。存在references目录下\n- 已授权\n- continue\n- continue\n- 现在脚本页选中脚本后分享还是会要求存png，修正一下，要支持通过剪贴板复制/粘贴读入\n- 视频生成页面支持新增视频生成task，并行处理\n- 视频生成页面支持新增视频生成task，并行处理；每个task的tab内容和现有的一致；支持每个tab折叠和展开，任务执行状态折叠时也要显示；\n- 每个生产任务的ui包括模型选择、脚本等信息，彼此之间相互独立。\n\nRegression target: avoid the original Survey bad case (unclassified): rounds_to_resolution=20"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "codex_2026-07-20_019f7e3d-a262-7682-9c3f-3d355d150e22"
+bad_case_type = "unclassified"
+captured_harness = "codex"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

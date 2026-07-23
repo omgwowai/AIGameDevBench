@@ -1,0 +1,23 @@
+[testcase]
+id = "survey-fixcommit_2026-07-17_30b5869_001"
+category = "behavior_logic"
+source_kind = "git"
+baseline_ref = "3491083e7894be8ef975b9ebbb118a38d68b3b04"
+source_repo = "C:\\Users\\WinterZhao\\GodotAvatarVideoGen"
+task = "Complete the original Survey bad-case task touching the relevant files: scripts/core/generation_service.gd, scripts/core/storage_paths.gd, scripts/llm/tokenrouter_image.gd, scripts/llm/tokenrouter_llm.gd, scripts/media/ffmpeg_util.gd, scripts/providers/jd_seedance_client.gd, scripts/providers/tencent_kling_client.gd, scripts/screens/video_gen.gd. Original failure notes: fix commit 30b5869: fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)\n\nRegression target: avoid the original Survey bad case (A1): fix commit 30b5869: fix: explicit Log/Credentials preloads for cold-start; smarter run.bat cache (#8)"
+
+[verifier]
+type = "survey_bad_case"
+entry = "survey_bad_case.json"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey"
+source_session = "fixcommit_2026-07-17_30b5869_001"
+bad_case_type = "A1"
+captured_harness = "git-history"
+transcript_session_id = ""
+context_file = "survey_bad_case.json"
+bad_diff = "bad.diff"

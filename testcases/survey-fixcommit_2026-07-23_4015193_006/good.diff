@@ -1,0 +1,99 @@
+diff --git a/config/jd_seedance_config.json b/config/jd_seedance_config.json
+index c6e44d9..8a5859e 100644
+--- a/config/jd_seedance_config.json
++++ b/config/jd_seedance_config.json
+@@ -8,5 +8,6 @@
+ 	"tools": false,
+ 	"image_tail": "",
+ 	"poll_interval_seconds": 5.0,
+-	"request_timeout_seconds": 60
++	"request_timeout_seconds": 60,
++	"download_timeout_seconds": 600
+ }
+diff --git a/config/seedance_config.json b/config/seedance_config.json
+index f2017dc..2c27d1c 100644
+--- a/config/seedance_config.json
++++ b/config/seedance_config.json
+@@ -10,5 +10,6 @@
+ 	"return_last_frame": false,
+ 	"seed": -1,
+ 	"poll_interval_seconds": 5.0,
+-	"request_timeout_seconds": 60
++	"request_timeout_seconds": 60,
++	"download_timeout_seconds": 600
+ }
+diff --git a/config/tencent_kling_config.json b/config/tencent_kling_config.json
+index 8debc1d..69b22f9 100644
+--- a/config/tencent_kling_config.json
++++ b/config/tencent_kling_config.json
+@@ -26,6 +26,7 @@
+ 	"seed": -1,
+ 	"poll_interval_seconds": 5.0,
+ 	"request_timeout_seconds": 60,
++	"download_timeout_seconds": 600,
+ 	"oci_par_base_url": "https://objectstorage.ap-singapore-1.oraclecloud.com/p/_JiDwzY7W73YRPfziSRy5QIsYReSEnjS6HPw966mSZ-VALsRnvi-y3V2Fx3KxOjn/n/axfe5bmjbvv9/b/npc-editor/o/",
+ 	"llm_model": "claude-opus-4-8",
+ 	"image_path": "/v1/images/generations",
+diff --git a/scripts/providers/jd_seedance_client.gd b/scripts/providers/jd_seedance_client.gd
+index a918360..bcadbb2 100644
+--- a/scripts/providers/jd_seedance_client.gd
++++ b/scripts/providers/jd_seedance_client.gd
+@@ -52,7 +52,8 @@ const DEFAULT_CONFIG := {
+ 	"tools": false,
+ 	"image_tail": "",
+ 	"poll_interval_seconds": 5.0,
+-	"request_timeout_seconds": 60
++	"request_timeout_seconds": 60,
++	"download_timeout_seconds": 600
+ }
+ 
+ var config: Dictionary = {}
+@@ -497,7 +498,8 @@ func _download_video(video_url: String) -> void:
+ 	Log.info("JDSeedance", "开始下载成片", { "task_id": active_task_id, "url": video_url, "dest": active_output_path })
+ 	download_request.cancel_request()
+ 	download_request.download_file = active_output_path
+-	download_request.timeout = int(config.get("request_timeout_seconds", 60))
++	# Downloading the finished video needs a longer timeout than the 60s API-call default.
++	download_request.timeout = int(config.get("download_timeout_seconds", 600))
+ 	var error: Error = download_request.request(video_url)
+ 	if error != OK:
+ 		_emit_failure("Could not download generated video: %s" % error_string(error), active_provider_response)
+diff --git a/scripts/providers/seedance_client.gd b/scripts/providers/seedance_client.gd
+index fc80fda..3864665 100644
+--- a/scripts/providers/seedance_client.gd
++++ b/scripts/providers/seedance_client.gd
+@@ -22,7 +22,8 @@ const DEFAULT_CONFIG := {
+ 	"return_last_frame": false,
+ 	"seed": -1,
+ 	"poll_interval_seconds": 5.0,
+-	"request_timeout_seconds": 60
++	"request_timeout_seconds": 60,
++	"download_timeout_seconds": 600
+ }
+ 
+ var config: Dictionary = {}
+@@ -290,7 +291,8 @@ func _download_video(video_url: String) -> void:
+ 
+ 	download_request.cancel_request()
+ 	download_request.download_file = active_output_path
+-	download_request.timeout = int(config.get("request_timeout_seconds", 60))
++	# Downloading the finished video needs a longer timeout than the 60s API-call default.
++	download_request.timeout = int(config.get("download_timeout_seconds", 600))
+ 	var error: Error = download_request.request(video_url)
+ 	if error != OK:
+ 		_emit_failure("Could not download generated video: %s" % error_string(error), active_provider_response)
+diff --git a/scripts/providers/tencent_kling_client.gd b/scripts/providers/tencent_kling_client.gd
+index 1e2e833..d340517 100644
+--- a/scripts/providers/tencent_kling_client.gd
++++ b/scripts/providers/tencent_kling_client.gd
+@@ -597,7 +597,9 @@ func _download_video(video_url: String) -> void:
+ 	Log.info("TencentKling", "开始下载成片", { "task_id": active_task_id, "url": video_url, "dest": active_output_path })
+ 	download_request.cancel_request()
+ 	download_request.download_file = active_output_path
+-	download_request.timeout = int(config.get("request_timeout_seconds", 60))
++	# Downloading the finished video (tens of MB, cross-region OCI bucket) needs a much longer
++	# timeout than the 60s API-call default, or large clips fail with "timeout".
++	download_request.timeout = int(config.get("download_timeout_seconds", 600))
+ 	var error: Error = download_request.request(video_url)
+ 	if error != OK:
+ 		_emit_failure("Could not download generated video: %s" % error_string(error), active_provider_response)

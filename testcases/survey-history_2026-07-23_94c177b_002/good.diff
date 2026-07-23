@@ -1,0 +1,165 @@
+diff --git a/scripts/screens/avatar_gen.gd b/scripts/screens/avatar_gen.gd
+index 8cdac90..881b2fe 100644
+--- a/scripts/screens/avatar_gen.gd
++++ b/scripts/screens/avatar_gen.gd
+@@ -1,5 +1,6 @@
+ extends Control
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const AvatarPreviewScript := preload("res://scripts/screens/avatar_preview.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ 
+diff --git a/scripts/screens/edit_gen.gd b/scripts/screens/edit_gen.gd
+index 9558aa4..580951b 100644
+--- a/scripts/screens/edit_gen.gd
++++ b/scripts/screens/edit_gen.gd
+@@ -4,6 +4,7 @@ extends Control
+ # 排序（上/下移）、删除、每段可选裁剪起止(start/dur)，然后用 ffmpeg 导出为一条成片。
+ # 复用 FfmpegUtil（trim + concat）；成片按项目约定：路径展示 + Open File 外部播放。
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ const FfmpegUtilScript := preload("res://scripts/media/ffmpeg_util.gd")
+ const LibraryImportScript := preload("res://scripts/storage/library_import.gd")
+diff --git a/scripts/screens/image_gen.gd b/scripts/screens/image_gen.gd
+index a30baab..6ce789b 100644
+--- a/scripts/screens/image_gen.gd
++++ b/scripts/screens/image_gen.gd
+@@ -4,6 +4,7 @@ extends Control
+ # image endpoint (Nano Banana by default), previews it, and can save into the shared
+ # library (kind="image"). Layout: left StepNav | middle form+preview | right LibraryPanel.
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ const LibraryPanelScript := preload("res://scripts/storage/library_panel.gd")
+ const TokenRouterImageScript := preload("res://scripts/llm/tokenrouter_image.gd")
+diff --git a/scripts/screens/library_demo.gd b/scripts/screens/library_demo.gd
+index 1f8f7a2..5e8e42f 100644
+--- a/scripts/screens/library_demo.gd
++++ b/scripts/screens/library_demo.gd
+@@ -8,6 +8,7 @@ extends Control
+ # This validates the generic storage framework; LibraryPanel can later be mounted into
+ # videoGen or the future NPC-profile editor unchanged.
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const LibraryPanelScript := preload("res://scripts/storage/library_panel.gd")
+ const MediaMetadataScript := preload("res://scripts/media/media_metadata.gd")
+ 
+diff --git a/scripts/screens/media_inspector.gd b/scripts/screens/media_inspector.gd
+index 5f4b51d..c34e55b 100644
+--- a/scripts/screens/media_inspector.gd
++++ b/scripts/screens/media_inspector.gd
+@@ -10,6 +10,7 @@ extends Control
+ #
+ # See docs/plan_media_inspector.md.
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const MediaMetadataScript := preload("res://scripts/media/media_metadata.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ 
+diff --git a/scripts/screens/pipeline_gen.gd b/scripts/screens/pipeline_gen.gd
+index f83c249..8049258 100644
+--- a/scripts/screens/pipeline_gen.gd
++++ b/scripts/screens/pipeline_gen.gd
+@@ -7,6 +7,7 @@ extends Control
+ # wired API (1 split, 3 keyframe, 5 TTS) use PipelineProvider fallbacks. See
+ # docs/plan_pipeline_scene.md.
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const SeedanceClientScript := preload("res://scripts/providers/seedance_client.gd")
+ const TencentKlingClientScript := preload("res://scripts/providers/tencent_kling_client.gd")
+ const JDSeedanceClientScript := preload("res://scripts/providers/jd_seedance_client.gd")
+diff --git a/scripts/screens/profile_editor.gd b/scripts/screens/profile_editor.gd
+index 644fe8b..5930396 100644
+--- a/scripts/screens/profile_editor.gd
++++ b/scripts/screens/profile_editor.gd
+@@ -4,6 +4,7 @@ extends Control
+ # shared LibraryStore (kind="profile") + LibraryPanel for storage. Layout:
+ # left StepNav | middle ProfileForm (scrollable) | right library panel.
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ const LibraryPanelScript := preload("res://scripts/storage/library_panel.gd")
+ const LibraryStoreScript := preload("res://scripts/storage/library_store.gd")
+diff --git a/scripts/screens/script_gen.gd b/scripts/screens/script_gen.gd
+index 8a03a46..1260f98 100644
+--- a/scripts/screens/script_gen.gd
++++ b/scripts/screens/script_gen.gd
+@@ -32,6 +32,7 @@ extends Control
+ #
+ # Layout: left StepNav | middle form+output | right LibraryPanel(kind="script").
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ const LibraryPanelScript := preload("res://scripts/storage/library_panel.gd")
+ const LibraryStoreScript := preload("res://scripts/storage/library_store.gd")
+diff --git a/scripts/screens/video_gen.gd b/scripts/screens/video_gen.gd
+index 567efa9..1f06a85 100644
+--- a/scripts/screens/video_gen.gd
++++ b/scripts/screens/video_gen.gd
+@@ -3,6 +3,7 @@ extends Control
+ signal embedded_task_status_changed(editor_id: String, status: String, active: bool, elapsed_seconds: float)
+ signal embedded_task_name_changed(editor_id: String, task_name: String)
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const SeedanceClientScript := preload("res://scripts/providers/seedance_client.gd")
+ const TencentKlingClientScript := preload("res://scripts/providers/tencent_kling_client.gd")
+ const JDSeedanceClientScript := preload("res://scripts/providers/jd_seedance_client.gd")
+diff --git a/scripts/screens/video_script_gen.gd b/scripts/screens/video_script_gen.gd
+index 5712f4b..c86abb3 100644
+--- a/scripts/screens/video_script_gen.gd
++++ b/scripts/screens/video_script_gen.gd
+@@ -14,6 +14,7 @@ extends Control
+ #
+ # Layout: left StepNav | middle 输入+分镜编辑 | right LibraryPanel(kind="script").
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ const LibraryPanelScript := preload("res://scripts/storage/library_panel.gd")
+ const LibraryStoreScript := preload("res://scripts/storage/library_store.gd")
+diff --git a/scripts/screens/video_tasks_screen.gd b/scripts/screens/video_tasks_screen.gd
+index 5104d1f..ec4aa12 100644
+--- a/scripts/screens/video_tasks_screen.gd
++++ b/scripts/screens/video_tasks_screen.gd
+@@ -3,6 +3,7 @@ extends Control
+ # Step 4 container. Each accordion body is a complete, independent VideoGen editor
+ # instance; editors share only the persistent GenerationService coordinator.
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const VideoTaskEditorScript := preload("res://scripts/screens/video_gen.gd")
+ const StepNavScript := preload("res://scripts/ui/step_nav.gd")
+ 
+diff --git a/scripts/ui/step_nav.gd b/scripts/ui/step_nav.gd
+index 2b0ac3a..a7e50c4 100644
+--- a/scripts/ui/step_nav.gd
++++ b/scripts/ui/step_nav.gd
+@@ -1,5 +1,6 @@
+ extends Control
+ class_name StepNav
++const Palette := preload("res://scripts/ui/palette.gd")
+ 
+ # Reusable left-side step navigation bar (DevGuide's "left side step buttons").
+ # Each button switches scenes. Steps without a UI yet are disabled so navigation can't
+diff --git a/scripts/ui/storyboard_editor.gd b/scripts/ui/storyboard_editor.gd
+index 89c83df..535b0ed 100644
+--- a/scripts/ui/storyboard_editor.gd
++++ b/scripts/ui/storyboard_editor.gd
+@@ -1,5 +1,6 @@
+ extends VBoxContainer
+ class_name StoryboardEditor
++const Palette := preload("res://scripts/ui/palette.gd")
+ 
+ # Reusable editable storyboard (分镜) widget. Extracted from ScriptGen so VideoGen can show
+ # and edit the same two-level shot structure instead of a flat text prompt.
+diff --git a/scripts/ui/token_prompt.gd b/scripts/ui/token_prompt.gd
+index 0f6e265..0bd3938 100644
+--- a/scripts/ui/token_prompt.gd
++++ b/scripts/ui/token_prompt.gd
+@@ -13,6 +13,7 @@ class_name TokenPrompt
+ 
+ signal token_saved(token: String)
+ 
++const Palette := preload("res://scripts/ui/palette.gd")
+ const CredentialsScript := preload("res://scripts/core/credentials.gd")
+ 
+ # When true (default), auto-show on _ready only if there is no token yet.

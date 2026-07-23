@@ -1,0 +1,107 @@
+diff --git a/scripts/core/generation_service.gd b/scripts/core/generation_service.gd
+index d5348c9..4881e9f 100644
+--- a/scripts/core/generation_service.gd
++++ b/scripts/core/generation_service.gd
+@@ -1,5 +1,4 @@
+ extends Node
+-const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Autoload `GenerationService`. Owns the provider client instances and runs video-generation
+ # jobs OUTSIDE any scene, so switching tabs (which destroys/rebuilds the videoGen scene) does
+diff --git a/scripts/core/storage_paths.gd b/scripts/core/storage_paths.gd
+index e0a2d2e..7f13e44 100644
+--- a/scripts/core/storage_paths.gd
++++ b/scripts/core/storage_paths.gd
+@@ -1,5 +1,4 @@
+ extends Node
+-const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Autoload `StoragePaths`. Central authority for WHERE library items are read from and
+ # written to, per DevGuide's "hash the ow token, split into folders by hash, id+timestamp".
+diff --git a/scripts/llm/tokenrouter_image.gd b/scripts/llm/tokenrouter_image.gd
+index a721b90..dd6a7e8 100644
+--- a/scripts/llm/tokenrouter_image.gd
++++ b/scripts/llm/tokenrouter_image.gd
+@@ -1,6 +1,5 @@
+ extends Node
+ class_name TokenRouterImage
+-const Log := preload("res://scripts/core/log_util.gd")
+ const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # Generates images through the local TokenRouter using an OpenAI-compatible endpoint.
+diff --git a/scripts/llm/tokenrouter_llm.gd b/scripts/llm/tokenrouter_llm.gd
+index fe7ed0f..f886912 100644
+--- a/scripts/llm/tokenrouter_llm.gd
++++ b/scripts/llm/tokenrouter_llm.gd
+@@ -1,6 +1,5 @@
+ extends Node
+ class_name TokenRouterLLM
+-const Log := preload("res://scripts/core/log_util.gd")
+ const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # Calls LLMs through the local TokenRouter, routing by PROTOCOL:
+diff --git a/scripts/media/ffmpeg_util.gd b/scripts/media/ffmpeg_util.gd
+index af79d01..231a24e 100644
+--- a/scripts/media/ffmpeg_util.gd
++++ b/scripts/media/ffmpeg_util.gd
+@@ -1,6 +1,5 @@
+ extends RefCounted
+ class_name FfmpegUtil
+-const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Shared ffmpeg helpers: locate the binary, trim a clip, concatenate clips. Used by the
+ # Step 5 edit editor; the pipeline has its own inline copy (kept to avoid regressions).
+diff --git a/scripts/providers/jd_seedance_client.gd b/scripts/providers/jd_seedance_client.gd
+index b3672d7..a918360 100644
+--- a/scripts/providers/jd_seedance_client.gd
++++ b/scripts/providers/jd_seedance_client.gd
+@@ -1,6 +1,5 @@
+ extends Node
+ class_name JDSeedanceClient
+-const Log := preload("res://scripts/core/log_util.gd")
+ const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # JD Cloud 灵境 (Lingjing) Seedance 2.0-fast client.
+diff --git a/scripts/providers/tencent_kling_client.gd b/scripts/providers/tencent_kling_client.gd
+index 0b2cf44..02ef43c 100644
+--- a/scripts/providers/tencent_kling_client.gd
++++ b/scripts/providers/tencent_kling_client.gd
+@@ -1,6 +1,5 @@
+ extends Node
+ class_name TencentKlingClient
+-const Log := preload("res://scripts/core/log_util.gd")
+ const Credentials := preload("res://scripts/core/credentials.gd")
+ 
+ # Tencent VOD AIGC video client, routed through TokenRouter (not direct to Tencent).
+diff --git a/scripts/screens/video_gen.gd b/scripts/screens/video_gen.gd
+index 165f0b9..8a11e8b 100644
+--- a/scripts/screens/video_gen.gd
++++ b/scripts/screens/video_gen.gd
+@@ -1,5 +1,4 @@
+ extends Control
+-const Log := preload("res://scripts/core/log_util.gd")
+ 
+ const SeedanceClientScript := preload("res://scripts/providers/seedance_client.gd")
+ const TencentKlingClientScript := preload("res://scripts/providers/tencent_kling_client.gd")
+diff --git a/scripts/storage/data_api.gd b/scripts/storage/data_api.gd
+index 665be8b..1d638df 100644
+--- a/scripts/storage/data_api.gd
++++ b/scripts/storage/data_api.gd
+@@ -1,6 +1,5 @@
+ extends RefCounted
+ class_name DataApi
+-const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Open data interface: a single facade for creating/updating profiles, scripts (and their
+ # generation configs), and requesting video generation. Both the editor UIs and the AI
+diff --git a/scripts/ui/ai_panel.gd b/scripts/ui/ai_panel.gd
+index 4183df0..71b966f 100644
+--- a/scripts/ui/ai_panel.gd
++++ b/scripts/ui/ai_panel.gd
+@@ -1,6 +1,5 @@
+ extends CanvasLayer
+ class_name AiPanel
+-const Log := preload("res://scripts/core/log_util.gd")
+ 
+ # Reusable AI assistant overlay. A floating "AI" button sits bottom-right of any host page;
+ # clicking it opens a chat panel. The user chats in natural language; the LLM is instructed
