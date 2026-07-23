@@ -105,9 +105,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 # --- Preflight ---------------------------------------------------------------
-for bin in docker kubectl envsubst python3; do
+for bin in kubectl envsubst python3; do
   command -v "$bin" >/dev/null 2>&1 || { echo "ERROR: '$bin' not found on PATH" >&2; exit 1; }
 done
+# docker is only exercised by build, push, and in-image testcase discovery
+# (-t skips discovery), so a kubectl-only host can fan out a prebuilt,
+# already-pushed image with: --no-build --no-push -t "id id ...".
+if [[ "$DO_BUILD" == "1" || "$DO_PUSH" == "1" || -z "$TESTCASES" ]]; then
+  command -v docker >/dev/null 2>&1 || { echo "ERROR: 'docker' not found on PATH (needed by build/push/testcase discovery; pass --no-build --no-push and -t to run without it)" >&2; exit 1; }
+fi
 [[ -n "$IMAGE" ]] || { echo "ERROR: -i IMAGE (full registry ref) is required" >&2; exit 2; }
 kubectl get ns "$NAMESPACE" >/dev/null 2>&1 || {
   echo "ERROR: namespace '$NAMESPACE' not reachable (is kubectl configured?)" >&2; exit 1; }
@@ -240,17 +246,29 @@ echo ">>> waiting for and collecting ${#JOBNAME[@]} Job(s) as they finish..."
 deadline_wait=$((ACTIVE_DEADLINE + 120))
 extract_report() {
   # stdin: full pod log. stdout: the JSON between the markers (first match).
+  # Some clusters (e.g. OKE virtual nodes) hand back raw CRI-formatted lines
+  # ("<rfc3339> stdout F <content>") through `kubectl logs`; strip that prefix
+  # first or the extracted JSON lines won't parse. Clean logs are unaffected.
   awk '
+    { sub(/^[0-9][^ ]* (stdout|stderr) [FP] /, "") }
     /<<<AIGDBENCH_REPORT_BEGIN/ {grab=1; next}
     /<<<AIGDBENCH_REPORT_END/   {grab=0}
     grab {print}
   '
 }
 collect_one() {
-  local tc="$1" jn="$2" tcl raw rep st
+  local tc="$1" jn="$2" tcl raw rep st tries
   tcl="$(sanitize "$tc")"
   raw="$OUT_DIR/logs/${tcl}.pod.log"
-  kubectl -n "$NAMESPACE" logs "job/$jn" --tail=-1 > "$raw" 2>/dev/null || true
+  # The log pipeline on some clusters (observed on OKE virtual nodes) lags the
+  # Job's terminal condition: an immediate fetch intermittently returns an
+  # EMPTY log for a pod that did print its report. Retry a few times until the
+  # report marker shows up; a genuinely reportless pod just costs ~30s extra.
+  for tries in 1 2 3 4 5 6; do
+    kubectl -n "$NAMESPACE" logs "job/$jn" --tail=-1 > "$raw" 2>/dev/null || true
+    grep -q '<<<AIGDBENCH_REPORT_BEGIN' "$raw" 2>/dev/null && break
+    sleep 5
+  done
   rep="$OUT_DIR/${tcl}.json"
   if extract_report < "$raw" | python3 -c 'import sys,json;json.load(sys.stdin)' 2>/dev/null; then
     extract_report < "$raw" > "$rep"
