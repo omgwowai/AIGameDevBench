@@ -1,0 +1,469 @@
+{
+  "apiVersion": "beaverhub.dev/batch/v1",
+  "kind": "BatchPlan",
+  "metadata": {
+    "name": "aigdbench-filtered-patch"
+  },
+  "spec": {
+    "execution": {
+      "max_concurrency": 10,
+      "retry": {
+        "max_attempts": 2
+      },
+      "on_item_failure": "continue"
+    },
+    "metrics": [
+      {
+        "name": "mean-score",
+        "artifact": "result.json",
+        "path": "mean_score"
+      }
+    ],
+    "items": [
+      {
+        "id": "ability-cooldown-gate-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "ability-cooldown-gate",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "collision-layer-precise-edit-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "collision-layer-precise-edit",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "component-layer-boundary-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "component-layer-boundary",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "damage-formula-refactor-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "damage-formula-refactor",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "event-bus-priority-dispatch-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "event-bus-priority-dispatch",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "gdb-task-0007-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "gdb-task_0007",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "gdb-task-0012-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "gdb-task_0012",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "gdb-task-0103-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "gdb-task_0103",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "gdb-task-0281-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "gdb-task_0281",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "gdscript-cannot-infer-type-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "gdscript-cannot-infer-type",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "hard-mode-difficulty-preset-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "hard-mode-difficulty-preset",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "health-damage-death-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "health-damage-death",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "hud-healthbar-anchor-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "hud-healthbar-anchor",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "inventory-equipment-system-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "inventory-equipment-system",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "loot-drop-rate-rebalance-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "loot-drop-rate-rebalance",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "menu-panel-layout-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "menu-panel-layout",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "missing-resource-import-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "missing-resource-import",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "no-hardcoded-res-path-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "no-hardcoded-res-path",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "pathfinding-npc-bridge-astar-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "pathfinding-npc-bridge-astar",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "pickup-inventory-ui-chain-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "pickup-inventory-ui-chain",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "platformer-jump-retune-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "platformer-jump-retune",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "player-fsm-transition-guard-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "player-fsm-transition-guard",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "reparent-spawnpoint-precise-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "reparent-spawnpoint-precise",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-history-2023-06-09-73dc20c-000-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-history_2023-06-09_73dc20c_000",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-history-2023-08-21-9cbd293-003-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-history_2023-08-21_9cbd293_003",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-history-2025-09-19-019b51c-009-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-history_2025-09-19_019b51c_009",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-history-2026-01-26-1406822-013-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-history_2026-01-26_1406822_013",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-26f37eb-retaliation-offender-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_26f37eb_retaliation-offender",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-39f9033-rethink-sideeffect-gating-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_39f9033_rethink-sideeffect-gating",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-60282af-guard-reaction-scope-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_60282af_guard-reaction-scope",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-84039a5-alms-item-transfer-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_84039a5_alms-item-transfer",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-84d8c23-stale-combat-target-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_84d8c23_stale-combat-target",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-afda272-rescue-state-gating-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_afda272_rescue-state-gating",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "survey-stardive-ee84ed2-stage-shout-broadcast-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "survey-stardive_ee84ed2_stage-shout-broadcast",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "timer-signal-wire-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "timer-signal-wire",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "wave-combat-score-system-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "wave-combat-score-system",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      },
+      {
+        "id": "wave-spawner-hidden-bugs-patch",
+        "ref": {
+          "beaver": "beaver-godot",
+          "task": "aigdbench"
+        },
+        "input": {
+          "driver": "patch",
+          "testcase": "wave-spawner-hidden-bugs",
+          "testcases_dir": "/app/testcases_filtered"
+        }
+      }
+    ]
+  }
+}
