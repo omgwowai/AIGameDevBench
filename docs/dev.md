@@ -246,6 +246,25 @@ Job 参数：`-i 镜像`、`-j 并发`、`-d driver`、`-t "id..."`、`-T 每例
 
 > **运维踩坑**：Job 用不存在于 registry 的 tag（如手动传 `:latest` 但 registry 无此 tag）→ 全 pod `ImagePullBackOff`。orchestrator 会持续按 gate 重建 Job，**光删 pod/Job 无用**，必须先杀 orchestrator 进程再删 Job。candidate 流程用 immutable commit tag 正是为规避 `:latest` 陈旧/缺失问题。
 
+### 11.1 BeaverHub 运行（平台任务形态）
+
+上面两套矩阵脚本把调度、结果收集、聚合、清理**全手写在 bash 里**（k8s 版还靠刮
+`kubectl logs` 里的 `AIGDBENCH_REPORT` 标记回传结果）。另一种形态是把一个 testcase
+交给 **BeaverHub** 平台跑：把 `docker/entrypoint.sh` 的隐式合同（一个 testcase 进、
+一份结构化 result 出）显式化成 `.beaver/tasks/aigdbench/` 下的 **TaskPackage**，由平台
+接管调度 / 并发 / 重试 / `/out` 收割 / 凭据注入 / 清理——同一份 runtime + 合同可复用于
+Interactive / Run / Batch 等 RunType，不必为每种形态再写脚本。
+
+- `task.yaml`（`beaverhub.dev/task/v1` 合同，内联自包含 entrypoint）、`input.schema.json`、
+  `batch.filtered-patch.json`（37 例 BatchPlan）、`run.sh`（与 `entrypoint.sh` 等价的参考 wrapper）。
+- 运行命令、内联 entrypoint 的原理、集群前置条件（客户端版本、镜像 digest-pin、
+  凭据 secret、local mode）、以及已实测跑通的证据，全部见
+  [`.beaver/tasks/aigdbench/README.md`](../.beaver/tasks/aigdbench/README.md)。
+
+> 实测：客户端 `0.0.2-alpha.1` + 本地 k3s，`beaver task run … --wait --confirm` 把
+> `pathfinding-npc-bridge-astar`（driver=patch）跑到 mean score 1.000，closure SUCCESS、
+> pod 自动清理。矩阵脚本适合本地/CI 快速跑；BeaverHub 适合共享、可审计、跨形态复用。
+
 ---
 
 ## 12. 报告结构

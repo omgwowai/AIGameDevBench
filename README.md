@@ -22,6 +22,7 @@ harness 的改动由自动验证器打分。核心契约：**什么都不做必�
 - [Webhook 自动触发](#webhook-自动触发pr-opened--gated-候选--自动合并发布)
 - [运行测试](#运行测试)
 - [开发者文档](#开发者文档) — 架构 · 原理 · 关键路由（[`docs/dev.md`](docs/dev.md)）
+- [BeaverHub 运行](#beaverhub-运行) — 把 testcase 作为平台任务跑（[`.beaver/tasks/aigdbench/README.md`](.beaver/tasks/aigdbench/README.md)）
 
 ---
 
@@ -748,3 +749,11 @@ pytest
 面向开发者的完整参考——整体架构、一次评测的生命周期、testcase 数据模型、
 driver / 验证器 / L0-L1 门、dashboard 与 webhook 链路、k8s/本地矩阵执行，
 以及**关键路由与代码路径速查**，见 [`docs/dev.md`](docs/dev.md)。
+
+## BeaverHub 运行
+
+除了本地 / k8s 矩阵脚本，一个 testcase 也可以作为 **BeaverHub** 平台任务来跑：
+把 `docker/entrypoint.sh` 的隐式合同显式化成一份 TaskPackage（同一份 runtime +
+合同可复用于 Interactive / Run / Batch 等 RunType，无需为每种形态手写编排）。
+契约、运行命令、集群前置条件、以及已实测跑通的证据见
+[`.beaver/tasks/aigdbench/README.md`](.beaver/tasks/aigdbench/README.md)。
