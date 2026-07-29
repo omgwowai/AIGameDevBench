@@ -66,7 +66,13 @@ ACTIVE_DEADLINE="${ACTIVE_DEADLINE:-}"
 TTL_AFTER_FINISHED="${TTL_AFTER_FINISHED:-14400}"
 HARNESS_SECRET="${HARNESS_SECRET:-}"
 HARNESS_INSTALL="${HARNESS_INSTALL:-}"
-CPU_REQ="${CPU_REQ:-500m}"; MEM_REQ="${MEM_REQ:-1Gi}"
+# CPU request is a SCHEDULING RESERVATION, not real usage. The harness is
+# I/O-bound (waits on the AI API + Godot), using ~6% CPU in practice, so a large
+# request needlessly serializes Jobs on a small node (a 2-core node fits only ~3
+# Jobs at 500m -> the rest sit Pending). 250m lets ~2x more run concurrently
+# while the 2-core limit still caps real CPU bursts. Raise via --cpu-req if a
+# testcase is genuinely CPU-bound.
+CPU_REQ="${CPU_REQ:-250m}"; MEM_REQ="${MEM_REQ:-1Gi}"
 CPU_LIM="${CPU_LIM:-2}";    MEM_LIM="${MEM_LIM:-4Gi}"
 TESTCASES=""
 DO_BUILD=1; DO_PUSH=1; KEEP_JOBS=0
@@ -156,29 +162,45 @@ TC_ARR=($TESTCASES)
 echo ">>> ${#TC_ARR[@]} testcase(s), driver=$DRIVER, concurrency=$JOBS, ns=$NAMESPACE"
 
 # --- 3. envFrom / harness plumbing -------------------------------------------
-# If a Secret is named it supplies HARNESS_CMD + provider keys. Otherwise, for
-# DRIVER=command we inject HARNESS_CMD directly via an inline env in the manifest
-# (handled below by appending to the rendered YAML).
+# If a Secret is named it supplies HARNESS_CMD + provider keys via envFrom.
+# An explicit -c (HARNESS_CMD) is injected as an inline env entry in the pod
+# template BEFORE create -- k8s Job pod templates are immutable after creation,
+# so post-create `kubectl set env` is invalid ("field is immutable"). An inline
+# env entry also takes precedence over the Secret's envFrom, so -c overrides the
+# command while the Secret still provides provider API keys.
 if [[ -n "$HARNESS_SECRET" ]]; then
   ENV_FROM='[{"secretRef":{"name":"'"$HARNESS_SECRET"'"}}]'
 else
   ENV_FROM='[]'
 fi
+# Render the optional HARNESS_CMD env entry (empty string when no -c given).
+# json.dumps handles YAML-safe quoting of arbitrary command text (quotes,
+# braces, backslashes). Indentation matches the template's env list (12 spaces).
+if [[ "$DRIVER" == "command" && -n "$HARNESS_CMD" ]]; then
+  HARNESS_CMD_YAML="$(HC="$HARNESS_CMD" python3 -c '
+import json, os
+v = json.dumps(os.environ["HC"])
+print("            - name: HARNESS_CMD")
+print("              value: " + v)
+')"
+else
+  HARNESS_CMD_YAML=""
+fi
 export IMAGE DRIVER TIMEOUT GODOT_BINARY="godot" TESTCASES_DIR NAMESPACE
 export ACTIVE_DEADLINE TTL_AFTER_FINISHED CPU_REQ MEM_REQ CPU_LIM MEM_LIM ENV_FROM RUN_ID
+export HARNESS_CMD_YAML
 HARNESS_ID="$DRIVER"; export HARNESS_ID
 
 sanitize() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-40; }
 
 render_job() {
-  # $1 = testcase id ; writes rendered manifest to stdout
+  # $1 = testcase id ; writes rendered manifest to stdout. HARNESS_CMD (if any)
+  # is baked in via ${HARNESS_CMD_YAML} before create -- pod templates are
+  # immutable, so it must be present at create time, not patched afterwards.
   local tc="$1" tcl; tcl="$(sanitize "$tc")"
   TESTCASE="$tc" TESTCASE_LABEL="$tcl" \
   JOB_NAME="aigdbench-${RUN_ID}-${tcl}" \
     envsubst < docker/job-template.yaml
-  # NOTE: for DRIVER=command without a Secret, HARNESS_CMD is injected after
-  # create via `kubectl set env` (see launch) to avoid YAML-quoting hazards for
-  # arbitrary command text.
 }
 
 # --- 4. Fan out: one Job per testcase, gated at $JOBS ------------------------
@@ -189,11 +211,9 @@ launch() {
   JOBNAME["$tc"]="$jn"
   manifest="$OUT_DIR/logs/${tcl}.job.yaml"
   render_job "$tc" > "$manifest"
+  # HARNESS_CMD (if -c given) is already baked into the manifest via
+  # ${HARNESS_CMD_YAML}; nothing to patch after create (templates are immutable).
   kubectl -n "$NAMESPACE" create -f "$manifest" >/dev/null
-  # Inline HARNESS_CMD (avoids YAML-quoting hazards for arbitrary command text).
-  if [[ "$DRIVER" == "command" && -z "$HARNESS_SECRET" && -n "$HARNESS_CMD" ]]; then
-    kubectl -n "$NAMESPACE" set env "job/$jn" "HARNESS_CMD=$HARNESS_CMD" >/dev/null
-  fi
 }
 
 # Count Jobs of THIS run that are neither complete nor failed (i.e. in flight).
@@ -249,13 +269,26 @@ PY
     echo "    !! ${tc}: no report in log (job=$st) — see $raw"
   fi
 }
+# Wait for a job to reach ANY terminal condition (Complete OR Failed), then
+# return. Do NOT use `kubectl wait --for=condition=complete` alone: it blocks the
+# full timeout for a job that FAILED (the Complete condition never arrives), so a
+# single DeadlineExceeded job would stall collection ~47 min before the fallback
+# runs. Poll both conditions cheaply so a failed job is detected immediately.
+wait_terminal() {
+  local jn="$1" waited=0 cond
+  while [[ "$waited" -lt "$deadline_wait" ]]; do
+    cond="$(kubectl -n "$NAMESPACE" get "job/$jn" \
+      -o jsonpath='{range .status.conditions[*]}{.type}={.status} {end}' 2>/dev/null)"
+    case "$cond" in
+      *Complete=True*|*Failed=True*|*FailureTarget=True*) return 0 ;;
+    esac
+    sleep 5; waited=$((waited + 5))
+  done
+  return 1   # timed out; collect_one will synthesize an error record
+}
 for tc in "${TC_ARR[@]}"; do
   jn="${JOBNAME[$tc]}"
-  # Wait for either complete or failed; whichever lands first, then collect NOW.
-  kubectl -n "$NAMESPACE" wait --for=condition=complete "job/$jn" \
-      --timeout="${deadline_wait}s" >/dev/null 2>&1 \
-    || kubectl -n "$NAMESPACE" wait --for=condition=failed "job/$jn" \
-      --timeout=30s >/dev/null 2>&1 || true
+  wait_terminal "$jn"
   collect_one "$tc" "$jn"
 done
 

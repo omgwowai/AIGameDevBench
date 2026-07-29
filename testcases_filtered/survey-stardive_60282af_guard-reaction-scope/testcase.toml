@@ -1,0 +1,30 @@
+[testcase]
+id = "survey-stardive_60282af_guard-reaction-scope"
+category = "architecture"
+source_kind = "folder"
+snapshot = "stardive_kugutsushi__1eefa98"
+source_repo = "survey:stardive_kugutsushi (offline snapshot)"
+task = """
+In this tavern sim, a single guard is supposed to react to nearby violence and theft: the guard's profile opts into two event reactions, attack_started_guard_reaction (event combat_started) and theft_guard_reaction (event steal_succeeded), each of which forces the reacting NPC into a combat/pursuit behavior. But right now, when anyone throws a punch, the WHOLE crowd attacks — one bar fight escalates into a room-wide brawl, and every bystander chases a pickpocket.
+
+The root cause is a missing scope boundary in the event-reaction system. These guard reactions are authored inline in configs/ai_catalog/events.json, so DataCatalog loads them into the shared per-event reaction pool. DataCatalog.get_reactions_for_event(event_id) (autoload/DataCatalog.gd) returns that entire pool, and the world broadcasts those reactions to EVERY NPC in range of the event — not just the NPCs whose profile explicitly lists the reaction in event_reaction_ids. So the guard-only reactions leak to everyone.
+
+Fix it by introducing a per-reaction scope flag and honoring it:
+- Add an is_global property to EventReactionDef (scripts/resources/event_reaction_def.gd), defaulting to true so existing ambient reactions (danger, performance) keep broadcasting to everyone.
+- Have DataCatalog parse this flag from the reaction config (e.g. a "global" key, default true) and, in get_reactions_for_event, return only reactions whose is_global is true.
+- Mark the two guard reactions in events.json as non-global so they are no longer broadcast to the crowd.
+NPCs that opt in through their profile's event_reaction_ids (the guard) must still keep and fire these reactions; bystanders (e.g. alice) must never inherit them, and the global combat_started / steal_succeeded pools must no longer contain the guard reactions.
+"""
+
+[verifier]
+type = "godot_scene_assert"
+entry = "verifier_scene.tscn"
+
+[scoring]
+mode = "checkpoints"
+
+[provenance]
+source = "survey-stardive (AIGameDevCollecter)"
+source_session = "lans-test:60282af"
+bad_case_type = "B1"
+notes = "Real fix from stardive_kugutsushi (commit 60282af, parent 1eefa98). Baseline leaks the guard-only combat/theft reactions into the GLOBAL event-reaction pool so DataCatalog.get_reactions_for_event broadcasts them to every NPC (whole crowd attacks). Adapted from the fix's own regression test tools/test_combat.gd::_test_guard_reaction_scope. Snapshot generated on demand by scripts/make_snapshots.py."

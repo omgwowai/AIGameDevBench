@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__1d83e11",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "1d83e115f5d136d0cff3ed627dbec47fb312dedb",
+  "note": "base_ref is the pre-image (parent) of fix commit 84039a5 — buggy state where a directed give_alms/refuse_alms candidate carries a live beggar NPC reference that cannot survive the LLM JSON round-trip. The baseline never stashes/merges that reference back, so _complete_give_alms() finds no beggar and the alms item is never transferred. good.diff is the golden fix (adds _pending_alms_context_params stash + _merge_alms_context_params). Private repo: initial clone needs auth; runs offline afterwards."
+}

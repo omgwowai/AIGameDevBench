@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__ee84ed2",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "ee84ed228eb251028d16562545a562f13556a334",
+  "note": "base_ref is the pre-image (parent) of fix commit afda272 — buggy state where the rescue_npc option is only offered within 500px and going down never broadcasts a world event. good.diff is the golden fix: rescue availability binds to the stunned state regardless of distance (max_distance 99999) and _on_buff_added emits npc_incapacitated. good.diff also carries the WS-backend contract/encoding changes, which are NOT headless-observable and are not asserted here. Private repo: initial clone needs auth; runs offline afterwards."
+}

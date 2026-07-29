@@ -1,0 +1,106 @@
+# BeaverHub TaskPackage for AIGameDevBench.
+#
+# Makes explicit the contract currently buried in docker/entrypoint.sh: one
+# testcase in, one structured result out. Once validated, the same beaver-godot
+# runtime + this contract is reusable across every RunType (Interactive / Run /
+# Batch / Flow / CI / Service) with no per-form scripting — it replaces the
+# hand-written scheduling/log-scraping/cleanup in scripts/run_k8s_matrix.sh.
+#
+# Field names conform to internal/taskspec (beaverhub.dev/task/v1): metadata is
+# {name,version} only (the Beaver binding is the profile's half, never named
+# here); entrypoint is argv-only; input is {schema} only; output paths must sit
+# under /out; capabilities are generic dotted slugs matched against the beaver
+# descriptor at dispatch. Verified with `beaver task validate` + `conformance`.
+apiVersion: beaverhub.dev/task/v1
+kind: TaskPackage
+metadata:
+  name: aigdbench
+  version: "1"
+
+spec:
+  runtime:
+    # Was implicit in the Dockerfile (ARG GODOT_VERSION=4.5-stable) and the
+    # GODOT_BINARY env default. Binary keys are executable names ([a-z][a-z0-9_]*);
+    # a second engine (godot3) becomes selectable per input.engine once
+    # beaver-godot ships it (showcase PR #1158).
+    requires:
+      binaries:
+        godot: ">=4.5"
+        python3: ">=3.12"
+      # Generic slugs (ADR-0068): read the baseline repo, write /out artifacts.
+      capabilities:
+        - workspace.repo
+        - artifacts.write
+
+  # Was: entrypoint.sh assembling the `aigdbench run ...` argv from env vars.
+  # Self-contained argv: `bash -lc <inline>` reads the mounted input contract at
+  # /in/input.json and calls the image's baked `aigdbench` CLI, writing the
+  # result to /out/result.json. Inlined (not a repo run.sh) because `beaver task
+  # run` does not mount the owning repo into the container — the script must live
+  # in the argv itself. `bash` is argv[0], so this is a valid argv, not a refused
+  # bare shell string.
+  entrypoint:
+    argv:
+      - bash
+      - -lc
+      - |
+        set -uo pipefail
+        IN=/in/input.json; OUT=/out; mkdir -p "$OUT/logs"
+        TC=$(python3 -c "import json;print(json.load(open('$IN'))['testcase'])")
+        DRV=$(python3 -c "import json;print(json.load(open('$IN')).get('driver','patch'))")
+        TCD=$(python3 -c "import json;print(json.load(open('$IN')).get('testcases_dir','/app/testcases_filtered'))")
+        REP="$OUT/result.json"
+        a=(run --testcases-dir "$TCD" --testcase "$TC" --harness "$DRV" --driver "$DRV" --godot-binary godot --log-dir "$OUT/logs" --report "$REP")
+        if [ "$DRV" = patch ]; then
+          for c in fix.diff good.diff; do [ -f "$TCD/$TC/$c" ] && { a+=(--patch "$TCD/$TC/$c"); break; }; done
+        fi
+        rf="$TCD/$TC/baseline"; [ -d "$rf" ] || rf="$TCD"
+        ( cd "$rf" && aigdbench "${a[@]}" ) 2>&1 | tee "$OUT/logs/$TC.log"
+        st=${PIPESTATUS[0]}
+        [ -f "$REP" ] || printf '{"harness":"%s","count":1,"mean_score":0.0,"testcases":[{"testcase_id":"%s","score":0.0,"l0_l1_pass":false,"verifier_result":{"status":"error","error":"runner exited %s"}}]}\n' "$DRV" "$TC" "$st" > "$REP"
+        exit "$st"
+
+  # Was: TESTCASE / DRIVER / HARNESS_CMD / TIMEOUT env vars, unvalidated.
+  # Narrowed to a schema-checked business contract (analogous to the showcase's
+  # {"command":...} -> typed-field tightening). Repo-relative path, no escape.
+  input:
+    schema: .beaver/tasks/aigdbench/input.schema.json
+
+  # Was: $OUT_DIR/<testcase>.json plus the stdout AIGDBENCH_REPORT markers used
+  # to smuggle results back through `kubectl logs`. With an output contract the
+  # platform harvests /out directly — the marker hack is no longer needed. All
+  # paths must be rooted at /out. Per-testcase run.log + status.jsonl live under
+  # the artifacts dir.
+  output:
+    result: /out/result.json
+    artifacts: /out
+    domainKind: aigdbench.report/v1
+
+  # Only the command driver (real AI harness) needs these; names only, never
+  # values — the platform injects them at authorization time. patch/noop need none.
+  credentials:
+    - ANTHROPIC_BASE_URL
+    - ANTHROPIC_AUTH_TOKEN
+
+  # Was: TIMEOUT env default 900s. Per-testcase harness budget.
+  timeout: 15m
+
+# ---------------------------------------------------------------------------
+# input.driver semantics (from entrypoint.sh's `case "$DRIVER"`):
+#   noop    -> baseline sanity: should score 0.00, no extra fields
+#   patch   -> replay the golden fix (fix.diff, else good.diff). Should score
+#              1.00. The wrapper resolves the patch file; callers don't pass it.
+#   command -> real AI harness; requires input.harness_cmd (was HARNESS_CMD),
+#              e.g. "claude -p {task} --dangerously-skip-permissions"
+#
+# The wrapper (run.sh) preserves entrypoint.sh's two guarantees:
+#   1. Always emit /out/result.json — synthesize an error report if aigdbench
+#      crashes, so batch aggregation never has a silent hole.
+#   2. cd into <testcase>/baseline when present (folder-type), else the
+#      testcases dir (git-type), so both kinds run from one image.
+#
+# Shared-corpus note: the showcase reads the testcase corpus from prewarmed
+# shared storage (/shared/testcases). Under task/v1 that is a spec.datasets
+# requirement (logical name + access mode) plus the dataset.ref capability,
+# NOT a physical path baked into input. Left out of v1 here so the contract
+# validates against a plain beaver-godot; add when the shared dataset exists.

@@ -7,8 +7,10 @@ extends Node
 
 var signal_counts: Array[int] = []
 
+# Scored checkpoints are task-discriminating only. `cards is Array` is a
+# scaffolding guard (the baseline stub already declares the export), so it gates
+# the run but is NOT scored — otherwise a no-op would leak partial credit.
 const CHECKPOINTS := [
-    "cards_is_array",
     "new_pile_empty",
     "add_emits_new_counts",
     "cards_appended",
@@ -56,8 +58,9 @@ func _emit() -> void:
 func run_validation() -> void:
     var card_pile_script: GDScript = load("res://scripts/card_pile.gd")
     var pile = card_pile_script.new() as Resource
-    if not _record("cards_is_array", pile.cards is Array,
-            "cards export must be an Array", "Array", typeof(pile.cards)):
+    # Scaffolding guard (not scored): the baseline already exports `cards` as an
+    # Array. If a harness broke even this, bail so every task checkpoint fails.
+    if not (pile.cards is Array):
         return _emit()
     if not _record("new_pile_empty", pile.empty(),
             "New CardPile should be empty", true, pile.empty()):

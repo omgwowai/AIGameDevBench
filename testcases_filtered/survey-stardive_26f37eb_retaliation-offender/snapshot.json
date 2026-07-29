@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__15c57f2",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "15c57f26954880ca501f2933161327c6cacd280a",
+  "note": "base_ref is the pre-image (parent) of fix commit 26f37eb — buggy state where event_listener forces attack_npc with EMPTY params, so the target_query falls back to NEAREST_NPC and a retaliating guard punches the closest bystander instead of the offender named in the event payload. good.diff is the golden fix (pins the payload actor as target_npc_id). Private repo: initial clone needs auth; runs offline afterwards."
+}

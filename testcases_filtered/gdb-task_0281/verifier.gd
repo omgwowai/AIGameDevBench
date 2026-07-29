@@ -7,11 +7,12 @@ extends Node
 
 const MAIN_SCENE := preload("res://scenes/main.tscn")
 
+# Scored checkpoints are task-discriminating only. The scene-structure checks
+# (HUD/CardRow present, three cards spawned, CardStateMachine + base/clicked/
+# dragging state nodes) already hold in the baseline, so they gate the run as
+# silent guards but are NOT scored — otherwise a no-op leaks partial credit for
+# scaffolding it never touched.
 const CHECKPOINTS := [
-	"hud_cardrow_present",
-	"three_cards_spawned",
-	"card_has_state_machine",
-	"card_has_drag_states",
 	"enters_base_on_ready",
 	"left_click_enters_clicked",
 	"clicked_records_index",
@@ -77,12 +78,12 @@ func run_validation() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
+	# Scaffolding guards (not scored): these all hold in the baseline. If a harness
+	# broke the scene structure, bail so every task checkpoint fails (score 0).
 	var hand = main.get_node_or_null("HUD/CardRow")
-	if not _record("hud_cardrow_present", hand != null,
-			"Main must provide HUD/CardRow", "HUD/CardRow node", "null"):
+	if hand == null:
 		return _emit()
-	if not _record("three_cards_spawned", hand.get_child_count() == 3,
-			"Main must spawn three cards into CardRow", 3, hand.get_child_count()):
+	if hand.get_child_count() != 3:
 		return _emit()
 
 	var card = hand.get_child(0)
@@ -93,14 +94,9 @@ func run_validation() -> void:
 	var drop_area = main.get_node_or_null("PlayZone")
 	var ui_layer = main.get_node_or_null("HUD")
 
-	if not _record("card_has_state_machine", machine != null,
-			"CardUI must contain a CardStateMachine", "CardStateMachine node", "null"):
+	if machine == null:
 		return _emit()
-	if not _record("card_has_drag_states",
-			base_state != null and clicked_state != null and dragging_state != null,
-			"CardUI must provide the drag state nodes",
-			"base/clicked/dragging nodes",
-			"base=%s clicked=%s dragging=%s" % [base_state != null, clicked_state != null, dragging_state != null]):
+	if not (base_state != null and clicked_state != null and dragging_state != null):
 		return _emit()
 	if not _record("enters_base_on_ready", machine.current_state == base_state,
 			"CardStateMachine must enter CardBaseState on ready",

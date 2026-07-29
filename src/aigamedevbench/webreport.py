@@ -185,6 +185,89 @@ INDEX_HTML = r"""<!DOCTYPE html>
   .tools { list-style:none; padding:0; margin:4px 0 0; }
   .tools li { font-size:12px; color:#9fb4d8; padding:1px 0;
               white-space:pre-wrap; word-break:break-word; }
+  /* Run tab */
+  .run-form { display:grid; gap:12px;
+              grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+  .run-form label { display:flex; flex-direction:column; gap:4px;
+                    font-size:12px; color:var(--muted); }
+  .run-form .run-cmd-row, .run-form .run-patch-row,
+  .run-form .run-harness-row { grid-column:1/-1; }
+  .run-form input, .run-form select { background:#0c0e14; border:1px solid var(--line);
+              border-radius:6px; color:var(--fg); padding:6px 9px; font:inherit; }
+  .run-actions { display:flex; align-items:center; gap:12px; margin-top:14px; }
+  .run-msg { color:var(--muted); font-size:12px; }
+  .run-msg.err { color:#f0a0a0; }
+  .run-intro { color:var(--muted); font-size:12px; margin-bottom:12px;
+               line-height:1.5; }
+  .run-infra { margin-top:12px; display:grid; gap:3px 12px; font-size:12px;
+               grid-template-columns:130px 1fr; }
+  .run-infra .k { color:var(--muted); }
+  .run-infra .v { word-break:break-all; }
+  .run-status-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .run-cmdline { color:var(--muted); font-size:12px; margin-top:8px;
+                 word-break:break-all; }
+  .run-log { background:#0c0e14; border:1px solid var(--line); border-radius:6px;
+             padding:10px 12px; max-height:420px; overflow:auto; white-space:pre-wrap;
+             word-break:break-word; font-size:12px; color:#cdd6e6; }
+  .badge.run { background:#12314f; color:#8fc0ff; }
+  .badge.done { background:#16301f; color:#74d99f; }
+  .badge.failed { background:#3a1818; color:#f0b0b0; }
+  .badge.idle { background:#222634; color:#aeb6c6; }
+  /* header live indicator (shown on every tab) */
+  .live-indicator { display:none; align-items:center; gap:6px; font-size:12px;
+                    padding:3px 9px; border-radius:12px; border:1px solid var(--line); }
+  .live-indicator.show { display:inline-flex; }
+  .live-indicator .dot { width:8px; height:8px; border-radius:50%; background:var(--muted); }
+  .live-indicator.running { border-color:#3a5da8; color:#8fc0ff; }
+  .live-indicator.running .dot { background:#6ea8fe; animation:pulse 1.2s ease-in-out infinite; }
+  .live-indicator.done { border-color:#2c6b45; color:#74d99f; }
+  .live-indicator.done .dot { background:#74d99f; }
+  .live-indicator.failed { border-color:#7a3a3a; color:#f0b0b0; }
+  .live-indicator.failed .dot { background:#f06e6e; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  /* Status tab */
+  .st-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .st-title { font-weight:600; }
+  .st-bar-wrap { display:flex; align-items:center; gap:12px; }
+  .st-bar-track { flex:1; background:#0c0e14; border:1px solid var(--line);
+                  border-radius:6px; height:22px; overflow:hidden; }
+  .st-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#3a5da8,#6ea8fe);
+                 transition:width .4s ease; }
+  .st-bar-num { color:var(--muted); font-variant-numeric:tabular-nums; min-width:70px;
+                text-align:right; }
+  .st-grid { display:grid; gap:6px;
+             grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); }
+  .st-cell { display:flex; align-items:center; gap:8px; border:1px solid var(--line);
+             border-radius:6px; padding:6px 10px; font-size:12px; background:#0c0e14; }
+  .st-cell .nm { flex:1; word-break:break-all; }
+  .st-cell .sc { font-variant-numeric:tabular-nums; color:var(--muted); }
+  .st-cell.pending { opacity:.55; }
+  .st-cell.pass { border-left:3px solid #74d99f; }
+  .st-cell.fail { border-left:3px solid #f06e6e; }
+  .st-cell.run  { border-left:3px solid #6ea8fe; }
+  /* Webhooks tab */
+  .wh-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+                margin-bottom:12px; }
+  .wh-auto { display:flex; align-items:center; gap:6px; color:var(--muted);
+             font-size:12px; }
+  .hook { background:#0c0e14; border:1px solid var(--line); border-radius:8px;
+          overflow:hidden; margin:6px 0; }
+  .hook > summary { cursor:pointer; list-style:none; padding:9px 12px;
+          display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .hook > summary::-webkit-details-marker { display:none; }
+  .hook .id { font-weight:600; word-break:break-all; }
+  .hook .from { color:var(--muted); font-size:12px; }
+  .hook .when { color:var(--muted); font-size:12px; }
+  .hook .body { border-top:1px solid var(--line); padding:11px 13px; }
+  .hook .body pre { margin:0; white-space:pre-wrap; word-break:break-word;
+                    font-size:12px; color:#cdd6e6; }
+  .hook .kv { display:grid; grid-template-columns:110px 1fr; gap:3px 12px;
+              margin-bottom:9px; font-size:12px; }
+  .hook .kv .k { color:var(--muted); }
+  .badge.b-accepted { background:#16301f; color:#74d99f; }
+  .badge.b-skipped  { background:#3a2a12; color:#f0b86e; }
+  .badge.b-error    { background:#3a1818; color:#f0b0b0; }
+  .badge.b-event    { background:#222634; color:#aeb6c6; border:1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -194,7 +277,11 @@ INDEX_HTML = r"""<!DOCTYPE html>
     <button id="tab-reports" class="tab active">Reports</button>
     <button id="tab-testcases" class="tab">Testcases</button>
     <button id="tab-contents" class="tab">Contents</button>
+    <button id="tab-run" class="tab">Run</button>
+    <button id="tab-status" class="tab">Status</button>
+    <button id="tab-webhooks" class="tab">Webhooks</button>
   </nav>
+  <span id="live-indicator" class="live-indicator" title="Benchmark run status"></span>
   <button id="refresh">Refresh</button>
   <span id="status" style="color:var(--muted)"></span>
 </header>
@@ -243,6 +330,99 @@ INDEX_HTML = r"""<!DOCTYPE html>
       <div id="content-list" class="content-list"></div>
       <div id="content-detail"><span class="empty">Select a testcase.</span></div>
     </div>
+  </div>
+</div>
+
+<div id="view-run" class="wrap" style="display:none">
+  <div class="panel">
+    <h2>Launch a benchmark run (docker + Kubernetes)</h2>
+    <div id="run-disabled" class="empty" style="display:none">
+      Running is disabled. Restart the dashboard with <code>--allow-run</code>.
+    </div>
+    <div id="run-intro" class="run-intro">
+      Fans out one Kubernetes Job per testcase on the shared runner image (the
+      same production path the PR-candidate flow uses). The harness comes from
+      the cluster Secret; results are aggregated into a normal report and shown
+      in the Reports tab under your run name.
+    </div>
+    <div id="run-form" class="run-form">
+      <label>run name (required)
+        <input id="run-name" type="text" placeholder="e.g. claude-2026-07-13">
+      </label>
+      <label>runner image (tag from beaver_hub-public)
+        <select id="run-image"><option value="">loading…</option></select>
+      </label>
+      <label>testcases (blank = all; space/comma-separated ids)
+        <input id="run-testcases" type="text" placeholder="leave blank for all">
+      </label>
+      <label class="run-harness-row">harness command (blank = Secret default; {task} is substituted)
+        <input id="run-harness" type="text"
+               placeholder="e.g. claude -p {task} --dangerously-skip-permissions">
+      </label>
+      <label>jobs (max concurrent k8s Jobs)
+        <input id="run-jobs" type="number" value="16" min="1">
+      </label>
+      <label>per-testcase timeout (s)
+        <input id="run-timeout" type="number" value="1200" min="1">
+      </label>
+    </div>
+    <div class="run-infra" id="run-infra"></div>
+    <div class="run-actions">
+      <button id="run-start" class="primary">Start benchmark</button>
+      <button id="run-stop" class="danger" disabled>Stop</button>
+      <span id="run-msg" class="run-msg"></span>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Live status</h2>
+    <div id="run-status-head" class="run-status-head">
+      <span id="run-badge" class="badge">idle</span>
+      <span id="run-elapsed" class="tc-count"></span>
+      <span id="run-report" class="tc-count"></span>
+    </div>
+    <div id="run-meta" class="run-cmdline"></div>
+    <div id="run-cmdline" class="run-cmdline"></div>
+    <h2 style="margin-top:14px">Matrix log (docker build/push skipped · k8s Jobs)</h2>
+    <pre id="run-log" class="run-log">No run yet.</pre>
+  </div>
+</div>
+
+<div id="view-status" class="wrap" style="display:none">
+  <div class="panel">
+    <div class="st-head">
+      <span id="st-badge" class="badge idle">idle</span>
+      <span id="st-title" class="st-title">No benchmark running</span>
+      <span style="flex:1"></span>
+      <span id="st-elapsed" class="tc-count"></span>
+    </div>
+    <div class="st-bar-wrap">
+      <div class="st-bar-track"><div id="st-bar-fill" class="st-bar-fill"></div></div>
+      <span id="st-bar-num" class="st-bar-num">0 / 0</span>
+    </div>
+    <div id="st-meta" class="run-cmdline"></div>
+  </div>
+  <div class="panel">
+    <h2>Per-testcase progress</h2>
+    <div id="st-grid" class="st-grid"><span class="empty">No run yet.</span></div>
+  </div>
+</div>
+
+<div id="view-webhooks" class="wrap" style="display:none">
+  <div class="panel">
+    <div class="wh-toolbar">
+      <h2 style="margin:0">Received webhooks</h2>
+      <span id="wh-count" class="tc-count"></span>
+      <span style="flex:1"></span>
+      <button id="wh-loadall" class="sm">Load all</button>
+      <label class="wh-auto"><input id="wh-auto" type="checkbox" checked> auto-refresh (3s)</label>
+      <button id="wh-refresh" class="sm">Refresh</button>
+    </div>
+    <div id="wh-disabled" class="empty" style="display:none">
+      No webhook log configured. Restart the dashboard with
+      <code>--webhook-log &lt;path&gt;</code> (the webhook receiver writes
+      <code>.orchestrator/webhooks.jsonl</code>).
+    </div>
+    <div id="wh-list"><span class="empty">Loading...</span></div>
   </div>
 </div>
 
@@ -900,12 +1080,16 @@ async function renderContentsDetail(id) {
 // "#testcases/<id>" -> that testcase's sub-page, "#contents" -> full contents.
 function showView(which) {
   const views = {reports:"#view-reports", testcases:"#view-testcases",
-                 testcase:"#view-testcase", contents:"#view-contents"};
+                 testcase:"#view-testcase", contents:"#view-contents",
+                 run:"#view-run", status:"#view-status", webhooks:"#view-webhooks"};
   for (const [k, sel] of Object.entries(views))
     $(sel).style.display = (k === which) ? "" : "none";
   $("#tab-reports").classList.toggle("active", which === "reports");
   $("#tab-testcases").classList.toggle("active", which === "testcases" || which === "testcase");
   $("#tab-contents").classList.toggle("active", which === "contents");
+  $("#tab-run").classList.toggle("active", which === "run");
+  $("#tab-status").classList.toggle("active", which === "status");
+  $("#tab-webhooks").classList.toggle("active", which === "webhooks");
 }
 
 function route() {
@@ -924,6 +1108,15 @@ function route() {
   } else if (h === "contents") {
     showView("contents");
     renderContentsList();
+  } else if (h === "run") {
+    showView("run");
+    enterRunTab();
+  } else if (h === "status") {
+    showView("status");
+    enterStatusTab();
+  } else if (h === "webhooks") {
+    showView("webhooks");
+    enterWebhooksTab();
   } else {
     showView("reports");
   }
@@ -933,6 +1126,9 @@ window.addEventListener("hashchange", route);
 $("#tab-reports").addEventListener("click", () => { location.hash = "reports"; });
 $("#tab-testcases").addEventListener("click", () => { location.hash = "testcases"; });
 $("#tab-contents").addEventListener("click", () => { location.hash = "contents"; });
+$("#tab-run").addEventListener("click", () => { location.hash = "run"; });
+$("#tab-status").addEventListener("click", () => { location.hash = "status"; });
+$("#tab-webhooks").addEventListener("click", () => { location.hash = "webhooks"; });
 $("#tc-back").addEventListener("click", () => { location.hash = "testcases"; });
 
 // Testcases toolbar: live search + New button
@@ -953,12 +1149,420 @@ $("#overlay").addEventListener("click", e => {
   if (e.target.id === "overlay") $("#overlay").classList.remove("show"); });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") $("#overlay").classList.remove("show"); });
+
+// ---- Run tab: launch a real docker+k8s matrix and stream its status ----
+let RUN_POLL = null;
+let RUN_INIT = false;
+
+function renderRunInfra() {
+  const r = (CONFIG && CONFIG.run) || {};
+  const rows = [
+    ["executor", "docker build/push skipped · one k8s Job per testcase"],
+    ["runner image", r.runner_image || "(default)"],
+    ["k8s namespace", r.namespace || "default"],
+    ["harness secret", r.harness_secret || "aigdbench-harness"],
+    ["testcases (in image)", r.image_testcases_dir || ""],
+    ["ids from", r.local_testcases_dir || "(none — blank runs all discovered)"],
+  ];
+  $("#run-infra").innerHTML = rows.map(
+    ([k, v]) => `<span class="k">${esc(k)}</span><span class="v">${esc(v)}</span>`
+  ).join("");
+  if (r.default_jobs && !$("#run-jobs").dataset.userset)
+    $("#run-jobs").value = r.default_jobs;
+}
+
+async function enterRunTab() {
+  if (!CONFIG) await loadConfig();
+  const disabled = !(CONFIG && CONFIG.allow_run);
+  $("#run-disabled").style.display = disabled ? "" : "none";
+  $("#run-form").style.display = disabled ? "none" : "";
+  $("#run-intro").style.display = disabled ? "none" : "";
+  $("#run-infra").style.display = disabled ? "none" : "";
+  $("#run-start").disabled = disabled;
+  if (disabled) return;
+  if (!RUN_INIT) {
+    RUN_INIT = true;
+    $("#run-jobs").addEventListener("input", e => { e.target.dataset.userset = "1"; });
+    $("#run-start").addEventListener("click", startRun);
+    $("#run-stop").addEventListener("click", stopRun);
+  }
+  renderRunInfra();
+  loadRunImages();
+  refreshRunStatus();
+}
+
+// Populate the runner-image dropdown with tags from beaver_hub-public (Harbor).
+async function loadRunImages() {
+  const sel = $("#run-image");
+  try {
+    const d = await (await fetch("/api/images")).json();
+    const tags = (d && d.tags) || [];
+    if (!tags.length) {
+      sel.innerHTML = '<option value="">' +
+        (d && d.error ? "error: " + esc(d.error) : "no images") + '</option>';
+      return;
+    }
+    const def = (d && d.default) || "";
+    sel.innerHTML = tags.map(t => {
+      const label = t.tag + (t.pushed ? "  (" + t.pushed.replace("T", " ") + ")" : "")
+        + (t.tag === def ? "  — default" : "");
+      return `<option value="${esc(t.tag)}"${t.tag === def ? " selected" : ""}>${esc(label)}</option>`;
+    }).join("");
+  } catch (e) {
+    sel.innerHTML = '<option value="">failed to load images</option>';
+  }
+}
+
+async function startRun() {
+  const name = $("#run-name").value.trim();
+  const msg = $("#run-msg");
+  if (!name) {
+    msg.className = "run-msg err"; msg.textContent = "run name is required";
+    return;
+  }
+  const payload = {
+    name: name,
+    image: $("#run-image").value,
+    testcases: $("#run-testcases").value.trim(),
+    harness_cmd: $("#run-harness").value.trim(),
+    jobs: $("#run-jobs").value,
+    timeout: $("#run-timeout").value,
+  };
+  msg.className = "run-msg"; msg.textContent = "starting docker/k8s matrix...";
+  $("#run-start").disabled = true;
+  try {
+    const res = await fetch("/api/runs/start", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      msg.className = "run-msg err"; msg.textContent = data.error || "failed";
+      $("#run-start").disabled = false;
+      return;
+    }
+    msg.textContent = "started";
+    applyRunStatus(data);
+    beginRunPolling();
+  } catch (err) {
+    msg.className = "run-msg err"; msg.textContent = String(err);
+    $("#run-start").disabled = false;
+  }
+}
+
+async function stopRun() {
+  $("#run-stop").disabled = true;
+  try {
+    const res = await fetch("/api/runs/stop", {method: "POST"});
+    applyRunStatus(await res.json());
+  } catch (err) { /* ignore */ }
+}
+
+async function refreshRunStatus() {
+  try {
+    const res = await fetch("/api/runs/status");
+    const data = await res.json();
+    applyRunStatus(data);
+    if (data.state === "running") beginRunPolling();
+  } catch (err) { /* ignore */ }
+}
+
+function beginRunPolling() {
+  if (RUN_POLL) return;
+  RUN_POLL = setInterval(async () => {
+    try {
+      const res = await fetch("/api/runs/status");
+      applyRunStatus(await res.json());
+    } catch (err) { /* ignore */ }
+  }, 2000);
+}
+
+function stopRunPolling() {
+  if (RUN_POLL) { clearInterval(RUN_POLL); RUN_POLL = null; }
+}
+
+let RUN_LAST_STATE = null;
+function applyRunStatus(s) {
+  if (!s || s.state === "disabled") return;
+  const badge = $("#run-badge");
+  const labels = {running:"running", done:"done", failed:"failed", idle:"idle"};
+  badge.className = "badge " + (s.state === "running" ? "run" : s.state);
+  badge.textContent = labels[s.state] || s.state;
+  $("#run-elapsed").textContent = s.elapsed ? (s.elapsed + "s") : "";
+  $("#run-report").textContent = s.report_file
+    ? (s.report_ready ? ("report: " + s.report_file)
+                      : ("report (pending): " + s.report_file)) : "";
+  const metaBits = [];
+  if (s.name) metaBits.push("name=" + s.name);
+  if (s.harness_cmd) metaBits.push("harness=" + s.harness_cmd);
+  if (s.image) metaBits.push("image=" + s.image);
+  if (s.namespace) metaBits.push("ns=" + s.namespace);
+  if (s.testcase_count) metaBits.push(s.testcase_count + " testcase(s)");
+  if (s.error) metaBits.push("⚠ " + s.error);
+  $("#run-meta").textContent = metaBits.join("  ·  ");
+  $("#run-cmdline").textContent = s.cmd || "";
+  if (s.log_tail) $("#run-log").textContent = s.log_tail;
+  const running = s.state === "running";
+  $("#run-start").disabled = running || !(CONFIG && CONFIG.allow_run);
+  $("#run-stop").disabled = !running;
+  if (running) {
+    beginRunPolling();
+  } else {
+    stopRunPolling();
+    // A run just finished: refresh Reports data so the new report shows.
+    if (RUN_LAST_STATE === "running") {
+      const m = $("#run-msg");
+      m.className = "run-msg";
+      m.textContent = "finished (" + s.state + ")"
+        + (s.report_ready ? " — see Reports tab" : "");
+      load();
+    }
+  }
+  RUN_LAST_STATE = s.state;
+}
+
+// ---- Webhooks tab: show deliveries received by bench-orchestrator.sh ----
+let WH_POLL = null;
+let WH_INIT = false;
+let WH_ALL = false;   // true once "Load all" is clicked -> fetch full history
+
+function whBadge(h) {
+  if (h.decision === "accepted") return '<span class="badge b-accepted">accepted</span>';
+  if (h.decision === "skipped")  return '<span class="badge b-skipped">skipped'
+    + (h.skipped_reason ? " · " + esc(h.skipped_reason) : "") + '</span>';
+  if (h.decision === "error")    return '<span class="badge b-error">error'
+    + (h.error ? " · " + esc(h.error) : "") + '</span>';
+  return '<span class="badge b-event">' + esc(h.decision || "received") + '</span>';
+}
+
+function whTime(ts) {
+  if (!ts) return "";
+  try { return new Date(ts * 1000).toLocaleString(); } catch (e) { return String(ts); }
+}
+
+function renderWebhooks(hooks, total) {
+  const list = $("#wh-list");
+  const t = (typeof total === "number") ? total : hooks.length;
+  $("#wh-count").textContent = (hooks.length < t)
+    ? `showing ${hooks.length} of ${t}` : `${t} received`;
+  // Hide "Load all" once everything is shown.
+  const btn = $("#wh-loadall");
+  if (btn) btn.style.display = (hooks.length < t) ? "" : "none";
+  if (!hooks.length) {
+    list.innerHTML = '<span class="empty">No webhooks received yet.</span>';
+    return;
+  }
+  list.innerHTML = hooks.map((h, i) => {
+    const open = i === 0 ? " open" : "";
+    const bodyStr = (typeof h.body === "object")
+      ? JSON.stringify(h.body, null, 2) : esc(h.body);
+    return `<details class="hook"${open}>
+      <summary>
+        ${whBadge(h)}
+        <span class="badge b-event">${esc(h.event || "?")}${h.action ? " / " + esc(h.action) : ""}</span>
+        <span class="id">${esc(h.delivery || "(no delivery id)")}</span>
+        <span class="from">from ${esc(h.client || "?")} · ${esc(h.source || "http")}</span>
+        <span style="flex:1"></span>
+        <span class="when">${esc(whTime(h.time))}</span>
+      </summary>
+      <div class="body">
+        <div class="kv">
+          <span class="k">repo</span><span>${esc(h.repo || "")}</span>
+          <span class="k">pr_number</span><span>${esc(h.pr_number || "")}</span>
+          <span class="k">head_sha</span><span>${esc(h.head_sha || "")}</span>
+          <span class="k">base_ref</span><span>${esc(h.base_ref || "")}</span>
+        </div>
+        <pre>${esc(bodyStr)}</pre>
+      </div>
+    </details>`;
+  }).join("");
+}
+
+async function loadWebhooks() {
+  try {
+    const q = WH_ALL ? "?limit=all" : "";
+    const d = await (await fetch("/api/webhooks" + q)).json();
+    if (d && d.disabled) {
+      $("#wh-disabled").style.display = "";
+      $("#wh-list").innerHTML = "";
+      $("#wh-count").textContent = "";
+      const btn = $("#wh-loadall"); if (btn) btn.style.display = "none";
+      return;
+    }
+    $("#wh-disabled").style.display = "none";
+    renderWebhooks((d && d.webhooks) || [], d && d.total);
+  } catch (e) {
+    $("#wh-list").innerHTML = '<span class="empty">Failed to load: ' + esc(e) + '</span>';
+  }
+}
+
+function whSetAuto(on) {
+  if (WH_POLL) { clearInterval(WH_POLL); WH_POLL = null; }
+  if (on) WH_POLL = setInterval(loadWebhooks, 3000);
+}
+
+function enterWebhooksTab() {
+  if (!WH_INIT) {
+    WH_INIT = true;
+    $("#wh-refresh").addEventListener("click", loadWebhooks);
+    $("#wh-loadall").addEventListener("click", () => { WH_ALL = true; loadWebhooks(); });
+    $("#wh-auto").addEventListener("change", e => whSetAuto(e.target.checked));
+  }
+  loadWebhooks();
+  whSetAuto($("#wh-auto").checked);
+}
+
+// ---- Status tab + always-on header indicator ----
+// A single background poller (started once) drives BOTH the header live dot
+// (visible on every tab) and the Status tab detail. It polls faster while a
+// run is active, slower when idle, so an in-flight benchmark is always visible.
+let ST_TIMER = null;
+let ST_LAST = null;
+
+function renderLiveIndicator(s) {
+  const el = $("#live-indicator");
+  if (!el) return;
+  if (!s || s.state === "disabled" || s.state === "idle") {
+    // Only keep showing a finished run's dot; hide when never run / idle.
+    if (!s || s.state === "idle" || s.state === "disabled") {
+      el.className = "live-indicator"; el.innerHTML = ""; el.classList.remove("show");
+      return;
+    }
+  }
+  const p = s.progress || {};
+  let text;
+  if (s.state === "running") {
+    text = `running ${p.completed||0}/${p.total||0}`;
+  } else if (s.state === "done") {
+    text = `done ${p.completed||0}/${p.total||0}`;
+  } else if (s.state === "failed") {
+    text = "run failed";
+  } else { text = s.state; }
+  el.className = "live-indicator show " + s.state;
+  el.innerHTML = `<span class="dot"></span><span>${esc(s.name ? s.name+": " : "")}${esc(text)}</span>`;
+}
+
+function renderStatusView(s) {
+  const badge = $("#st-badge");
+  const p = (s && s.progress) || {total:0, completed:0, percent:0, results:[]};
+  const st = s ? s.state : "idle";
+  badge.className = "badge " + (st === "running" ? "run" : st);
+  badge.textContent = st;
+  $("#st-title").textContent = (s && s.name)
+    ? (st === "running" ? `Running “${s.name}”` : `“${s.name}” — ${st}`)
+    : "No benchmark running";
+  $("#st-elapsed").textContent = (s && s.elapsed) ? (s.elapsed + "s") : "";
+  const pct = p.percent || 0;
+  $("#st-bar-fill").style.width = pct + "%";
+  $("#st-bar-num").textContent = `${p.completed||0} / ${p.total||0}` +
+    (p.total ? `  (${pct}%)` : "");
+  const meta = [];
+  if (s && s.external) meta.push("source=webhook PR candidate");
+  if (s && s.phase) meta.push("phase=" + s.phase);
+  if (s && s.image) meta.push("image=" + s.image);
+  if (s && s.namespace) meta.push("ns=" + s.namespace);
+  if (s && s.report_ready && s.report_file) meta.push("report=" + s.report_file);
+  if (s && s.error) meta.push("⚠ " + s.error);
+  $("#st-meta").textContent = meta.join("  ·  ");
+
+  // Per-testcase grid: show every planned id, mark done ones with their score.
+  const grid = $("#st-grid");
+  const ids = (s && s.testcases) || [];
+  const byId = {};
+  for (const r of (p.results || [])) byId[r.testcase_id] = r;
+  const list = ids.length ? ids : (p.results || []).map(r => r.testcase_id);
+  if (!list.length) {
+    grid.innerHTML = '<span class="empty">No run yet. Start one from the Run tab.</span>';
+    return;
+  }
+  grid.innerHTML = list.map(id => {
+    const r = byId[id];
+    let cls = "pending", sc = "…";
+    if (r) {
+      const passed = (typeof r.score === "number") ? r.score >= 1.0 : false;
+      cls = (r.status === "pass" || passed) ? "pass"
+          : (r.status === "error" || r.status === "fail" || r.score === 0) ? "fail" : "pass";
+      sc = (typeof r.score === "number") ? r.score.toFixed(2) : (r.status || "done");
+    } else if (st === "running") {
+      cls = "run"; sc = "running";
+    }
+    return `<div class="st-cell ${cls}"><span class="nm">${esc(id)}</span>` +
+           `<span class="sc">${esc(sc)}</span></div>`;
+  }).join("");
+}
+
+async function pollStatus() {
+  try {
+    const s = await (await fetch("/api/runs/status")).json();
+    ST_LAST = s;
+    renderLiveIndicator(s);
+    // Only repaint the Status view when it's the visible tab (cheap guard).
+    if (location.hash.replace(/^#/, "") === "status") renderStatusView(s);
+    // A run just finished -> refresh Reports so the new report shows.
+    if (window.__ST_PREV === "running" && s.state !== "running") load();
+    window.__ST_PREV = s.state;
+    // Adapt cadence: fast while running, slow when idle.
+    const want = (s.state === "running") ? 2000 : 8000;
+    if (ST_TIMER && ST_TIMER._ms !== want) {
+      clearInterval(ST_TIMER); ST_TIMER = null;
+    }
+    if (!ST_TIMER) { ST_TIMER = setInterval(pollStatus, want); ST_TIMER._ms = want; }
+  } catch (e) { /* ignore transient errors */ }
+}
+
+function enterStatusTab() {
+  renderStatusView(ST_LAST);   // paint immediately from last known
+  pollStatus();                // then refresh
+}
+
+// Kick off the background poller once (drives the header dot on every tab),
+// but only if the Run feature is enabled.
+async function initStatusPoller() {
+  if (!CONFIG) await loadConfig();
+  if (CONFIG && CONFIG.allow_run) pollStatus();
+}
+
 load();
 route();
+initStatusPoller();
 </script>
 </body>
 </html>
 """
+
+
+def load_webhooks(log_path: Path, limit: int | None = 500) -> tuple[list[dict], int]:
+    """Read a JSONL webhook log (written by the webhook receiver), newest first.
+
+    Returns (rows, total) where total is the count of all valid records in the
+    file and rows is the newest `limit` of them (or all when limit is None).
+    Each line is one received webhook delivery. Tolerates partial/garbage lines
+    and a missing file (returns ([], 0)). The full history is always kept in the
+    file; the dashboard can load a slice or everything via the Webhooks tab.
+    """
+    log_path = Path(log_path)
+    if not log_path.exists():
+        return [], 0
+    out: list[dict] = []
+    try:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except ValueError:
+                    continue
+                if isinstance(obj, dict):
+                    out.append(obj)
+    except OSError:
+        return [], 0
+    total = len(out)
+    out.reverse()
+    if limit is not None:
+        out = out[:limit]
+    return out, total
 
 
 def load_reports(reports_dir: Path) -> list[dict]:

@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__df2194f",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "df2194f641479c1d364e6b60d69352cd77fa9e56",
+  "note": "base_ref is the pre-image (parent) of fix commit 84d8c23 — buggy state where _combat_opponent()/_merge_combat_context_params leak a stale stashed opponent over the LLM's explicit target_npc_id. good.diff is the golden fix. Private repo: initial clone needs auth; runs offline afterwards."
+}

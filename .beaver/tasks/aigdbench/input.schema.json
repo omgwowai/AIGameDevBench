@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "DRAFT input contract for the aigdbench Task. Replaces the unvalidated TESTCASE/DRIVER/HARNESS_CMD/TIMEOUT env vars from docker/entrypoint.sh with a schema-checked business contract.",
+  "title": "aigdbench task input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["testcase", "driver"],
+  "properties": {
+    "testcase": {
+      "type": "string",
+      "description": "Testcase id, e.g. pathfinding-npc-bridge-astar (was $TESTCASE). See `aigdbench list`.",
+      "pattern": "^[A-Za-z0-9._-]+$"
+    },
+    "driver": {
+      "type": "string",
+      "description": "How to run the testcase (was $DRIVER).",
+      "enum": ["noop", "patch", "command"],
+      "default": "patch"
+    },
+    "harness_cmd": {
+      "type": "string",
+      "description": "Real AI harness command template, required only when driver=command (was $HARNESS_CMD). {task} is substituted with the task prompt.",
+      "examples": ["claude -p {task} --dangerously-skip-permissions"]
+    },
+    "testcases_dir": {
+      "type": "string",
+      "description": "Testcase corpus root inside the image / shared storage (was $TESTCASES_DIR). Defaults to the baked-in set; point at /shared/testcases for the prewarmed shared corpus.",
+      "default": "/app/testcases"
+    },
+    "engine": {
+      "type": "string",
+      "description": "Which Godot engine to use, once beaver-godot ships the second one (showcase PR #1158). Selects the --godot-binary.",
+      "enum": ["godot-4.5", "godot-3.6"],
+      "default": "godot-4.5"
+    },
+    "timeout_seconds": {
+      "type": "integer",
+      "description": "Per-testcase harness budget (was $TIMEOUT). The Task-level spec.timeout still hard-caps this.",
+      "minimum": 1,
+      "default": 900
+    }
+  },
+  "allOf": [
+    {
+      "$comment": "driver=command requires harness_cmd (entrypoint.sh's `: ${HARNESS_CMD:?...}`).",
+      "if": { "properties": { "driver": { "const": "command" } } },
+      "then": { "required": ["harness_cmd"] }
+    }
+  ]
+}

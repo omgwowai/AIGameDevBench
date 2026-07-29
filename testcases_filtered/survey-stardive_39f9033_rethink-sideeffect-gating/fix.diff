@@ -1,0 +1,195 @@
+diff --git a/scripts/components/npc_brain.gd b/scripts/components/npc_brain.gd
+index e5afb08..a3885e5 100644
+--- a/scripts/components/npc_brain.gd
++++ b/scripts/components/npc_brain.gd
+@@ -9,6 +9,12 @@ var owner_npc: NPC
+ var forced_behavior: BehaviorDef = null
+ var forced_params: Dictionary = {}
+ var rethink_queued := false
++# P0-2: the reason for the rethink queued THIS frame. call_deferred folds multiple
++# same-frame request_rethink calls into one _think, so we can't pass the reason as a
++# call arg — a later, higher-priority reason (an event interrupt) would be lost to
++# the first one that happened to arrive (e.g. a throttled llm_periodic). We keep the
++# highest-priority reason seen this frame here and _think reads it.
++var _queued_reason: StringName = &""
+ var llm_pending := false
+ 
+ const MAX_IMPOSSIBLE_OPTIONS := 5
+@@ -152,12 +158,31 @@ func _is_active_merchant() -> bool:
+ 
+ func request_rethink(reason: StringName) -> void:
+ 	if rethink_queued:
+-		AiDebug.log(owner_npc, "Brain", "rethink already queued, reason=%s" % String(reason), 1.0)
++		# Already queued this frame. Don't drop the newcomer — upgrade the queued
++		# reason if the newcomer outranks it, so an immediate interrupt (a fight
++		# broke out) isn't swallowed by a lower-priority reason that merely arrived
++		# first (a throttled periodic tick). Same/lower rank keeps the existing one.
++		if _reason_rank(reason) > _reason_rank(_queued_reason):
++			AiDebug.log(owner_npc, "Brain", "rethink queued reason upgraded %s -> %s" % [String(_queued_reason), String(reason)], 0.5)
++			_queued_reason = reason
++		else:
++			AiDebug.log(owner_npc, "Brain", "rethink already queued (%s), drop lower reason=%s" % [String(_queued_reason), String(reason)], 1.0)
+ 		return
+ 
+ 	rethink_queued = true
++	_queued_reason = reason
+ 	AiDebug.log(owner_npc, "Brain", "queue rethink reason=%s" % String(reason), 0.25)
+-	call_deferred("_think", reason)
++	call_deferred("_think")
++
++# P0-2: rank a rethink reason so same-frame competitors merge by priority instead
++# of first-come-first-served. immediate interrupt (event:* / event_interrupt* /
++# inspector_edit) > behavior-end bookkeeping > everything else (periodic, spawn…).
++func _reason_rank(reason: StringName) -> int:
++	if _is_immediate_interrupt_reason(reason):
++		return 2
++	if _is_behavior_end_reason(reason):
++		return 1
++	return 0
+ 
+ func wait_before_next_behavior(seconds: float, reason: StringName = &"dialogue_wait") -> void:
+ 	var wait_msec := int(maxf(seconds, 0.0) * 1000.0)
+@@ -233,8 +258,13 @@ func _top_candidate_summaries(candidates: Array[Dictionary]) -> Array[Dictionary
+ 		})
+ 	return rows
+ 
+-func _think(_reason: StringName = &"") -> void:
++func _think(explicit_reason: StringName = &"") -> void:
++	# P0-2: the effective reason is whatever request_rethink last upgraded to this
++	# frame (highest priority seen). An explicit arg, if a direct caller ever passes
++	# one, wins over the queued reason.
++	var _reason := explicit_reason if explicit_reason != &"" else _queued_reason
+ 	rethink_queued = false
++	_queued_reason = &""
+ 	if owner_npc == null or owner_npc.runner == null:
+ 		return
+ 
+@@ -547,19 +577,40 @@ func _apply_llm_result(result: Dictionary, source: StringName, allow_local_fallb
+ 
+ 	var fast_response: Dictionary = fast_response_value
+ 	var decision := _decision_from_fast_response(fast_response)
+-	_apply_llm_favorability_changes(decision)
++
++	# P0-3: commit persistent side effects (favorability / goal board / memories)
++	# ONLY after confirming the response is valid. "Valid" = an intentional wait OR
++	# a parseable action sequence. A half-broken response — one whose sequence won't
++	# parse but that still carries favorability/goal/memory fields — must not be
++	# allowed to pollute relationships, the goal board, or memory before we bounce it
++	# to the local fallback; those are persistent states that feed every later think.
++	var is_wait := _is_wait_decision(decision, fast_response)
++	var sequence: Array[Dictionary] = []
++	if not is_wait:
++		sequence = _parse_llm_sequence_from_decision(decision)
++		# "Valid" is stricter than "non-empty": a hallucinated behavior id parses
++		# into a non-empty sequence but names nothing real, so it must count as a
++		# bad response too. Require at least one behavior that exists in DataCatalog.
++		if sequence.is_empty() or not _sequence_has_known_behavior(sequence):
++			AiDebug.warn(owner_npc, "LLM", "%s returned no usable behavior; side effects skipped" % String(source), 1.0)
++			if allow_local_fallback:
++				_start_local_if_idle(invalid_reason)
++			return
++
++	# Response is valid (wait is a first-class decision, or we have a real sequence):
++	# now it's safe to persist the model's relationship/goal/memory reasoning. All
++	# three read from fast_response (the complete raw response) rather than the
++	# action-parsing intermediate `decision` — otherwise a wait decision, whose
++	# `decision` collapses to {"wait": true}, would silently drop its favorability
++	# changes (goal/memories already read fast_response; favorability lagged behind).
++	_apply_llm_favorability_changes(fast_response)
+ 	_apply_llm_goal_update(fast_response)
+ 	_apply_llm_memories(fast_response)
+-	if _is_wait_decision(decision, fast_response):
++
++	if is_wait:
+ 		AiDebug.log(owner_npc, "LLM", "%s decided wait" % String(source), 0.25)
+ 		wait_before_next_behavior(llm_min_think_interval_sec, &"llm_wait")
+ 		return
+-	var sequence := _parse_llm_sequence_from_decision(decision)
+-	if sequence.is_empty():
+-		AiDebug.warn(owner_npc, "LLM", "%s returned empty or invalid sequence" % String(source), 1.0)
+-		if allow_local_fallback:
+-			_start_local_if_idle(invalid_reason)
+-		return
+ 
+ 	_pending_behavior_sequence = sequence
+ 	var inner_thought := _first_string_from_keys(fast_response, _llm_output_keys("thought_keys", ["thoughts", "inner_thought"]))
+@@ -567,7 +618,7 @@ func _apply_llm_result(result: Dictionary, source: StringName, allow_local_fallb
+ 	# models sometimes emit it at the response top level (sibling to sequence). If
+ 	# the first action has no speech of its own, adopt the top-level one so it
+ 	# isn't silently dropped — NPCs can speak while acting.
+-	var top_level_speech := _first_string_from_keys(fast_response, _llm_output_keys("speech_keys", ["speech", "talk_text", "talk"])).strip_edges()
++	var top_level_speech := _first_string_from_keys(fast_response, _llm_output_keys("speech_keys", ["speech"])).strip_edges()
+ 	var behavior_ids: Array[String] = []
+ 	var actual_speech := ""
+ 	var is_first_entry := true
+@@ -1559,7 +1610,7 @@ func _decision_from_fast_response(fast_response: Dictionary) -> Dictionary:
+ 	elif actions_value is String:
+ 		action_items = [actions_value]
+ 
+-	var talk_text := _first_string_from_keys(fast_response, _llm_output_keys("speech_keys", ["speech", "talk_text", "talk"])).strip_edges()
++	var speech_text := _first_string_from_keys(fast_response, _llm_output_keys("speech_keys", ["speech"])).strip_edges()
+ 	for action_value in action_items:
+ 		var action_text := _llm_action_text(action_value)
+ 		if action_text.strip_edges().to_lower() == "wait":
+@@ -1567,7 +1618,7 @@ func _decision_from_fast_response(fast_response: Dictionary) -> Dictionary:
+ 		var behavior_id := _behavior_id_from_llm_action(action_text)
+ 		if behavior_id == &"":
+ 			continue
+-		var params := _llm_dialogue_params_for_behavior(behavior_id, talk_text)
++		var params := _llm_dialogue_params_for_behavior(behavior_id, speech_text)
+ 		if action_value is Dictionary:
+ 			var action_params := _llm_action_params(action_value as Dictionary)
+ 			for key in action_params.keys():
+@@ -1578,12 +1629,12 @@ func _decision_from_fast_response(fast_response: Dictionary) -> Dictionary:
+ 		})
+ 		break
+ 
+-	if sequence.is_empty() and talk_text != "":
++	if sequence.is_empty() and speech_text != "":
+ 		var fallback_id := _first_available_dialogue_behavior()
+ 		if fallback_id != &"":
+ 			sequence.append({
+ 				&"behavior_id": fallback_id,
+-				&"params": _llm_dialogue_params_for_behavior(fallback_id, talk_text)
++				&"params": _llm_dialogue_params_for_behavior(fallback_id, speech_text)
+ 			})
+ 
+ 	var result := {"sequence": sequence}
+@@ -1713,14 +1764,15 @@ func _trade_price_anchor_rows() -> Array[Dictionary]:
+ 		})
+ 	return result
+ 
+-func _llm_dialogue_params_for_behavior(behavior_id: StringName, talk_text: String) -> Dictionary:
++func _llm_dialogue_params_for_behavior(behavior_id: StringName, speech_text: String) -> Dictionary:
+ 	var params: Dictionary = {}
+-	if talk_text == "":
++	if speech_text == "":
+ 		return params
+ 	if not DataCatalog.is_dialogue_behavior_id(behavior_id):
+ 		return params
+-	params[&"speech"] = talk_text
+-	params[&"talk_text"] = talk_text
++	# Only `speech` — the talk_text alias was removed at the source; the runner and
++	# prompt read `speech` exclusively now.
++	params[&"speech"] = speech_text
+ 	return params
+ 
+ func _extra_candidate_failed_reason(behavior: BehaviorDef) -> String:
+@@ -1930,6 +1982,17 @@ func _parse_llm_sequence_from_decision(decision: Dictionary) -> Array[Dictionary
+ 
+ 	return result
+ 
++# P0-3: a parsed sequence is only "valid" if at least one entry names a behavior
++# that actually exists in the catalog. Guards against the LLM hallucinating a
++# behavior id (which parses fine but can never run) being treated as a real
++# decision and committing side effects before bouncing to the local fallback.
++func _sequence_has_known_behavior(sequence: Array[Dictionary]) -> bool:
++	for entry in sequence:
++		var behavior_id := StringName(String(entry.get(&"behavior_id", "")))
++		if behavior_id != &"" and DataCatalog.get_behavior(behavior_id) != null:
++			return true
++	return false
++
+ func _is_wait_decision(decision: Dictionary, fast_response: Dictionary = {}) -> bool:
+ 	if bool(decision.get("wait", false)):
+ 		return true

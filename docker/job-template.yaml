@@ -61,8 +61,10 @@ spec:
               value: "${TESTCASES_DIR}"
             - name: OUT_DIR
               value: "/out"
+${HARNESS_CMD_YAML}
           # HARNESS_CMD and any provider API keys (ANTHROPIC_API_KEY, ...) come
           # from a Secret when one is named; envFrom is a no-op list otherwise.
+          # An explicit HARNESS_CMD env above (from -c) overrides the Secret's.
           envFrom: ${ENV_FROM}
           resources:
             requests:

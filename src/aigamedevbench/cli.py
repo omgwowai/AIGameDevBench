@@ -1479,6 +1479,524 @@ def _scores_by_category(report: dict) -> dict:
     return out
 
 
+class BenchJobManager:
+    """Run one real (docker + Kubernetes) benchmark matrix at a time.
+
+    The dashboard's Run tab launches ``scripts/run_k8s_matrix.sh``: it fans out
+    one k8s Job per testcase on the shared runner image (harness = the k8s
+    Secret) — exactly the same production path the orchestrator/candidate flow
+    uses — NOT a local ``aigdbench run``. Stdout/stderr of the matrix stream into
+    a log file the UI tails. When the matrix finishes it writes
+    ``<out>/report.json``; we stamp the user's custom run name into it (as the
+    ``harness`` label the dashboard groups by) and copy it into the scanned
+    reports dir so the run shows up in the Reports tab like any normal run.
+
+    Single-job by design: a second Start is refused while one is in flight.
+    """
+
+    def __init__(self, reports_dir: Path, *, repo_root: Path,
+                 runner_image: str, namespace: str, harness_secret: str,
+                 image_testcases_dir: str, local_testcases_dir: Path | None,
+                 default_jobs: int = 16, image_repo: str = "",
+                 harbor_secret: str = "harbor-cred"):
+        import threading as _threading
+        self._reports_dir = Path(reports_dir)
+        self._runs_dir = self._reports_dir / "_runs"
+        self._repo_root = Path(repo_root)
+        self._runner_image = runner_image
+        # Image repo (no tag) the Run tab lists selectable tags from. Derive it
+        # from runner_image ("repo:tag" -> "repo") if not given explicitly.
+        self._image_repo = image_repo or runner_image.rsplit(":", 1)[0]
+        self._harbor_secret = harbor_secret
+        self._namespace = namespace
+        self._harness_secret = harness_secret
+        self._image_testcases_dir = image_testcases_dir
+        self._local_testcases_dir = (
+            Path(local_testcases_dir) if local_testcases_dir else None)
+        self._default_jobs = default_jobs
+        self._lock = _threading.Lock()
+        self._proc = None          # subprocess.Popen | None
+        self._logf = None
+        self._state = "idle"       # idle | running | done | failed
+        self._cmd: list[str] = []
+        self._label = ""
+        self._name = ""
+        self._harness_cmd = ""
+        self._image = runner_image
+        self._testcases: list[str] = []
+        self._started_at = 0.0
+        self._started_mono = 0.0
+        self._ended_at = 0.0
+        self._returncode = None
+        self._log_path: Path | None = None
+        self._out_dir: Path | None = None
+        self._report_path: Path | None = None   # final copy in reports dir
+        self._error = ""
+        # Externally-launched run (the webhook receiver's bench-candidate), which
+        # the dashboard does not spawn itself. The receiver POSTs lifecycle
+        # updates to /api/runs/external; when the manager is otherwise idle,
+        # status() surfaces this so the Live status / Status tab shows it.
+        self._external: dict | None = None
+
+    def _monotonic(self) -> float:
+        import time
+        return time.monotonic()
+
+    def config(self) -> dict:
+        """Infra defaults surfaced to the UI (read-only)."""
+        return {
+            "runner_image": self._runner_image,
+            "image_repo": self._image_repo,
+            "namespace": self._namespace,
+            "harness_secret": self._harness_secret,
+            "image_testcases_dir": self._image_testcases_dir,
+            "local_testcases_dir": (
+                str(self._local_testcases_dir) if self._local_testcases_dir else ""),
+            "default_jobs": self._default_jobs,
+        }
+
+    def list_images(self, limit: int = 40) -> dict:
+        """List selectable runner-image tags from the Harbor project, newest
+        first, for the Run tab dropdown. Reads the robot cred from the
+        harbor-cred k8s secret (pull+push scope) and queries Harbor's v2 API.
+        Returns {"repo", "default", "tags":[{tag, pushed}], "error"?}."""
+        import base64
+        import json as _json
+        import subprocess
+        import urllib.request
+        import urllib.error
+
+        repo = self._image_repo                       # e.g. host/project/name
+        default_tag = self._runner_image.rsplit(":", 1)[-1] \
+            if ":" in self._runner_image else "latest"
+        out = {"repo": repo, "default": default_tag, "tags": []}
+        # repo = <host>/<project>/<name>
+        parts = repo.split("/", 2)
+        if len(parts) < 3:
+            out["error"] = f"cannot parse host/project/name from {repo!r}"
+            return out
+        host, project, name = parts[0], parts[1], parts[2]
+
+        # Robot credential from the cluster's harbor pull secret.
+        try:
+            raw = subprocess.check_output(
+                ["kubectl", "-n", self._namespace, "get", "secret",
+                 self._harbor_secret, "-o",
+                 "jsonpath={.data.\\.dockerconfigjson}"],
+                stderr=subprocess.DEVNULL)
+            cfg = _json.loads(base64.b64decode(raw).decode())
+            entry = cfg.get("auths", {}).get(host, {})
+            user = entry.get("username", "")
+            pw = entry.get("password", "")
+            if not user and entry.get("auth"):
+                user, _, pw = base64.b64decode(entry["auth"]).decode().partition(":")
+        except Exception as e:  # noqa: BLE001
+            out["error"] = f"cannot read {self._harbor_secret}: {e}"
+            return out
+
+        api = (f"https://{host}/api/v2.0/projects/{project}/repositories/"
+               f"{name}/artifacts?with_tag=true&page_size={int(limit)}"
+               f"&sort=-push_time")
+        try:
+            req = urllib.request.Request(api)
+            token = base64.b64encode(f"{user}:{pw}".encode()).decode()
+            req.add_header("Authorization", f"Basic {token}")
+            with urllib.request.urlopen(req, timeout=15) as r:
+                arts = _json.loads(r.read().decode())
+        except Exception as e:  # noqa: BLE001
+            out["error"] = f"harbor API failed: {e}"
+            return out
+
+        tags = []
+        for a in arts:
+            for t in (a.get("tags") or []):
+                tags.append({"tag": t.get("name"),
+                             "pushed": (a.get("push_time") or "")[:19]})
+        # Ensure the configured default tag is present and first.
+        if default_tag not in [t["tag"] for t in tags]:
+            tags.insert(0, {"tag": default_tag, "pushed": ""})
+        out["tags"] = tags
+        return out
+
+    def _enumerate_local_ids(self) -> list[str]:
+        """Testcase ids from the local dir (skip _snapshots/README), for -t."""
+        d = self._local_testcases_dir
+        if not d or not d.is_dir():
+            return []
+        ids = []
+        for p in sorted(d.iterdir()):
+            if p.is_dir() and not p.name.startswith("_") and p.name != "README":
+                ids.append(p.name)
+        return ids
+
+    def start(self, opts: dict) -> dict:
+        """Launch a matrix run. ValueError on bad input, RuntimeError if busy."""
+        import subprocess
+        import time
+        with self._lock:
+            if self._state == "running":
+                raise RuntimeError("a benchmark run is already in progress")
+
+            name = str(opts.get("name") or "").strip()
+            if not name:
+                raise ValueError("a run name is required")
+            # The name becomes the harness label + part of filenames/paths.
+            safe = "".join(c if c.isalnum() or c in "-_" else "-" for c in name)
+            safe = safe.strip("-") or "run"
+
+            def _num(key, default, cast):
+                val = opts.get(key)
+                if val in (None, ""):
+                    return default
+                try:
+                    return cast(val)
+                except (TypeError, ValueError):
+                    raise ValueError(f"{key} must be a number")
+
+            jobs = _num("jobs", self._default_jobs, int)
+            timeout = _num("timeout", int(DEFAULT_TIMEOUT), int)
+
+            # Runner image: opts["image"] may be a bare tag ("latest",
+            # "6776e740") resolved against the configured image repo, or a full
+            # "registry/repo:tag" ref. Empty -> the configured default image.
+            image = str(opts.get("image") or "").strip()
+            if not image:
+                image = self._runner_image
+            elif "/" not in image:
+                image = f"{self._image_repo}:{image.lstrip(':')}"  # bare tag
+
+            # Optional custom harness command. Empty => use the Secret's default
+            # HARNESS_CMD. When set, it overrides the command per Job while the
+            # Secret still supplies provider API keys ({task} is substituted by
+            # the runner). Mirrors run_k8s_matrix.sh -c.
+            harness_cmd = str(opts.get("harness_cmd") or "").strip()
+
+            # Testcase selection: explicit ids (space/comma separated) or all.
+            raw_tc = str(opts.get("testcases") or opts.get("testcase") or "").strip()
+            if raw_tc:
+                ids = [t for t in raw_tc.replace(",", " ").split() if t]
+            else:
+                ids = self._enumerate_local_ids()
+            self._testcases = ids
+
+            matrix = self._repo_root / "scripts" / "run_k8s_matrix.sh"
+            if not matrix.is_file():
+                raise RuntimeError(f"matrix script not found: {matrix}")
+
+            self._runs_dir.mkdir(parents=True, exist_ok=True)
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            base = f"{stamp}-{safe}"
+            log_path = self._runs_dir / f"{base}.log"
+            out_dir = self._runs_dir / f"{base}-matrix"
+            out_dir.mkdir(parents=True, exist_ok=True)
+            report_path = self._reports_dir / f"report-{base}.json"
+
+            # Reuse the pushed :latest image (no build/push), harness via Secret,
+            # one k8s Job per testcase. Mirrors bench-candidate.sh's invocation.
+            cmd = [
+                "bash", str(matrix),
+                "-i", image,
+                "-d", "command",
+                "-s", self._harness_secret,
+                "-j", str(jobs),
+                "-n", self._namespace,
+                "-T", str(timeout),
+                "-D", self._image_testcases_dir,
+                "-o", str(out_dir),
+                "--no-build", "--no-push",
+            ]
+            if ids:
+                cmd += ["-t", " ".join(ids)]
+            if harness_cmd:
+                cmd += ["-c", harness_cmd]
+
+            logf = open(log_path, "wb")
+            try:
+                proc = subprocess.Popen(
+                    cmd, cwd=str(self._repo_root),
+                    stdout=logf, stderr=subprocess.STDOUT,
+                )
+            except OSError as e:
+                logf.close()
+                raise RuntimeError(f"failed to launch matrix: {e}")
+
+            self._proc = proc
+            self._logf = logf
+            self._state = "running"
+            self._cmd = cmd
+            self._name = name
+            self._harness_cmd = harness_cmd
+            self._image = image
+            n = len(ids) if ids else 0
+            self._label = (f"{name} · docker/k8s · ns={self._namespace} · "
+                           f"{n if n else 'all'} testcase(s)")
+            self._started_at = time.time()
+            self._started_mono = self._monotonic()
+            self._ended_at = 0.0
+            self._returncode = None
+            self._log_path = log_path
+            self._out_dir = out_dir
+            self._report_path = report_path
+            self._error = ""
+
+            import threading as _threading
+            watcher = _threading.Thread(target=self._wait, args=(proc,), daemon=True)
+            watcher.start()
+
+        return self.status()
+
+    def _finalize_report(self) -> None:
+        """Stamp the run name into the matrix report.json and copy it into the
+        scanned reports dir so it appears in the Reports tab."""
+        import json as _json
+        import time
+        if not self._out_dir or not self._report_path:
+            return
+        src = self._out_dir / "report.json"
+        if not src.is_file():
+            self._error = "matrix produced no report.json (see log)"
+            return
+        try:
+            data = _json.loads(src.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            self._error = f"could not read matrix report: {e}"
+            return
+        # The dashboard groups runs by the top-level "harness" field.
+        data["harness"] = self._name
+        data.setdefault("run_name", self._name)
+        data["executor"] = "k8s-matrix"
+        if self._harness_cmd:
+            data["harness_cmd"] = self._harness_cmd
+        data["created_at"] = time.time()
+        try:
+            self._report_path.write_text(
+                _json.dumps(data, indent=2), encoding="utf-8")
+        except OSError as e:
+            self._error = f"could not write report copy: {e}"
+
+    def _wait(self, proc) -> None:
+        import time
+        rc = proc.wait()
+        with self._lock:
+            if proc is not self._proc:
+                return
+            self._returncode = rc
+            try:
+                self._logf.close()
+            except Exception:
+                pass
+            # Even on nonzero exit the matrix may have produced a partial report
+            # (aggregate always runs); copy whatever exists.
+            self._finalize_report()
+            ok = (rc == 0) and self._report_path and self._report_path.is_file()
+            self._state = "done" if ok else "failed"
+            self._ended_at = time.time()
+
+    def stop(self) -> dict:
+        with self._lock:
+            proc = self._proc
+            running = self._state == "running" and proc is not None
+        if running:
+            proc.terminate()
+            try:
+                proc.wait(timeout=10)
+            except Exception:
+                proc.kill()
+        return self.status()
+
+    def _log_tail(self, max_bytes: int = 20000) -> str:
+        if not self._log_path or not self._log_path.exists():
+            return ""
+        try:
+            with open(self._log_path, "rb") as f:
+                f.seek(0, 2)
+                size = f.tell()
+                f.seek(max(0, size - max_bytes))
+                data = f.read()
+        except OSError:
+            return ""
+        text = data.decode("utf-8", "replace")
+        if len(data) >= max_bytes and "\n" in text:
+            text = text.split("\n", 1)[1]
+        return text
+
+    def _progress(self) -> dict:
+        """Scan the matrix out dir for per-testcase result JSONs to derive live
+        progress. The matrix writes ``<out>/<sanitized-id>.json`` per Job as it
+        finishes (and ``report.json`` at the very end), so counting those files
+        gives completed/total without parsing the streaming log."""
+        import json as _json
+        total = len(self._testcases)
+        done: list[dict] = []
+        if self._out_dir and self._out_dir.is_dir():
+            for p in sorted(self._out_dir.glob("*.json")):
+                if p.name == "report.json":
+                    continue
+                try:
+                    d = _json.loads(p.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                # per-testcase files look like {"testcases":[{...}]} or a bare
+                # record; normalize to the first record's id/score/status.
+                rec = None
+                if isinstance(d, dict) and isinstance(d.get("testcases"), list) \
+                        and d["testcases"]:
+                    rec = d["testcases"][0]
+                elif isinstance(d, dict):
+                    rec = d
+                if not isinstance(rec, dict):
+                    continue
+                done.append({
+                    "testcase_id": rec.get("testcase_id") or p.stem,
+                    "score": rec.get("score"),
+                    "status": rec.get("status"),
+                })
+        completed = len(done)
+        if not total:
+            total = completed  # "all" runs: total unknown until files land
+        pct = round(100.0 * completed / total, 1) if total else 0.0
+        return {"total": total, "completed": completed, "percent": pct,
+                "results": done}
+
+    def _scan_progress(self, out_dir: Path | None, total: int) -> dict:
+        """Same as _progress but for an arbitrary matrix out dir (used for the
+        externally-launched candidate run)."""
+        import json as _json
+        done: list[dict] = []
+        if out_dir and out_dir.is_dir():
+            for p in sorted(out_dir.glob("*.json")):
+                if p.name == "report.json":
+                    continue
+                try:
+                    d = _json.loads(p.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                rec = None
+                if isinstance(d, dict) and isinstance(d.get("testcases"), list) \
+                        and d["testcases"]:
+                    rec = d["testcases"][0]
+                elif isinstance(d, dict):
+                    rec = d
+                if not isinstance(rec, dict):
+                    continue
+                done.append({"testcase_id": rec.get("testcase_id") or p.stem,
+                             "score": rec.get("score"),
+                             "status": rec.get("status")})
+        completed = len(done)
+        if not total:
+            total = completed
+        pct = round(100.0 * completed / total, 1) if total else 0.0
+        return {"total": total, "completed": completed, "percent": pct,
+                "results": done}
+
+    def register_external(self, info: dict) -> dict:
+        """Record/refresh a run launched OUTSIDE this manager (the webhook
+        receiver's bench-candidate). Fields: name, state(running|done|failed),
+        phase, out_dir, total, image, namespace, error, report_file."""
+        with self._lock:
+            import time
+            state = str(info.get("state") or "running")
+            prev = self._external or {}
+            ext = {
+                "name": str(info.get("name") or prev.get("name") or "candidate"),
+                "state": state,
+                "phase": str(info.get("phase") or prev.get("phase") or ""),
+                "out_dir": str(info.get("out_dir") or prev.get("out_dir") or ""),
+                "total": int(info.get("total") or prev.get("total") or 0),
+                "image": str(info.get("image") or prev.get("image") or ""),
+                "namespace": str(info.get("namespace")
+                                 or prev.get("namespace") or self._namespace),
+                "pr_number": str(info.get("pr_number") or prev.get("pr_number") or ""),
+                "error": str(info.get("error") or ""),
+                "report_file": str(info.get("report_file")
+                                   or prev.get("report_file") or ""),
+                "started_at": prev.get("started_at") or time.time(),
+                "updated_at": time.time(),
+            }
+            if state != "running":
+                ext["ended_at"] = time.time()
+            self._external = ext
+            return dict(ext)
+
+    def _external_status(self) -> dict | None:
+        """Render the external run as a status() payload, or None if absent."""
+        ext = self._external
+        if not ext:
+            return None
+        out_dir = Path(ext["out_dir"]) if ext.get("out_dir") else None
+        progress = self._scan_progress(out_dir, int(ext.get("total") or 0))
+        started = ext.get("started_at") or 0.0
+        ended = ext.get("ended_at") or 0.0
+        elapsed = round((ended or ext.get("updated_at", started)) - started, 1) \
+            if started else 0.0
+        label_bits = [ext["name"], "docker/k8s candidate"]
+        if ext.get("phase"):
+            label_bits.append(ext["phase"])
+        return {
+            "state": ext["state"],
+            "label": " · ".join(label_bits),
+            "name": ext["name"],
+            "executor": "bench-candidate",
+            "external": True,
+            "phase": ext.get("phase", ""),
+            "image": ext.get("image", ""),
+            "namespace": ext.get("namespace", ""),
+            "harness_secret": self._harness_secret,
+            "harness_cmd": "(secret default)",
+            "testcase_count": progress["total"],
+            "testcases": [r["testcase_id"] for r in progress["results"]],
+            "progress": progress,
+            "cmd": "",
+            "started_at": started or None,
+            "elapsed": elapsed,
+            "returncode": None,
+            "report_file": ext.get("report_file") or None,
+            "report_ready": bool(ext.get("report_file")),
+            "error": ext.get("error", ""),
+            "log_tail": "",
+        }
+
+    def status(self) -> dict:
+        with self._lock:
+            # If this manager isn't itself running a run, surface the externally
+            # launched candidate (webhook receiver) so the UI shows it. A local
+            # Run-tab run always takes precedence while active.
+            if self._state != "running" and self._external is not None:
+                ext = self._external_status()
+                if ext is not None:
+                    return ext
+            if self._state == "running" and self._started_mono:
+                elapsed = self._monotonic() - self._started_mono
+            elif self._ended_at and self._started_at:
+                elapsed = self._ended_at - self._started_at
+            else:
+                elapsed = 0.0
+            report_name = self._report_path.name if self._report_path else None
+            report_exists = bool(self._report_path and self._report_path.is_file())
+            progress = self._progress()
+            return {
+                "state": self._state,
+                "label": self._label,
+                "name": self._name,
+                "executor": "k8s-matrix",
+                "image": self._image,
+                "namespace": self._namespace,
+                "harness_secret": self._harness_secret,
+                "harness_cmd": self._harness_cmd or "(secret default)",
+                "testcase_count": len(self._testcases),
+                "testcases": list(self._testcases),
+                "progress": progress,
+                "cmd": " ".join(self._cmd),
+                "started_at": self._started_at or None,
+                "elapsed": round(elapsed, 1),
+                "returncode": self._returncode,
+                "report_file": report_name,
+                "report_ready": report_exists,
+                "error": self._error,
+                "log_tail": self._log_tail(),
+            }
+
+
 @main.command("serve")
 @click.option("--reports-dir", default=".", type=click.Path(exists=True),
               help="Directory to scan for *.json benchmark reports (default: cwd)")
@@ -1493,13 +2011,47 @@ def _scores_by_category(report: dict) -> dict:
               help="Enable in-dashboard testcase create/edit/delete (writes to "
                    "--testcases-dir). Off by default: the dashboard is read-only "
                    "unless this flag is passed.")
+@click.option("--allow-run/--no-allow-run", default=True,
+              help="Enable the in-dashboard Run tab to launch a real (docker + "
+                   "k8s) benchmark matrix (one at a time). On by default.")
+@click.option("--webhook-log", "webhook_log", default=None, type=click.Path(),
+              help="JSONL file of webhooks received by bench-orchestrator.sh "
+                   "(e.g. .orchestrator/webhooks.jsonl). When set, the dashboard "
+                   "shows them in a Webhooks tab.")
+@click.option("--runner-image", "runner_image",
+              default="harbor.omgwow.ai/beaver_hub-public/aigdbench-runner:latest",
+              help="Runner image the Run tab fans out on k8s (reused as-is, "
+                   "--no-build --no-push).")
+@click.option("--k8s-namespace", "k8s_namespace", default="default",
+              help="Kubernetes namespace for Run-tab benchmark Jobs.")
+@click.option("--harness-secret", "harness_secret", default="aigdbench-harness",
+              help="k8s Secret carrying HARNESS_CMD + API keys for Run-tab runs.")
+@click.option("--image-testcases-dir", "image_testcases_dir",
+              default="/app/testcases_filtered",
+              help="Testcases dir path INSIDE the runner image (matrix -D).")
+@click.option("--jobs", "default_jobs", default=16, type=int,
+              help="Default max concurrent k8s Jobs for a Run-tab run.")
+@click.option("--image-repo", "image_repo", default="",
+              help="Runner image repo (no tag) the Run tab lists selectable "
+                   "tags from. Default: derived from --runner-image.")
+@click.option("--harbor-secret", "harbor_secret", default="harbor-cred",
+              help="k8s docker-registry Secret with the Harbor robot cred, used "
+                   "to list image tags for the Run tab dropdown.")
 def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
-              open_browser: bool, editable: bool):
+              open_browser: bool, editable: bool, allow_run: bool,
+              webhook_log: str | None, runner_image: str, k8s_namespace: str,
+              harness_secret: str, image_testcases_dir: str, default_jobs: int,
+              image_repo: str, harbor_secret: str):
     """Serve a local web dashboard to view and compare benchmark reports.
 
     Scans --reports-dir for report JSON files on every request, so re-running a
     benchmark and refreshing the page shows the new run immediately. Pure
     stdlib, fully offline; charts are drawn with native SVG/CSS.
+
+    The Run tab launches the real production matrix (scripts/run_k8s_matrix.sh):
+    one Kubernetes Job per testcase on --runner-image, harness from
+    --harness-secret. The aggregated report.json is copied into --reports-dir
+    (stamped with the run's custom name) so it shows up like any normal run.
     """
     import json
     import webbrowser
@@ -1510,8 +2062,10 @@ def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
         INDEX_HTML, load_reports, build_summary, report_detail,
         load_testcase_catalog, load_testcase_detail,
         create_testcase, save_testcase_file, delete_testcase_file,
-        editor_enums, EditError,
+        editor_enums, EditError, load_webhooks,
     )
+
+    webhook_log_path = Path(webhook_log) if webhook_log else None
 
     root = Path(reports_dir)
     if testcases_dir:
@@ -1519,6 +2073,17 @@ def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
     else:
         default_tc = root / "testcases"
         tc_root = default_tc if default_tc.is_dir() else None
+
+    # repo root = two levels up from this file (src/aigamedevbench/cli.py).
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    job_manager = (
+        BenchJobManager(
+            root, repo_root=repo_root, runner_image=runner_image,
+            namespace=k8s_namespace, harness_secret=harness_secret,
+            image_testcases_dir=image_testcases_dir,
+            local_testcases_dir=tc_root, default_jobs=default_jobs,
+            image_repo=image_repo, harbor_secret=harbor_secret)
+        if allow_run else None)
 
     class Handler(BaseHTTPRequestHandler):
         def _send(self, code: int, body: bytes, content_type: str) -> None:
@@ -1542,7 +2107,43 @@ def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
             if path == "/api/config":
                 self._json({"editable": editable and tc_root is not None,
                             "has_testcases": tc_root is not None,
+                            "allow_run": job_manager is not None,
+                            "has_webhooks": webhook_log_path is not None,
+                            "default_testcases_dir": (
+                                str(tc_root) if tc_root is not None else ""),
+                            "run": (job_manager.config()
+                                    if job_manager is not None else None),
                             "enums": editor_enums()})
+                return
+            if path == "/api/webhooks":
+                if webhook_log_path is None:
+                    self._json({"disabled": True, "webhooks": [],
+                                "count": 0, "total": 0})
+                    return
+                q = parse_qs(parsed.query)
+                raw_limit = (q.get("limit") or ["200"])[0]
+                if raw_limit in ("all", "0", "-1"):
+                    limit = None  # everything
+                else:
+                    try:
+                        limit = int(raw_limit)
+                    except ValueError:
+                        limit = 200
+                hooks, total = load_webhooks(webhook_log_path, limit=limit)
+                self._json({"webhooks": hooks, "count": len(hooks),
+                            "total": total})
+                return
+            if path == "/api/runs/status":
+                if job_manager is None:
+                    self._json({"state": "disabled"})
+                else:
+                    self._json(job_manager.status())
+                return
+            if path == "/api/images":
+                if job_manager is None:
+                    self._json({"disabled": True, "tags": []})
+                else:
+                    self._json(job_manager.list_images())
                 return
             if path == "/api/summary":
                 self._json(build_summary(load_reports(root)))
@@ -1586,6 +2187,28 @@ def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
         def do_POST(self) -> None:  # noqa: N802 (http.server API)
             parsed = urlparse(self.path)
             path = parsed.path
+            # Run-control endpoints are gated on --allow-run only.
+            if path in ("/api/runs/start", "/api/runs/stop", "/api/runs/external"):
+                if job_manager is None:
+                    self._json({"error": "running is disabled "
+                                "(run serve with --allow-run)"}, code=403)
+                    return
+                if path == "/api/runs/stop":
+                    self._json(job_manager.stop())
+                    return
+                if path == "/api/runs/external":
+                    # The webhook receiver reports its externally-launched
+                    # candidate run here so the Live status / Status tab shows it.
+                    self._json(job_manager.register_external(self._read_json_body()))
+                    return
+                body = self._read_json_body()
+                try:
+                    self._json(job_manager.start(body))
+                except ValueError as e:
+                    self._json({"error": str(e)}, code=400)
+                except RuntimeError as e:
+                    self._json({"error": str(e)}, code=409)
+                return
             # Every write endpoint is gated on --editable AND a known testcases dir.
             if not (editable and tc_root is not None):
                 self._json({"error": "editing is disabled (run serve with --editable)"},
@@ -1626,6 +2249,14 @@ def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
         click.echo(f"--- testcases from {tc_root.resolve()} ({mode})")
     elif editable:
         click.echo("--- --editable ignored: no --testcases-dir")
+    click.echo(f"--- Run tab: {'enabled' if allow_run else 'disabled'}"
+               + (f" (docker+k8s matrix; image={runner_image} ns={k8s_namespace} "
+                  f"secret={harness_secret})" if allow_run else ""))
+    if webhook_log_path is not None:
+        click.echo(f"--- Webhooks tab: {webhook_log_path}")
+    if host in ("0.0.0.0", "::"):
+        click.echo("--- WARNING: bound to all interfaces with no auth; anyone "
+                   "who can reach this port can start benchmark runs.")
     if open_browser:
         webbrowser.open(url)
     try:
@@ -1634,3 +2265,7 @@ def serve_cmd(reports_dir: str, testcases_dir: str | None, port: int, host: str,
         click.echo("\n--- stopped")
     finally:
         server.server_close()
+
+
+if __name__ == "__main__":
+    main()

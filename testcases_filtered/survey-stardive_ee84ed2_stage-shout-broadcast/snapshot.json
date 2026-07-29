@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__423dcec",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "423dcec907f2d2af2bc72d33859d4a7d7693a974",
+  "note": "base_ref is the pre-image (parent) of fix commit ee84ed2 — buggy state where a stage performance starting / shouting for tips emits nothing to the world, so nearby NPCs are never interrupted to rethink and the show is ignored. good.diff is the golden fix (broadcasts performance_started / performance_shout world events plus events.json reactions that interrupt bystanders in earshot). Private repo: initial clone needs auth; runs offline afterwards."
+}

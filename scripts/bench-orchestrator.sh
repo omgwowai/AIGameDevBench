@@ -1,27 +1,35 @@
 #!/usr/bin/env bash
-# bench-orchestrator.sh — turn a GitHub webhook delivery into ONE full
-# AIGameDevBench parallel benchmark run (one k8s Job per testcase, claude +
-# agentic-game-development plugin as the harness).
+# bench-orchestrator.sh — turn a GitHub `pull_request` (action=opened) webhook
+# delivery into ONE full AIGameDevBench parallel benchmark run of the PR head
+# (one k8s Job per testcase, claude + agentic-game-development plugin as the
+# harness), gated behind a strict "beats historical best" check.
+#
+# ONLY a freshly-OPENED pull request triggers a run. synchronize / reopened /
+# ready_for_review, and all `push` events, are intentionally ignored.
 #
 # Two trigger sources, pick with --mode:
 #
-#   http   (default) — run a tiny HTTP endpoint on :$PORT/trigger. The modified
-#                      github-webhook receiver POSTs here after a validated push:
+#   http   (default) — run a tiny HTTP endpoint on :$PORT/trigger. The
+#                      github-webhook receiver POSTs here after a validated,
+#                      HMAC-checked pull_request delivery:
 #                        POST /trigger
 #                        Header: x-bench-token: <BENCH_TRIGGER_TOKEN>
-#                        Body:   {"repo":"o/r","ref":"refs/heads/main",
-#                                 "after":"<sha>","delivery":"<uuid>"}
+#                        Body:   {"delivery":"<uuid>","repo":"o/r",
+#                                 "event":"pull_request","action":"opened",
+#                                 "pr_number":"42","head_sha":"<sha>",
+#                                 "base_ref":"main"}
 #                      See docs/webhook-forward-contract.md for the exact contract.
 #
 #   watch-logs      — no receiver change needed. tail the receiver pod's logs on
 #                      the mc-winter-zhao cluster (winter has pods/log there) and
-#                      trigger on each `accepted GitHub webhook delivery` line,
-#                      de-duped by its delivery id. Robust fallback when the
-#                      receiver cannot reach this host or its source is untouched.
+#                      trigger on each `accepted GitHub webhook delivery` line
+#                      that is a pull_request opened, de-duped by head.sha. Robust
+#                      fallback when the receiver cannot reach this host.
 #
-# Both paths de-dupe by delivery id (persisted in $STATE_DIR/seen) so a redelivery
-# or a log re-read never launches a second batch, and both invoke the SAME
-# benchmark launcher: scripts/run_k8s_matrix.sh.
+# Both paths de-dupe (http by delivery id, PR path by head.sha; persisted in
+# $STATE_DIR/seen) so a redelivery or log re-read never launches a second run,
+# and both dispatch a PR opened to the SAME gated candidate flow:
+# scripts/bench-candidate.sh.
 #
 # Usage:
 #   scripts/bench-orchestrator.sh --mode http        [options]
@@ -80,6 +88,9 @@ cd "$REPO_ROOT"
 
 MODE="${MODE:-http}"
 PORT="${PORT:-8899}"
+# Received webhooks are appended to $WEBHOOK_LOG (see below) and shown in the
+# AIGameDevBench dashboard's Webhooks tab (aigdbench serve --webhook-log ...).
+# There is no separate viewer process anymore.
 # Default to the public beaver_hub-public runner image (pullable with the
 # beaver_hub-public robot creds, and built with the claude CLI baked in). The
 # old xiaojun_private image is NOT pullable here → ImagePullBackOff → every
@@ -112,6 +123,15 @@ BUMP="${BUMP:-patch}"
 REBUILD=0
 REBUILD_IMPORT_K3S="${REBUILD_IMPORT_K3S:-0}"  # 0 => --rebuild pushes to registry; 1 => import into local k3s instead
 PLUGIN_BASE_REF="${PLUGIN_BASE_REF:-origin/main}"  # diff base for "this run's plugin changes"
+# --- v2: PR-triggered gated candidate flow (see docs/spec-v2.md) --------------
+# A `pull_request` (action=opened) webhook is dispatched to
+# scripts/bench-candidate.sh, which benchmarks the PR head in isolation and
+# (with --auto-release) merges+releases only if it strictly beats the historical
+# best. All other events (push, other PR actions) are ignored. IMAGE_REPO is the
+# repo WITHOUT tag; the candidate appends an immutable :<sha> tag itself.
+IMAGE_REPO="${IMAGE_REPO:-harbor.omgwow.ai/beaver_hub-public/aigdbench-runner}"
+CANDIDATE_ENGINE="${CANDIDATE_ENGINE:-auto}"   # docker|podman|auto for candidate image build
+# Reuse AUTO_RELEASE/MIN_DELTA/BUMP (declared above) for the candidate gate too.
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -137,6 +157,8 @@ while [[ $# -gt 0 ]]; do
     --rebuild) REBUILD=1; shift;;
     --rebuild-import-k3s) REBUILD=1; REBUILD_IMPORT_K3S=1; shift;;
     --plugin-base-ref) PLUGIN_BASE_REF="$2"; shift 2;;
+    --image-repo) IMAGE_REPO="$2"; shift 2;;
+    --candidate-engine) CANDIDATE_ENGINE="$2"; shift 2;;
     -h|--help) sed -n '2,60p' "$0"; exit 0;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
@@ -146,6 +168,11 @@ done
 mkdir -p "$STATE_DIR" "$RESULTS_ROOT"
 SEEN_FILE="$STATE_DIR/seen"
 touch "$SEEN_FILE"
+# JSONL log of every webhook received (both http and watch-logs paths append
+# here). The AIGameDevBench dashboard shows it in its Webhooks tab; start the
+# dashboard with:  aigdbench serve --webhook-log "$STATE_DIR/webhooks.jsonl"
+WEBHOOK_LOG="$STATE_DIR/webhooks.jsonl"
+touch "$WEBHOOK_LOG"
 
 log() { echo "[orchestrator] $*" >&2; }
 
@@ -202,6 +229,9 @@ PY
 }
 
 # --- Launch ONE benchmark batch for a delivery (de-duped, backgrounded) -------
+# LEGACY / UNREACHABLE: this was the v1 push-triggered post-hoc path. Since the
+# orchestrator now only acts on `pull_request` (action=opened) -> launch_candidate,
+# nothing dispatches here anymore. Kept for reference and possible manual reuse.
 launch_batch() {
   local delivery="$1" repo="${2:-}" ref="${3:-}" sha="${4:-}"
   local id; id="$(sanitize_id "$delivery")"
@@ -322,12 +352,44 @@ PY
   log "batch delivery=$id dispatched (pid=$!)"
 }
 
+# --- Launch a PR-triggered gated CANDIDATE (v2, see docs/spec-v2.md) ----------
+# pull_request events go here: benchmark the PR head in isolation on an immutable
+# candidate image and (with --auto-release) merge+release only if it strictly
+# beats the historical best. De-duped by head.sha (a PR's synchronize re-fires
+# on every push, but the same head only needs one run).
+launch_candidate() {
+  local delivery="$1" repo="$2" pr="$3" head_sha="$4" base_ref="${5:-main}"
+  [[ -n "$head_sha" ]] || { log "PR event without head_sha; skipping"; return 0; }
+  [[ -n "$repo" ]] || { log "PR event without repo; skipping"; return 0; }
+  # De-dupe by head.sha (not delivery): synchronize re-delivers the same head.
+  local key="pr-${pr}-${head_sha}"
+  if grep -qxF "$key" "$SEEN_FILE" 2>/dev/null; then
+    log "candidate $key already processed; skipping"
+    return 0
+  fi
+  echo "$key" >> "$SEEN_FILE"
+
+  local cand_flags=(--commit "$head_sha" --pr "$pr" --repo "$repo"
+                    --delivery "$delivery" --image-repo "$IMAGE_REPO"
+                    --secret "$HARNESS_SECRET" --jobs "$JOBS"
+                    --testcases-dir "$TESTCASES_DIR"
+                    --local-testcases-dir "$LOCAL_TESTCASES_DIR"
+                    --namespace "$NAMESPACE" --results-root "$RESULTS_ROOT"
+                    --plugin-repo "$PLUGIN_REPO" --bump "$BUMP"
+                    --engine "$CANDIDATE_ENGINE")
+  [[ "$AUTO_RELEASE" == "1" ]] && cand_flags+=(--auto-release)
+  log "CANDIDATE PR #$pr head=$head_sha repo=$repo -> bench-candidate.sh"
+  ( "$REPO_ROOT/scripts/bench-candidate.sh" "${cand_flags[@]}" ) &
+  log "candidate PR #$pr dispatched (pid=$!)"
+}
+
 # --- Mode: watch-logs ---------------------------------------------------------
 run_watch_logs() {
   [[ -r "$WEBHOOK_KUBECONFIG" ]] \
     || { echo "ERROR: cannot read WEBHOOK_KUBECONFIG=$WEBHOOK_KUBECONFIG" >&2; exit 1; }
   log "watch-logs mode: tailing deployment/github-webhook logs in ns=$WEBHOOK_NS"
   log "  (cluster from $WEBHOOK_KUBECONFIG; de-dupe by delivery id)"
+  log "  webhooks logged to $WEBHOOK_LOG (view in dashboard: serve --webhook-log ...)"
   # --tail=0 so we only react to NEW deliveries after startup. Each accepted line
   # is JSON: {"message":"accepted GitHub webhook delivery","event":"push",
   #           "delivery":"...","repository":"o/r", ...}. Extract fields with python.
@@ -335,23 +397,50 @@ run_watch_logs() {
       logs -f --tail=0 deployment/github-webhook 2>/dev/null \
   | while IFS= read -r line; do
       case "$line" in *'accepted GitHub webhook delivery'*) ;; *) continue;; esac
-      # Parse the JSON line safely; skip non-push events.
-      eval "$(printf '%s' "$line" | python3 -c '
-import sys, json, shlex
+      # Parse the JSON line safely; record EVERY delivery to the webhook log for
+      # the viewer, then dispatch only freshly-OPENED pull requests.
+      eval "$(printf '%s' "$line" | WEBHOOK_LOG="$WEBHOOK_LOG" python3 -c '
+import sys, json, shlex, os, time
 try:
     o = json.loads(sys.stdin.readline())
 except Exception:
     sys.exit(0)
-ev = o.get("event") or ""
-if ev != "push":
-    sys.exit(0)
+ev = (o.get("event") or "").lower()
 d = o.get("delivery") or ""
 r = o.get("repository") or ""
-print("D=%s R=%s" % (shlex.quote(d), shlex.quote(r)))
+pr = o.get("pull_request") or {}
+prnum = str(o.get("pr_number") or pr.get("number") or "")
+head = str(o.get("head_sha") or (pr.get("head") or {}).get("sha") or "")
+base = str(o.get("base_ref") or (pr.get("base") or {}).get("ref") or "main")
+action = (o.get("action") or "").lower()
+is_pr = ev in ("pull_request","pr") or bool(prnum and head)
+# Only a freshly-OPENED pull request triggers a benchmark. Everything else
+# (synchronize/reopened/ready_for_review, and all push events) is ignored.
+decision, reason = "skipped", (ev or "non-pull_request")
+if is_pr and (not action or action == "opened") and prnum and head:
+    decision, reason = "accepted", ""
+elif is_pr:
+    decision, reason = "skipped", (action or "missing pr_number/head_sha")
+log = os.environ.get("WEBHOOK_LOG", "")
+if log:
+    rec = {"time": time.time(), "source": "watch-logs", "decision": decision,
+           "skipped_reason": reason, "delivery": d,
+           "event": ev or ("pull_request" if is_pr else "?"), "action": action,
+           "repo": r, "pr_number": prnum, "head_sha": head, "base_ref": base,
+           "body": o}
+    try:
+        with open(log, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+if decision == "accepted":
+    print("EV=pr D=%s R=%s PR=%s HEAD=%s BASE=%s" % tuple(
+        shlex.quote(x) for x in (d, r, prnum, head, base)))
 ')"
-      [[ -n "${D:-}" ]] || continue
-      launch_batch "$D" "${R:-}" "" ""
-      unset D R
+      case "${EV:-}" in
+        pr)   [[ -n "${HEAD:-}" ]] && launch_candidate "$D" "${R:-}" "$PR" "$HEAD" "${BASE:-main}" ;;
+      esac
+      unset EV D R PR HEAD BASE
     done
 }
 
@@ -359,30 +448,52 @@ print("D=%s R=%s" % (shlex.quote(d), shlex.quote(r)))
 run_http() {
   log "http mode: listening on 0.0.0.0:$PORT  (POST /trigger)"
   [[ -n "$BENCH_TRIGGER_TOKEN" ]] || log "WARN: no --token set; /trigger is unauthenticated"
+  log "  webhooks logged to $WEBHOOK_LOG (view in dashboard: serve --webhook-log ...)"
   # A minimal, dependency-free HTTP server. We export what the handler needs and
   # call back into this script's launch_batch via a fifo-free approach: the
   # python server writes a compact command line to stdout lines that the bash
   # reader turns into launch_batch calls. This keeps k8s/launch logic in bash.
-  export BENCH_TRIGGER_TOKEN PORT
+  export BENCH_TRIGGER_TOKEN PORT WEBHOOK_LOG
   # The python server validates + emits one TAB-separated line per accepted
   # trigger; the bash while-loop turns each into a launch_batch call. Process
   # substitution keeps k8s/launch logic in bash and avoids heredoc-in-pipeline
   # ordering hazards.
   while IFS= read -r cmdline; do
-    # cmdline is: DELIVERY<TAB>REPO<TAB>REF<TAB>SHA  (already validated by server)
-    IFS=$'\t' read -r d r ref sha <<<"$cmdline"
-    launch_batch "$d" "$r" "$ref" "$sha"
+    # cmdline is \x1f-separated (unit separator), first column is the event:
+    #   pull_request  EV=pr  \x1f d \x1f repo \x1f \x1f \x1f prnum \x1f head_sha \x1f base_ref
+    # \x1f (not tab) so the empty ref/sha fields don't collapse under IFS.
+    IFS=$'\x1f' read -r ev d r ref sha pr head_sha base_ref <<<"$cmdline"
+    case "$ev" in
+      pr)   launch_candidate "$d" "$r" "$pr" "$head_sha" "${base_ref:-main}" ;;
+    esac
   done < <(python3 - <<'PY'
-import json, os, sys
+import json, os, sys, time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 TOKEN = os.environ.get("BENCH_TRIGGER_TOKEN", "")
 PORT = int(os.environ.get("PORT", "8899"))
+WEBHOOK_LOG = os.environ.get("WEBHOOK_LOG", "")
 
-def emit(delivery, repo, ref, sha):
-    # One tab-separated line to stdout -> bash launch_batch. Flush immediately.
-    sys.stdout.write("\t".join([delivery, repo or "", ref or "", sha or ""]) + "\n")
+def emit(ev, delivery, repo, ref, sha, pr="", head_sha="", base_ref=""):
+    # One \x1f (unit separator) delimited line to stdout -> bash dispatch. NOT
+    # tab: tab is IFS-whitespace so consecutive empty fields (ref+sha are empty
+    # for PR events) would collapse and shift head_sha/base_ref. \x1f never
+    # appears in webhook fields and is not IFS-whitespace, so empties survive.
+    sys.stdout.write("\x1f".join([ev, delivery, repo or "", ref or "", sha or "",
+                                  pr or "", head_sha or "", base_ref or ""]) + "\n")
     sys.stdout.flush()
+
+def record(rec):
+    # Append one JSON line to the webhook log so the viewer can render it.
+    if not WEBHOOK_LOG:
+        return
+    rec.setdefault("time", time.time())
+    rec.setdefault("source", "http")
+    try:
+        with open(WEBHOOK_LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
 
 class H(BaseHTTPRequestHandler):
     def _send(self, code, obj):
@@ -407,17 +518,68 @@ class H(BaseHTTPRequestHandler):
                 self._send(401, {"error": "bad token"}); return
         n = int(self.headers.get("Content-Length", "0") or "0")
         raw = self.rfile.read(n) if n > 0 else b"{}"
+        # Print the full received webhook request to stderr (stdout is reserved
+        # for the TAB-separated dispatch line consumed by the bash reader).
+        sys.stderr.write(
+            "[orchestrator] === incoming POST %s from %s ===\n"
+            % (self.path, self.client_address[0])
+        )
+        sys.stderr.write(
+            "[orchestrator] headers:\n%s\n" % "".join(
+                "[orchestrator]   %s: %s\n" % (k, v) for k, v in self.headers.items()
+            )
+        )
+        try:
+            pretty = json.dumps(json.loads(raw or b"{}"), indent=2, ensure_ascii=False)
+        except Exception:
+            pretty = (raw or b"").decode("utf-8", "replace")
+        sys.stderr.write("[orchestrator] body:\n%s\n" % pretty)
+        sys.stderr.flush()
+        client = self.client_address[0]
         try:
             o = json.loads(raw or b"{}")
         except Exception:
+            record({"decision": "error", "error": "bad json", "client": client,
+                    "event": "?", "body": (raw or b"").decode("utf-8", "replace")})
             self._send(400, {"error": "bad json"}); return
         delivery = str(o.get("delivery") or "").strip()
         if not delivery:
+            record({"decision": "error", "error": "missing delivery",
+                    "client": client, "event": str(o.get("event") or "?"), "body": o})
             self._send(400, {"error": "missing delivery"}); return
-        emit(delivery, str(o.get("repo") or ""), str(o.get("ref") or ""),
-             str(o.get("after") or o.get("sha") or ""))
-        # Accept fast; the benchmark runs asynchronously on the bash side.
-        self._send(202, {"accepted": True, "delivery": delivery})
+        # Event type: explicit "event" field, else infer from payload shape.
+        # A pull_request delivery carries pr_number/head_sha (see spec-v2 contract);
+        # some receivers nest it under o["pull_request"].
+        event = str(o.get("event") or "").strip().lower()
+        pr = o.get("pull_request") or {}
+        pr_number = str(o.get("pr_number") or o.get("pr") or pr.get("number") or "").strip()
+        head_sha = str(o.get("head_sha") or (pr.get("head") or {}).get("sha") or "").strip()
+        base_ref = str(o.get("base_ref") or (pr.get("base") or {}).get("ref") or "main").strip()
+        action = str(o.get("action") or "").strip().lower()
+        is_pr = event in ("pull_request", "pr") or bool(pr_number and head_sha)
+        base = {"delivery": delivery, "client": client,
+                "event": event or ("pull_request" if is_pr else "?"),
+                "action": action, "repo": str(o.get("repo") or ""),
+                "pr_number": pr_number, "head_sha": head_sha,
+                "base_ref": base_ref, "body": o}
+        if is_pr:
+            # Only a freshly-OPENED PR is a benchmark trigger. synchronize /
+            # reopened / ready_for_review are intentionally ignored.
+            if action and action != "opened":
+                record({**base, "decision": "skipped", "skipped_reason": action})
+                self._send(202, {"accepted": False, "skipped": action}); return
+            if not (pr_number and head_sha):
+                record({**base, "decision": "error",
+                        "error": "missing pr_number/head_sha"})
+                self._send(400, {"error": "pull_request missing pr_number/head_sha"}); return
+            record({**base, "decision": "accepted"})
+            emit("pr", delivery, str(o.get("repo") or ""), "", "", pr_number, head_sha, base_ref)
+            self._send(202, {"accepted": True, "event": "pull_request", "pr": pr_number})
+            return
+        # Non-PR events (push, etc.) no longer trigger a benchmark.
+        record({**base, "decision": "skipped",
+                "skipped_reason": event or "non-pull_request"})
+        self._send(202, {"accepted": False, "skipped": event or "non-pull_request"})
 
 HTTPServer(("0.0.0.0", PORT), H).serve_forever()
 PY

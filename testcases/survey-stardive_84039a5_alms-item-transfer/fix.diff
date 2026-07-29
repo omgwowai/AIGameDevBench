@@ -1,0 +1,83 @@
+diff --git a/scripts/components/npc_brain.gd b/scripts/components/npc_brain.gd
+index 883d6b1..a45b59a 100644
+--- a/scripts/components/npc_brain.gd
++++ b/scripts/components/npc_brain.gd
+@@ -31,6 +31,11 @@ var _decision_history: Array[Dictionary] = []
+ var _last_think_reason: StringName = &""
+ var _pending_behavior_sequence: Array[Dictionary] = []
+ var _pending_reply_context_params: Dictionary = {}
++# Directed alms (give_alms/refuse_alms) params carry a live NPC reference to the
++# beggar, which can't survive the LLM JSON round-trip. Stash them at candidate
++# build time and merge them back when the chosen behavior starts (mirrors the
++# reply-context flow above).
++var _pending_alms_context_params: Dictionary = {}
+ var _dialogue_wait_until_msec := 0
+ var _dialogue_wait_timer_active := false
+ var _startup_wait_reason: StringName = &""
+@@ -394,6 +399,8 @@ func _is_behavior_end_reason(reason: StringName) -> bool:
+ 	return false
+ 
+ func _is_immediate_interrupt_reason(reason: StringName) -> bool:
++	if reason == &"inspector_edit":
++		return true
+ 	var text := String(reason)
+ 	return text.begins_with("event_interrupt") or text.begins_with("event:")
+ 
+@@ -634,6 +641,7 @@ func _collect_valid_candidates() -> Array[Dictionary]:
+ 	var result: Array[Dictionary] = []
+ 	var seen := {}
+ 	_pending_reply_context_params = {}
++	_pending_alms_context_params = {}
+ 	_llm_impossible_options.clear()
+ 	_append_directed_broadcast_candidates(result, seen)
+ 	# Passive NPCs normally only react to directed broadcasts. An open merchant is
+@@ -778,6 +786,9 @@ func _append_directed_broadcast_candidates(result: Array[Dictionary], seen: Dict
+ 		seen[behavior.behavior_id] = true
+ 		if behavior.behavior_id == DataCatalog.get_gameplay_string_name("behavior_roles.dialogue_reply", &"reply_to_talk"):
+ 			_pending_reply_context_params = params.duplicate()
++		elif behavior.behavior_id == &"give_alms" or behavior.behavior_id == &"refuse_alms":
++			# Keep the live beggar reference + context; it can't round-trip the LLM.
++			_pending_alms_context_params = params.duplicate()
+ 		AiDebug.log(owner_npc, "Broadcast", "directed candidate %s from %s" % [String(behavior.behavior_id), String(broadcaster.name)], 0.5)
+ 
+ # Build behavior params from the broadcasting buff's context, per behavior.
+@@ -939,6 +950,8 @@ func _pop_sequence_entry() -> Dictionary:
+ 
+ 		if DataCatalog.is_dialogue_reply_behavior_id(behavior_id):
+ 			entry[&"params"] = _merge_reply_context_params(entry.get(&"params", {}))
++		elif behavior_id == &"give_alms" or behavior_id == &"refuse_alms":
++			entry[&"params"] = _merge_alms_context_params(entry.get(&"params", {}))
+ 
+ 		entry[&"behavior"] = behavior
+ 		return entry
+@@ -954,6 +967,17 @@ func _merge_reply_context_params(value) -> Dictionary:
+ 	_pending_reply_context_params = {}
+ 	return merged
+ 
++# Restore the beggar reference (+ context) the LLM couldn't carry, then let the
++# model's own params (e.g. item_id, speech) override on top.
++func _merge_alms_context_params(value) -> Dictionary:
++	var merged := _pending_alms_context_params.duplicate()
++	if value is Dictionary:
++		var params: Dictionary = value
++		for key in params.keys():
++			merged[key] = params[key]
++	_pending_alms_context_params = {}
++	return merged
++
+ func _get_dialogue_wait_remaining() -> float:
+ 	if _dialogue_wait_until_msec <= 0:
+ 		return 0.0
+diff --git a/scripts/ui/npc_inspector.gd b/scripts/ui/npc_inspector.gd
+index 63e2e28..763652f 100644
+--- a/scripts/ui/npc_inspector.gd
++++ b/scripts/ui/npc_inspector.gd
+@@ -191,6 +191,8 @@ func _apply_goal_edit() -> void:
+ 		return
+ 	selected_npc.profile.long_term_goal = _goal_edit.text.strip_edges()
+ 	AiDebug.log(selected_npc, "Goal", "long_term_goal set: %s" % selected_npc.profile.long_term_goal.left(60), 0.0)
++	if selected_npc.brain != null:
++		selected_npc.brain.request_rethink(&"inspector_edit")
+ 	_goal_apply_button.text = "已保存"
+ 	get_tree().create_timer(1.2).timeout.connect(func():
+ 		if is_instance_valid(_goal_apply_button):

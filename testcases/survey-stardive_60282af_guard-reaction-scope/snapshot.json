@@ -1,0 +1,6 @@
+{
+  "snapshot": "stardive_kugutsushi__1eefa98",
+  "repo_url": "https://github.com/omgwowai/stardive_kugutsushi",
+  "base_ref": "1eefa9809c81a7fe9ecf54bfa8f5bf5fbb752f20",
+  "note": "base_ref is the pre-image (parent) of fix commit 60282af — buggy state where the guard-only combat/theft reactions are authored inline in events.json and leak into the GLOBAL event-reaction pool, so DataCatalog.get_reactions_for_event broadcasts them to every NPC (one punch triggers a bar-wide brawl). good.diff is the golden fix (adds EventReactionDef.is_global, marks guard reactions global:false, filters the global pool). Private repo: initial clone needs auth; runs offline afterwards."
+}

@@ -1,0 +1,4143 @@
+diff --git a/configs/ai_catalog/behaviors.json b/configs/ai_catalog/behaviors.json
+index d98409d..141f8f9 100644
+--- a/configs/ai_catalog/behaviors.json
++++ b/configs/ai_catalog/behaviors.json
+@@ -1,1951 +1,1952 @@
+ [
+   {
+-	"behavior_id": "wander",
+-	"display_name": "闲逛",
+-	"feel": "随便走走，观察周围",
+-	"tags": [
++    "behavior_id": "wander",
++    "display_name": "闲逛",
++    "feel": "随便走走，观察周围",
++    "tags": [
+       "wander"
+-	],
+-	"target_query": {
+-	  "target_type": "SELF"
+-	},
+-	"base_score": 0.25,
+-	"base_success_chance": 1.0,
+-	"interaction_duration": 3.75,
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 0.5
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "SELF"
++    },
++    "base_score": 0.25,
++    "base_success_chance": 1.0,
++    "interaction_duration": 3.75,
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 0.5
++      }
++    ]
+   },
+   {
+-	"behavior_id": "rest",
+-	"display_name": "休息",
+-	"feel": "去休息区歇一会儿",
+-	"tags": [
++    "behavior_id": "rest",
++    "display_name": "休息",
++    "feel": "去休息区歇一会儿",
++    "tags": [
+       "rest"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "rest"
+-	},
+-	"base_score": 1.0,
+-	"base_success_chance": 0.8,
+-	"move_to_target_enabled": true,
+-	"move_speed": 80.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 13.5,
+-	"stat_weights": {
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "SELF_NEED_RANGE",
+-		"key": "fatigue",
+-		"value": 30.0,
+-		"value2": 101.0
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "rest"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": -25.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -2.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": -5.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "rest"
++    },
++    "base_score": 1.0,
++    "base_success_chance": 0.8,
++    "move_to_target_enabled": true,
++    "move_speed": 80.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 13.5,
++    "stat_weights": {
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "SELF_NEED_RANGE",
++        "key": "fatigue",
++        "value": 30.0,
++        "value2": 101.0
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "rest"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": -25.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -2.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": -5.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "talk_to_npc",
+-	"display_name": "搭话",
+-	"feel": "找 {target} 聊几句，可以缓解社交需求",
+-	"tags": [
+-	  "social",
+-	  "talk",
++    "behavior_id": "talk_to_npc",
++    "display_name": "搭话",
++    "feel": "找 {target} 聊几句，可以缓解社交需求",
++    "tags": [
++      "social",
++      "talk",
+       "fun"
+-	],
+-	"param_config": {
+-	  "optional": [
+-		"speech",
++    ],
++    "param_config": {
++      "optional": [
++        "speech",
+         "talk_text"
+-	  ],
+-	  "schema": {
+-		"speech": {
+-		  "type": "string",
+-		  "description": "一句要说出口的自然语言，会显示在NPC头顶气泡中。",
+-		  "aliases": [
++      ],
++      "schema": {
++        "speech": {
++          "type": "string",
++          "description": "一句要说出口的自然语言，会显示在NPC头顶气泡中。",
++          "aliases": [
+             "talk_text"
+-		  ]
+-		},
+-		"talk_text": {
+-		  "type": "string",
+-		  "description": "speech的兼容别名；如果同时提供，以speech为准。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "NEAREST_NPC",
+-	  "max_distance": 260.0,
+-	  "prefer_high_relation": true,
+-	  "excluded_area_tag": "door",
+-	  "excluded_buff_id": "stunned"
+-	},
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 36.0,
+-	"interaction_duration": 9.0,
+-	"lock_target": true,
+-	"base_success_chance": 0.45,
+-	"stat_weights": {
+-	  "charm": 0.004,
+-	  "empathy": 0.003,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_BUSY"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_IN_AREA_TAG",
+-		"key": "door"
+-	  },
+-	  {
+-		"type": "SELF_NEED_RANGE",
+-		"key": "social",
+-		"value": 0.0,
+-		"value2": 95.0
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 15.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 5.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "TARGET",
+-		"key": "social",
+-		"amount": 10.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "TARGET",
+-		"key": "fun",
+-		"amount": 3.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": 3.0,
+-		"relation_direction": "SELF_TO_TARGET"
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": 1.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  },
+-	  {
+-		"type": "GRANT_TARGET_ITEM_CHANCE",
+-		"receiver": "SELF",
+-		"count": 1
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 3.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -3.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "TARGET",
+-		"key": "fun",
+-		"amount": -1.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": -1.0,
+-		"relation_direction": "SELF_TO_TARGET"
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": -2.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  }
+-	],
+-	"interrupt_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -1.0
+-	  }
+-	]
++          ]
++        },
++        "talk_text": {
++          "type": "string",
++          "description": "speech的兼容别名；如果同时提供，以speech为准。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "NEAREST_NPC",
++      "max_distance": 260.0,
++      "prefer_high_relation": true,
++      "excluded_area_tag": "door",
++      "excluded_buff_id": "stunned"
++    },
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 36.0,
++    "interaction_duration": 9.0,
++    "lock_target": true,
++    "base_success_chance": 0.45,
++    "stat_weights": {
++      "charm": 0.004,
++      "empathy": 0.003,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_NOT_BUSY"
++      },
++      {
++        "type": "TARGET_NOT_IN_AREA_TAG",
++        "key": "door"
++      },
++      {
++        "type": "SELF_NEED_RANGE",
++        "key": "social",
++        "value": 0.0,
++        "value2": 95.0
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 15.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 5.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "TARGET",
++        "key": "social",
++        "amount": 10.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "TARGET",
++        "key": "fun",
++        "amount": 3.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": 3.0,
++        "relation_direction": "SELF_TO_TARGET"
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": 1.0,
++        "relation_direction": "TARGET_TO_SELF"
++      },
++      {
++        "type": "GRANT_TARGET_ITEM_CHANCE",
++        "receiver": "SELF",
++        "count": 1
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 3.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -3.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "TARGET",
++        "key": "fun",
++        "amount": -1.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": -1.0,
++        "relation_direction": "SELF_TO_TARGET"
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": -2.0,
++        "relation_direction": "TARGET_TO_SELF"
++      }
++    ],
++    "interrupt_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "eat_food",
+-	"display_name": "吃苹果",
+-	"feel": "去餐饮区吃点东西",
+-	"tags": [
++    "behavior_id": "eat_food",
++    "display_name": "吃苹果",
++    "feel": "去餐饮区吃点东西",
++    "tags": [
+       "eat"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "dining"
+-	},
+-	"is_global": true,
+-	"base_score": 1.0,
+-	"base_success_chance": 0.75,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 7.5,
+-	"stat_weights": {
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_SLOT_AVAILABLE",
+-		"key": "eat_food"
+-	  },
+-	  {
+-		"type": "SELF_HAS_ITEM",
+-		"key": "apple",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "SELF_NEED_RANGE",
+-		"key": "hunger",
+-		"value": 0.0,
+-		"value2": 95.0
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "dining"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "USE_CONFIGURED_ITEM",
+-		"receiver": "SELF",
+-		"key": "apple",
+-		"count": 1
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "INVENTORY_REMOVE",
+-		"receiver": "SELF",
+-		"key": "apple",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "hunger",
+-		"amount": 5.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -2.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "dining"
++    },
++    "is_global": true,
++    "base_score": 1.0,
++    "base_success_chance": 0.75,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 7.5,
++    "stat_weights": {
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_SLOT_AVAILABLE",
++        "key": "eat_food"
++      },
++      {
++        "type": "SELF_HAS_ITEM",
++        "key": "apple",
++        "count": 1
++      },
++      {
++        "type": "SELF_NEED_RANGE",
++        "key": "hunger",
++        "value": 0.0,
++        "value2": 95.0
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "dining"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "USE_CONFIGURED_ITEM",
++        "receiver": "SELF",
++        "key": "apple",
++        "count": 1
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "INVENTORY_REMOVE",
++        "receiver": "SELF",
++        "key": "apple",
++        "count": 1
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "hunger",
++        "amount": 5.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -2.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "buy_meal",
+-	"display_name": "买餐",
+-	"feel": "花 2 金币在厨房备餐柜台购买一份热餐",
+-	"tags": [
+-	  "food",
+-	  "trade",
+-	  "kitchen",
++    "behavior_id": "buy_meal",
++    "display_name": "买餐",
++    "feel": "花 2 金币在厨房备餐柜台购买一份热餐",
++    "tags": [
++      "food",
++      "trade",
++      "kitchen",
+       "eat"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "kitchen"
+-	},
+-	"is_global": true,
+-	"base_score": 0.85,
+-	"base_success_chance": 0.9,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 5.25,
+-	"stat_weights": {
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "SELF_HAS_ITEM",
+-		"key": "coin",
+-		"count": 2
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "kitchen"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "INVENTORY_REMOVE",
+-		"receiver": "SELF",
+-		"key": "coin",
+-		"count": 2
+-	  },
+-	  {
+-		"type": "INVENTORY_ADD",
+-		"receiver": "SELF",
+-		"key": "meal",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 1.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -1.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "kitchen"
++    },
++    "is_global": true,
++    "base_score": 0.85,
++    "base_success_chance": 0.9,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 5.25,
++    "stat_weights": {
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "SELF_HAS_ITEM",
++        "key": "coin",
++        "count": 2
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "kitchen"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "INVENTORY_REMOVE",
++        "receiver": "SELF",
++        "key": "coin",
++        "count": 2
++      },
++      {
++        "type": "INVENTORY_ADD",
++        "receiver": "SELF",
++        "key": "meal",
++        "count": 1
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 1.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "eat_meal",
+-	"display_name": "用餐",
+-	"feel": "去餐饮区吃掉背包里的一份餐食",
+-	"tags": [
+-	  "eat",
++    "behavior_id": "eat_meal",
++    "display_name": "用餐",
++    "feel": "去餐饮区吃掉背包里的一份餐食",
++    "tags": [
++      "eat",
+       "food"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "dining"
+-	},
+-	"is_global": true,
+-	"base_score": 1.05,
+-	"base_success_chance": 0.85,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 7.5,
+-	"stat_weights": {
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_SLOT_AVAILABLE",
+-		"key": "eat_meal"
+-	  },
+-	  {
+-		"type": "SELF_HAS_ITEM",
+-		"key": "meal",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "SELF_NEED_RANGE",
+-		"key": "hunger",
+-		"value": 0.0,
+-		"value2": 95.0
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "dining"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "USE_CONFIGURED_ITEM",
+-		"receiver": "SELF",
+-		"key": "meal",
+-		"count": 1
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -1.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "dining"
++    },
++    "is_global": true,
++    "base_score": 1.05,
++    "base_success_chance": 0.85,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 7.5,
++    "stat_weights": {
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_SLOT_AVAILABLE",
++        "key": "eat_meal"
++      },
++      {
++        "type": "SELF_HAS_ITEM",
++        "key": "meal",
++        "count": 1
++      },
++      {
++        "type": "SELF_NEED_RANGE",
++        "key": "hunger",
++        "value": 0.0,
++        "value2": 95.0
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "dining"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "USE_CONFIGURED_ITEM",
++        "receiver": "SELF",
++        "key": "meal",
++        "count": 1
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "reply_to_talk",
+-	"display_name": "回话",
+-	"feel": "回答刚才别人对自己的交谈",
+-	"tags": [
+-	  "reply",
+-	  "talk",
++    "behavior_id": "reply_to_talk",
++    "display_name": "回话",
++    "feel": "回答刚才别人对自己的交谈",
++    "tags": [
++      "reply",
++      "talk",
+       "social"
+-	],
+-	"param_config": {
+-	  "required_any": [
+-		"speech",
++    ],
++    "param_config": {
++      "required_any": [
++        "speech",
+         "talk_text"
+-	  ],
+-	  "optional": [
+-		"speech",
++      ],
++      "optional": [
++        "speech",
+         "talk_text"
+-	  ],
+-	  "schema": {
+-		"speech": {
+-		  "type": "string",
+-		  "description": "直接回应上一句对话的自然语言，会显示在NPC头顶气泡中。",
+-		  "aliases": [
++      ],
++      "schema": {
++        "speech": {
++          "type": "string",
++          "description": "直接回应上一句对话的自然语言，会显示在NPC头顶气泡中。",
++          "aliases": [
+             "talk_text"
+-		  ]
+-		},
+-		"talk_text": {
+-		  "type": "string",
+-		  "description": "speech的兼容别名；如果同时提供，以speech为准。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "SELF"
+-	},
+-	"is_global": false,
+-	"base_score": 2.8,
+-	"base_success_chance": 1.0,
+-	"interaction_duration": 6.0,
+-	"stat_weights": {
+-	  "empathy": 0.002,
+-	  "charm": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 6.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 2.0
+-	  }
+-	]
++          ]
++        },
++        "talk_text": {
++          "type": "string",
++          "description": "speech的兼容别名；如果同时提供，以speech为准。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "SELF"
++    },
++    "is_global": false,
++    "base_score": 2.8,
++    "base_success_chance": 1.0,
++    "interaction_duration": 6.0,
++    "stat_weights": {
++      "empathy": 0.002,
++      "charm": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 6.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 2.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "gift_item_to_npc",
+-	"display_name": "送礼",
+-	"feel": "把背包里的某个道具送给 {target}",
+-	"tags": [
+-	  "social",
+-	  "trade",
++    "behavior_id": "gift_item_to_npc",
++    "display_name": "送礼",
++    "feel": "把背包里的某个道具送给 {target}",
++    "tags": [
++      "social",
++      "trade",
+       "gift"
+-	],
+-	"param_config": {
+-	  "required": [
+-		"count",
+-		"item_id",
++    ],
++    "param_config": {
++      "required": [
++        "count",
++        "item_id",
+         "target_npc_id"
+-	  ],
+-	  "schema": {
+-		"count": {
+-		  "type": "integer",
+-		  "description": "赠与数量，必须大于等于1，且不能超过当前背包中该道具的数量。"
+-		},
+-		"item_id": {
+-		  "type": "string",
+-		  "description": "要赠与的道具ID，必须来自choices.item_id列表。"
+-		},
+-		"target_npc_id": {
+-		  "type": "string",
+-		  "description": "接收赠与的NPC ID，必须来自choices.target_npc_id列表。",
+-		  "aliases": [
+-			"receiver_npc_id",
+-			"target_id",
+-			"npc_id",
++      ],
++      "schema": {
++        "count": {
++          "type": "integer",
++          "description": "赠与数量，必须大于等于1，且不能超过当前背包中该道具的数量。"
++        },
++        "item_id": {
++          "type": "string",
++          "description": "要赠与的道具ID，必须来自choices.item_id列表。"
++        },
++        "target_npc_id": {
++          "type": "string",
++          "description": "接收赠与的NPC ID，必须来自choices.target_npc_id列表。",
++          "aliases": [
++            "receiver_npc_id",
++            "target_id",
++            "npc_id",
+             "receiver"
+-		  ]
+-		}
+-	  },
+-	  "choices": {
+-		"item_id": {
+-		  "source": "inventory_items",
+-		  "description": "当前NPC背包中可赠与的道具，包含item_id、display_name、description、feel、count。"
+-		},
+-		"count": {
+-		  "source": "inventory_count_for_item_id",
+-		  "rule": "1..所选item_id在当前背包中的count"
+-		},
+-		"target_npc_id": {
+-		  "source": "target_npcs",
+-		  "description": "可接收赠与的NPC，包含npc_id、display_name、node_name、grid、distance、favorability。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "NEAREST_NPC",
+-	  "max_distance": 260.0,
+-	  "prefer_high_relation": true,
+-	  "excluded_area_tag": "door",
+-	  "excluded_buff_id": "stunned"
+-	},
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 36.0,
+-	"interaction_duration": 6.0,
+-	"lock_target": true,
+-	"base_success_chance": 1.0,
+-	"stat_weights": {
+-	  "charm": 0.002,
+-	  "empathy": 0.002,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_BUSY"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_IN_AREA_TAG",
+-		"key": "door"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 4.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "TARGET",
+-		"key": "social",
+-		"amount": 3.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": 2.0,
+-		"relation_direction": "SELF_TO_TARGET"
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": 1.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -1.0
+-	  }
+-	]
++          ]
++        }
++      },
++      "choices": {
++        "item_id": {
++          "source": "inventory_items",
++          "description": "当前NPC背包中可赠与的道具，包含item_id、display_name、description、feel、count。"
++        },
++        "count": {
++          "source": "inventory_count_for_item_id",
++          "rule": "1..所选item_id在当前背包中的count"
++        },
++        "target_npc_id": {
++          "source": "target_npcs",
++          "description": "可接收赠与的NPC，包含npc_id、display_name、node_name、grid、distance、favorability。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "NEAREST_NPC",
++      "max_distance": 260.0,
++      "prefer_high_relation": true,
++      "excluded_area_tag": "door",
++      "excluded_buff_id": "stunned"
++    },
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 36.0,
++    "interaction_duration": 6.0,
++    "lock_target": true,
++    "base_success_chance": 1.0,
++    "stat_weights": {
++      "charm": 0.002,
++      "empathy": 0.002,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_NOT_BUSY"
++      },
++      {
++        "type": "TARGET_NOT_IN_AREA_TAG",
++        "key": "door"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 4.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "TARGET",
++        "key": "social",
++        "amount": 3.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": 2.0,
++        "relation_direction": "SELF_TO_TARGET"
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": 1.0,
++        "relation_direction": "TARGET_TO_SELF"
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "beg_from_npc",
+-	"display_name": "乞讨",
+-	"feel": "凑到 {target} 跟前哭穷讨要，开口要点金币或吃的；对方心软可能真给，也可能被嫌弃",
+-	"tags": [
+-	  "social",
++    "behavior_id": "beg_from_npc",
++    "display_name": "乞讨",
++    "feel": "凑到 {target} 跟前哭穷讨要，开口要点金币或吃的；对方心软可能真给，也可能被嫌弃",
++    "tags": [
++      "social",
+       "beg"
+-	],
+-	"param_config": {
+-	  "required_any": [
++    ],
++    "param_config": {
++      "required_any": [
+         "speech"
+-	  ],
+-	  "optional": [
++      ],
++      "optional": [
+         "speech"
+-	  ],
+-	  "schema": {
+-		"speech": {
+-		  "type": "string",
+-		  "description": "乞讨时说的话（哭穷/卖惨/套近乎），会显示在头顶气泡中。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "NEAREST_NPC",
+-	  "max_distance": 280.0,
+-	  "prefer_high_relation": true,
+-	  "excluded_area_tag": "door",
+-	  "excluded_buff_id": "stunned"
+-	},
+-	"is_global": true,
+-	"base_score": 0.6,
+-	"base_success_chance": 0.45,
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 36.0,
+-	"interaction_duration": 6.0,
+-	"lock_target": true,
+-	"stat_weights": {
+-	  "charm": 0.004,
+-	  "empathy": 0.003
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_BUSY"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_IN_AREA_TAG",
+-		"key": "door"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 5.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": -1.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -2.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": -3.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  }
+-	]
++      ],
++      "schema": {
++        "speech": {
++          "type": "string",
++          "description": "乞讨时说的话（哭穷/卖惨/套近乎），会显示在头顶气泡中。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "NEAREST_NPC",
++      "max_distance": 280.0,
++      "prefer_high_relation": true,
++      "excluded_area_tag": "door",
++      "excluded_buff_id": "stunned"
++    },
++    "is_global": true,
++    "base_score": 0.6,
++    "base_success_chance": 0.45,
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 36.0,
++    "interaction_duration": 6.0,
++    "lock_target": true,
++    "stat_weights": {
++      "charm": 0.004,
++      "empathy": 0.003
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_NOT_BUSY"
++      },
++      {
++        "type": "TARGET_NOT_IN_AREA_TAG",
++        "key": "door"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 5.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": -1.0,
++        "relation_direction": "TARGET_TO_SELF"
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -2.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": -3.0,
++        "relation_direction": "TARGET_TO_SELF"
++      }
++    ]
+   },
+   {
+-	"behavior_id": "steal_from_npc",
+-	"display_name": "顺手牵羊",
+-	"feel": "趁 {target} 不注意摸走点钱或吃的；得手白赚，被抓住会很难看",
+-	"tags": [
++    "behavior_id": "steal_from_npc",
++    "display_name": "顺手牵羊",
++    "feel": "趁 {target} 不注意摸走点钱或吃的；得手白赚，被抓住会很难看",
++    "tags": [
+       "steal"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_NPC",
+-	  "max_distance": 200.0,
+-	  "excluded_area_tag": "door",
+-	  "excluded_buff_id": "stunned"
+-	},
+-	"is_global": true,
+-	"base_score": 0.5,
+-	"base_success_chance": 0.45,
+-	"move_to_target_enabled": true,
+-	"move_speed": 95.0,
+-	"stop_distance": 32.0,
+-	"interaction_duration": 5.0,
+-	"stat_weights": {
+-	  "athletic": 0.004,
+-	  "logic": 0.002
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_IN_AREA_TAG",
+-		"key": "door"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 8.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -4.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": -8.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": -3.0,
+-		"relation_direction": "SELF_TO_TARGET"
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_NPC",
++      "max_distance": 200.0,
++      "excluded_area_tag": "door",
++      "excluded_buff_id": "stunned"
++    },
++    "is_global": true,
++    "base_score": 0.5,
++    "base_success_chance": 0.45,
++    "move_to_target_enabled": true,
++    "move_speed": 95.0,
++    "stop_distance": 32.0,
++    "interaction_duration": 5.0,
++    "stat_weights": {
++      "athletic": 0.004,
++      "logic": 0.002
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_NOT_IN_AREA_TAG",
++        "key": "door"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 8.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -4.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": -8.0,
++        "relation_direction": "TARGET_TO_SELF"
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": -3.0,
++        "relation_direction": "SELF_TO_TARGET"
++      }
++    ]
+   },
+   {
+-	"behavior_id": "enter_scene",
+-	"display_name": "进场招呼",
+-	"feel": "在原地欢迎刚进入场景的人",
+-	"tags": [
+-	  "talk",
+-	  "scene",
++    "behavior_id": "enter_scene",
++    "display_name": "进场招呼",
++    "feel": "在原地欢迎刚进入场景的人",
++    "tags": [
++      "talk",
++      "scene",
+       "greet"
+-	],
+-	"param_config": {
+-	  "required_any": [
+-		"speech",
++    ],
++    "param_config": {
++      "required_any": [
++        "speech",
+         "talk_text"
+-	  ],
+-	  "optional": [
+-		"speech",
++      ],
++      "optional": [
++        "speech",
+         "talk_text"
+-	  ],
+-	  "schema": {
+-		"speech": {
+-		  "type": "string",
+-		  "description": "欢迎或入场回应的自然语言，会显示在NPC头顶气泡中。",
+-		  "aliases": [
++      ],
++      "schema": {
++        "speech": {
++          "type": "string",
++          "description": "欢迎或入场回应的自然语言，会显示在NPC头顶气泡中。",
++          "aliases": [
+             "talk_text"
+-		  ]
+-		},
+-		"talk_text": {
+-		  "type": "string",
+-		  "description": "speech的兼容别名；如果同时提供，以speech为准。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "SELF"
+-	},
+-	"is_global": false,
+-	"base_score": 1.2,
+-	"base_success_chance": 1.0,
+-	"interaction_duration": 4.5,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 2.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 1.0
+-	  }
+-	]
++          ]
++        },
++        "talk_text": {
++          "type": "string",
++          "description": "speech的兼容别名；如果同时提供，以speech为准。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "SELF"
++    },
++    "is_global": false,
++    "base_score": 1.2,
++    "base_success_chance": 1.0,
++    "interaction_duration": 4.5,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 2.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "play",
+-	"display_name": "玩乐",
+-	"feel": "去娱乐区放松一下",
+-	"tags": [
++    "behavior_id": "play",
++    "display_name": "玩乐",
++    "feel": "去娱乐区放松一下",
++    "tags": [
+       "fun"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "recreation"
+-	},
+-	"is_global": true,
+-	"base_score": 1.0,
+-	"base_success_chance": 0.65,
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 10.5,
+-	"stat_weights": {
+-	  "logic": 0.002,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "recreation"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 25.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 5.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 5.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 5.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "recreation"
++    },
++    "is_global": true,
++    "base_score": 1.0,
++    "base_success_chance": 0.65,
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 10.5,
++    "stat_weights": {
++      "logic": 0.002,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "recreation"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 25.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 5.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 5.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 5.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "buy_wine",
+-	"display_name": "买酒",
+-	"feel": "花 1 金币在吧台买一杯酒",
+-	"tags": [
+-	  "drink",
+-	  "trade",
+-	  "bar",
++    "behavior_id": "buy_wine",
++    "display_name": "买酒",
++    "feel": "花 1 金币在吧台买一杯酒",
++    "tags": [
++      "drink",
++      "trade",
++      "bar",
+       "social"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "bar"
+-	},
+-	"is_global": true,
+-	"base_score": 0.7,
+-	"base_success_chance": 0.9,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 4.5,
+-	"stat_weights": {
+-	  "charm": 0.001,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "SELF_HAS_ITEM",
+-		"key": "coin",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "bar"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "INVENTORY_REMOVE",
+-		"receiver": "SELF",
+-		"key": "coin",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "INVENTORY_ADD",
+-		"receiver": "SELF",
+-		"key": "wine",
+-		"count": 1
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -1.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "bar"
++    },
++    "is_global": true,
++    "base_score": 0.7,
++    "base_success_chance": 0.9,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 4.5,
++    "stat_weights": {
++      "charm": 0.001,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "SELF_HAS_ITEM",
++        "key": "coin",
++        "count": 1
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "bar"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "INVENTORY_REMOVE",
++        "receiver": "SELF",
++        "key": "coin",
++        "count": 1
++      },
++      {
++        "type": "INVENTORY_ADD",
++        "receiver": "SELF",
++        "key": "wine",
++        "count": 1
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "drink_wine",
+-	"display_name": "喝酒",
+-	"feel": "在吧台喝掉背包里的一杯酒，增加乐趣和社交感",
+-	"tags": [
+-	  "drink",
+-	  "fun",
++    "behavior_id": "drink_wine",
++    "display_name": "喝酒",
++    "feel": "在吧台喝掉背包里的一杯酒，增加乐趣和社交感",
++    "tags": [
++      "drink",
++      "fun",
+       "social"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "bar"
+-	},
+-	"is_global": true,
+-	"base_score": 0.9,
+-	"base_success_chance": 0.82,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 7.5,
+-	"stat_weights": {
+-	  "charm": 0.001,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "SELF_HAS_ITEM",
+-		"key": "wine",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "bar"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "USE_CONFIGURED_ITEM",
+-		"receiver": "SELF",
+-		"key": "wine",
+-		"count": 1
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "INVENTORY_REMOVE",
+-		"receiver": "SELF",
+-		"key": "wine",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 2.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 5.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "bar"
++    },
++    "is_global": true,
++    "base_score": 0.9,
++    "base_success_chance": 0.82,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 7.5,
++    "stat_weights": {
++      "charm": 0.001,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "SELF_HAS_ITEM",
++        "key": "wine",
++        "count": 1
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "bar"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "USE_CONFIGURED_ITEM",
++        "receiver": "SELF",
++        "key": "wine",
++        "count": 1
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "INVENTORY_REMOVE",
++        "receiver": "SELF",
++        "key": "wine",
++        "count": 1
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 2.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 5.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "play_darts",
+-	"display_name": "玩飞镖",
+-	"feel": "去飞镖区玩飞镖，同一时间只能有一个人玩",
+-	"tags": [
+-	  "fun",
++    "behavior_id": "play_darts",
++    "display_name": "玩飞镖",
++    "feel": "去飞镖区玩飞镖，同一时间只能有一个人玩",
++    "tags": [
++      "fun",
+       "darts"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "darts"
+-	},
+-	"is_global": true,
+-	"base_score": 1.15,
+-	"base_success_chance": 0.7,
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 10.5,
+-	"stat_weights": {
+-	  "logic": 0.001,
+-	  "athletic": 0.003,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "BEHAVIOR_NOT_RUNNING",
+-		"key": "play_darts"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "darts"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 22.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 4.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 6.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 5.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "darts"
++    },
++    "is_global": true,
++    "base_score": 1.15,
++    "base_success_chance": 0.7,
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 10.5,
++    "stat_weights": {
++      "logic": 0.001,
++      "athletic": 0.003,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "BEHAVIOR_NOT_RUNNING",
++        "key": "play_darts"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "darts"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 22.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 4.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 6.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 5.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "perform_on_stage",
+-	"display_name": "登台表演",
+-	"feel": "登上舞台表演一段，表演中每隔一阵有一次魅力发挥，发挥出色能让周围观众更开心；也可以填 tip_speech 边表演边开口向观众讨赏",
+-	"tags": [
+-	  "fun",
+-	  "social",
++    "behavior_id": "perform_on_stage",
++    "display_name": "登台表演",
++    "feel": "登上舞台表演一段，表演中每隔一阵有一次魅力发挥，发挥出色能让周围观众更开心；也可以填 tip_speech 边表演边开口向观众讨赏",
++    "tags": [
++      "fun",
++      "social",
+       "stage"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "stage"
+-	},
+-	"is_global": true,
+-	"base_score": 1.1,
+-	"base_success_chance": 0.62,
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 36.0,
+-	"stat_weights": {
+-	  "charm": 0.004,
+-	  "empathy": 0.001,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "stage"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 28.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 8.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 6.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 4.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 4.0
+-	  }
+-	],
+-	"can_be_interrupted": true,
+-	"interrupt_priority": 150,
+-	"param_config": {
+-	  "optional": [
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "stage"
++    },
++    "is_global": true,
++    "base_score": 1.1,
++    "base_success_chance": 0.62,
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 36.0,
++    "stat_weights": {
++      "charm": 0.004,
++      "empathy": 0.001,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "stage"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 28.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 8.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 6.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 4.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 4.0
++      }
++    ],
++    "can_be_interrupted": true,
++    "interrupt_priority": 150,
++    "param_config": {
++      "optional": [
+         "tip_speech"
+-	  ],
+-	  "schema": {
+-		"tip_speech": {
+-		  "type": "string",
+-		  "description": "可选。表演中向观众索要小费时说的话（会显示在头顶气泡中），观众可能给金币。不想讨赏就不填。"
+-		}
+-	  }
+-	}
++      ],
++      "schema": {
++        "tip_speech": {
++          "type": "string",
++          "description": "可选。表演中向观众索要小费时说的话（会显示在头顶气泡中），观众可能给金币。不想讨赏就不填。"
++        }
++      }
++    }
+   },
+   {
+-	"behavior_id": "watch_performance",
+-	"display_name": "围观表演",
+-	"feel": "舞台上有人正在表演，凑过去围观；看到精彩处既解闷又热闹，还能和周围人讨论几句",
+-	"tags": [
+-	  "fun",
+-	  "social",
++    "behavior_id": "watch_performance",
++    "display_name": "围观表演",
++    "feel": "舞台上有人正在表演，凑过去围观；看到精彩处既解闷又热闹，还能和周围人讨论几句",
++    "tags": [
++      "fun",
++      "social",
+       "audience"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "stage"
+-	},
+-	"is_global": true,
+-	"base_score": 1.6,
+-	"base_success_chance": 0.95,
+-	"move_to_target_enabled": true,
+-	"move_speed": 95.0,
+-	"stop_distance": 88.0,
+-	"interaction_duration": 18.0,
+-	"param_config": {
+-	  "optional": [
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "stage"
++    },
++    "is_global": true,
++    "base_score": 1.6,
++    "base_success_chance": 0.95,
++    "move_to_target_enabled": true,
++    "move_speed": 95.0,
++    "stop_distance": 88.0,
++    "interaction_duration": 18.0,
++    "param_config": {
++      "optional": [
+         "speech"
+-	  ],
+-	  "schema": {
+-		"speech": {
+-		  "type": "string",
+-		  "description": "可选。围观时说的一句感想或讨论，会显示在头顶气泡中。"
+-		}
+-	  }
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "BEHAVIOR_RUNNING",
+-		"key": "perform_on_stage"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 6.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 4.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 2.0
+-	  }
+-	]
++      ],
++      "schema": {
++        "speech": {
++          "type": "string",
++          "description": "可选。围观时说的一句感想或讨论，会显示在头顶气泡中。"
++        }
++      }
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "BEHAVIOR_RUNNING",
++        "key": "perform_on_stage"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 6.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 4.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 2.0
++      }
++    ],
++    "interrupt_priority": 100
+   },
+   {
+-	"behavior_id": "warm_by_hearth",
+-	"display_name": "烤火",
+-	"feel": "去壁炉旁取暖休息，降低疲劳",
+-	"tags": [
+-	  "rest",
++    "behavior_id": "warm_by_hearth",
++    "display_name": "烤火",
++    "feel": "去壁炉旁取暖休息，降低疲劳",
++    "tags": [
++      "rest",
+       "hearth"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "hearth"
+-	},
+-	"is_global": true,
+-	"base_score": 0.75,
+-	"base_success_chance": 0.9,
+-	"move_to_target_enabled": true,
+-	"move_speed": 80.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 9.0,
+-	"stat_weights": {
+-	  "patience": 0.002
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "hearth"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": -12.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 3.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": -3.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "hearth"
++    },
++    "is_global": true,
++    "base_score": 0.75,
++    "base_success_chance": 0.9,
++    "move_to_target_enabled": true,
++    "move_speed": 80.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 9.0,
++    "stat_weights": {
++      "patience": 0.002
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "hearth"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": -12.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 3.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": -3.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "read_notice",
+-	"display_name": "看告示",
+-	"feel": "去告示板查看探险委托和传闻",
+-	"tags": [
+-	  "quest",
++    "behavior_id": "read_notice",
++    "display_name": "看告示",
++    "feel": "去告示板查看探险委托和传闻",
++    "tags": [
++      "quest",
+       "adventure"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "notice"
+-	},
+-	"is_global": false,
+-	"base_score": 0.65,
+-	"base_success_chance": 0.88,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 6.0,
+-	"stat_weights": {
+-	  "logic": 0.002,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "notice"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 6.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 2.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 1.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "notice"
++    },
++    "is_global": false,
++    "base_score": 0.65,
++    "base_success_chance": 0.88,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 6.0,
++    "stat_weights": {
++      "logic": 0.002,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "notice"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 6.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 2.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "sell_loot",
+-	"display_name": "卖战利品",
+-	"feel": "把背包里全部战利品按收购柜台的固定价一次性卖掉换金币（省事但不议价）",
+-	"tags": [
+-	  "trade",
++    "behavior_id": "sell_loot",
++    "display_name": "卖战利品",
++    "feel": "把背包里全部战利品按收购柜台的固定价一次性卖掉换金币（省事但不议价）",
++    "tags": [
++      "trade",
+       "merchant"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "merchant"
+-	},
+-	"is_global": true,
+-	"base_score": 0.8,
+-	"base_success_chance": 0.9,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 6.0,
+-	"stat_weights": {
+-	  "logic": 0.002,
+-	  "charm": 0.002,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "SELF_HAS_TAGGED_ITEM",
+-		"key": "loot",
+-		"count": 1
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "merchant"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "SELL_TAGGED_ITEMS",
+-		"receiver": "SELF",
+-		"key": "loot"
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 3.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -1.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "merchant"
++    },
++    "is_global": true,
++    "base_score": 0.8,
++    "base_success_chance": 0.9,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 6.0,
++    "stat_weights": {
++      "logic": 0.002,
++      "charm": 0.002,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "SELF_HAS_TAGGED_ITEM",
++        "key": "loot",
++        "count": 1
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "merchant"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "SELL_TAGGED_ITEMS",
++        "receiver": "SELF",
++        "key": "loot"
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 3.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "propose_trade",
+-	"display_name": "发起交易",
+-	"feel": "向 {target} 提出一笔交易：开价把自己背包里的某样东西卖给对方，可以顺便喊话兜售；对方可能接受也可能拒绝。定价可参考物品稀有度的市价锚点",
+-	"tags": [
+-	  "trade",
++    "behavior_id": "propose_trade",
++    "display_name": "发起交易",
++    "feel": "向 {target} 提出一笔交易：开价把自己背包里的某样东西卖给对方，可以顺便喊话兜售；对方可能接受也可能拒绝。定价可参考物品稀有度的市价锚点",
++    "tags": [
++      "trade",
+       "social"
+-	],
+-	"param_config": {
+-	  "required": [
+-		"item_id",
+-		"count",
++    ],
++    "param_config": {
++      "required": [
++        "item_id",
++        "count",
+         "price"
+-	  ],
+-	  "optional": [
++      ],
++      "optional": [
+         "speech"
+-	  ],
+-	  "schema": {
+-		"item_id": {
+-		  "type": "string",
+-		  "description": "要卖出的道具ID，必须来自choices.item_id列表。"
+-		},
+-		"count": {
+-		  "type": "integer",
+-		  "description": "卖出数量，1..背包中该道具数量。"
+-		},
+-		"price": {
+-		  "type": "integer",
+-		  "description": "索要的金币总价。可参考choices.price_anchor里的市价锚点自行加价或降价。"
+-		},
+-		"speech": {
+-		  "type": "string",
+-		  "description": "可选。兜售时喊的话，会显示在头顶气泡中。"
+-		}
+-	  },
+-	  "choices": {
+-		"item_id": {
+-		  "source": "inventory_items",
+-		  "description": "当前背包中可卖出的道具。"
+-		},
+-		"price_anchor": {
+-		  "source": "trade_price_anchors",
+-		  "description": "每个可卖道具按稀有度的单件市价锚点，供出价参考。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "NEAREST_NPC",
+-	  "max_distance": 300.0,
+-	  "prefer_high_relation": true,
+-	  "excluded_area_tag": "door",
+-	  "excluded_buff_id": "stunned"
+-	},
+-	"is_global": true,
+-	"base_score": 0.8,
+-	"base_success_chance": 1.0,
+-	"max_success_chance": 1.0,
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 40.0,
+-	"interaction_duration": 5.0,
+-	"lock_target": false,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_BUSY"
+-	  },
+-	  {
+-		"type": "SELF_HAS_TAGGED_ITEM",
+-		"key": "loot",
+-		"count": 1
+-	  }
+-	],
+-	"success_effects": [],
+-	"failure_effects": []
++      ],
++      "schema": {
++        "item_id": {
++          "type": "string",
++          "description": "要卖出的道具ID，必须来自choices.item_id列表。"
++        },
++        "count": {
++          "type": "integer",
++          "description": "卖出数量，1..背包中该道具数量。"
++        },
++        "price": {
++          "type": "integer",
++          "description": "索要的金币总价。可参考choices.price_anchor里的市价锚点自行加价或降价。"
++        },
++        "speech": {
++          "type": "string",
++          "description": "可选。兜售时喊的话，会显示在头顶气泡中。"
++        }
++      },
++      "choices": {
++        "item_id": {
++          "source": "inventory_items",
++          "description": "当前背包中可卖出的道具。"
++        },
++        "price_anchor": {
++          "source": "trade_price_anchors",
++          "description": "每个可卖道具按稀有度的单件市价锚点，供出价参考。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "NEAREST_NPC",
++      "max_distance": 300.0,
++      "prefer_high_relation": true,
++      "excluded_area_tag": "door",
++      "excluded_buff_id": "stunned"
++    },
++    "is_global": true,
++    "base_score": 0.8,
++    "base_success_chance": 1.0,
++    "max_success_chance": 1.0,
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 40.0,
++    "interaction_duration": 5.0,
++    "lock_target": false,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_NOT_BUSY"
++      },
++      {
++        "type": "SELF_HAS_TAGGED_ITEM",
++        "key": "loot",
++        "count": 1
++      }
++    ],
++    "success_effects": [],
++    "failure_effects": []
+   },
+   {
+-	"behavior_id": "accept_trade",
+-	"display_name": "接受交易",
+-	"feel": "接受 {target} 的交易提议，按对方开的价付钱拿货",
+-	"tags": [
+-	  "trade",
++    "behavior_id": "accept_trade",
++    "display_name": "接受交易",
++    "feel": "接受 {target} 的交易提议，按对方开的价付钱拿货",
++    "tags": [
++      "trade",
+       "reply"
+-	],
+-	"target_query": {
+-	  "target_type": "SELF"
+-	},
+-	"is_global": false,
+-	"base_score": 2.5,
+-	"base_success_chance": 1.0,
+-	"max_success_chance": 1.0,
+-	"interaction_duration": 3.0,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 3.0
+-	  }
+-	],
+-	"failure_effects": []
++    ],
++    "target_query": {
++      "target_type": "SELF"
++    },
++    "is_global": false,
++    "base_score": 2.5,
++    "base_success_chance": 1.0,
++    "max_success_chance": 1.0,
++    "interaction_duration": 3.0,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 3.0
++      }
++    ],
++    "failure_effects": []
+   },
+   {
+-	"behavior_id": "reject_trade",
+-	"display_name": "拒绝交易",
+-	"feel": "拒绝 {target} 的交易提议，可以顺口说一句拒绝的理由",
+-	"tags": [
+-	  "trade",
++    "behavior_id": "reject_trade",
++    "display_name": "拒绝交易",
++    "feel": "拒绝 {target} 的交易提议，可以顺口说一句拒绝的理由",
++    "tags": [
++      "trade",
+       "reply"
+-	],
+-	"param_config": {
+-	  "optional": [
++    ],
++    "param_config": {
++      "optional": [
+         "speech"
+-	  ],
+-	  "schema": {
+-		"speech": {
+-		  "type": "string",
+-		  "description": "可选。拒绝时说的话（嫌贵/不需要等），会显示在头顶气泡中。"
+-		}
+-	  }
+-	},
+-	"target_query": {
+-	  "target_type": "SELF"
+-	},
+-	"is_global": false,
+-	"base_score": 2.5,
+-	"base_success_chance": 1.0,
+-	"max_success_chance": 1.0,
+-	"interaction_duration": 2.0,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [],
+-	"failure_effects": []
++      ],
++      "schema": {
++        "speech": {
++          "type": "string",
++          "description": "可选。拒绝时说的话（嫌贵/不需要等），会显示在头顶气泡中。"
++        }
++      }
++    },
++    "target_query": {
++      "target_type": "SELF"
++    },
++    "is_global": false,
++    "base_score": 2.5,
++    "base_success_chance": 1.0,
++    "max_success_chance": 1.0,
++    "interaction_duration": 2.0,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [],
++    "failure_effects": []
+   },
+   {
+-	"behavior_id": "help_in_kitchen",
+-	"display_name": "帮厨",
+-	"feel": "去厨房打下手，能挣 1 金币工钱",
+-	"tags": [
+-	  "kitchen",
+-	  "social",
++    "behavior_id": "help_in_kitchen",
++    "display_name": "帮厨",
++    "feel": "去厨房打下手，能挣 1 金币工钱",
++    "tags": [
++      "kitchen",
++      "social",
+       "food"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "kitchen"
+-	},
+-	"is_global": true,
+-	"base_score": 0.6,
+-	"base_success_chance": 0.76,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 9.0,
+-	"stat_weights": {
+-	  "empathy": 0.002,
+-	  "patience": 0.002
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "kitchen"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 5.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 4.0
+-	  },
+-	  {
+-		"type": "INVENTORY_ADD",
+-		"receiver": "SELF",
+-		"key": "coin",
+-		"count": 1
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 5.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "kitchen"
++    },
++    "is_global": true,
++    "base_score": 0.6,
++    "base_success_chance": 0.76,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 9.0,
++    "stat_weights": {
++      "empathy": 0.002,
++      "patience": 0.002
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "kitchen"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 5.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 4.0
++      },
++      {
++        "type": "INVENTORY_ADD",
++        "receiver": "SELF",
++        "key": "coin",
++        "count": 1
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 5.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "adventure",
+-	"display_name": "外出冒险",
+-	"feel": "出门冒险一趟赚钱，能带回可以卖钱的素材，但有受伤的风险",
+-	"tags": [
+-	  "adventure",
++    "behavior_id": "adventure",
++    "display_name": "外出冒险",
++    "feel": "出门冒险一趟赚钱，能带回可以卖钱的素材，但有受伤的风险",
++    "tags": [
++      "adventure",
+       "move"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "door"
+-	},
+-	"base_score": 1.05,
+-	"base_success_chance": 0.7,
+-	"move_to_target_enabled": true,
+-	"move_speed": 90.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 15.0,
+-	"stat_weights": {
+-	  "logic": 0.002,
+-	  "athletic": 0.002,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "door"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "LOOT_ROLL",
+-		"receiver": "SELF",
+-		"key": "adventure_success"
+-	  },
+-	  {
+-		"type": "INVENTORY_ADD",
+-		"receiver": "SELF",
+-		"key": "coin",
+-		"min_count": 1,
+-		"max_count": 2
+-	  },
+-	  {
+-		"type": "INVENTORY_ADD",
+-		"receiver": "SELF",
+-		"key": "apple",
+-		"count": 1,
+-		"chance": 0.5
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 10.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 8.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "LOOT_ROLL",
+-		"receiver": "SELF",
+-		"key": "adventure_mishap"
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 10.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 1.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "door"
++    },
++    "base_score": 1.05,
++    "base_success_chance": 0.7,
++    "move_to_target_enabled": true,
++    "move_speed": 90.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 15.0,
++    "stat_weights": {
++      "logic": 0.002,
++      "athletic": 0.002,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "door"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "LOOT_ROLL",
++        "receiver": "SELF",
++        "key": "adventure_success"
++      },
++      {
++        "type": "INVENTORY_ADD",
++        "receiver": "SELF",
++        "key": "coin",
++        "min_count": 1,
++        "max_count": 2
++      },
++      {
++        "type": "INVENTORY_ADD",
++        "receiver": "SELF",
++        "key": "apple",
++        "count": 1,
++        "chance": 0.5
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 10.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 8.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "LOOT_ROLL",
++        "receiver": "SELF",
++        "key": "adventure_mishap"
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 10.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 1.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "pull_slot_lever",
+-	"display_name": "拉拉杆",
+-	"feel": "拉下那台怪机器的拉杆赌一把：可能爆出金币，也可能发生不好的事",
+-	"tags": [
+-	  "mystery",
+-	  "gamble",
++    "behavior_id": "pull_slot_lever",
++    "display_name": "拉拉杆",
++    "feel": "拉下那台怪机器的拉杆赌一把：可能爆出金币，也可能发生不好的事",
++    "tags": [
++      "mystery",
++      "gamble",
+       "fun"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "slot_machine"
+-	},
+-	"is_global": true,
+-	"base_score": 1.2,
+-	"base_success_chance": 0.2,
+-	"min_success_chance": 0.2,
+-	"max_success_chance": 0.2,
+-	"move_to_target_enabled": true,
+-	"move_speed": 85.0,
+-	"stop_distance": 24.0,
+-	"interaction_duration": 6.0,
+-	"can_be_interrupted": false,
+-	"interrupt_priority": 800,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "IN_AREA_TAG",
+-		"key": "slot_machine"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "SPAWN_GROUND_ITEMS",
+-		"receiver": "SELF",
+-		"key": "coin",
+-		"min_count": 2,
+-		"max_count": 4,
+-		"payload": {
+-		  "piles": 3,
+-		  "scatter_radius": 80.0
+-		}
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 20.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "BUFF_ADD",
+-		"receiver": "SELF",
+-		"key": "stunned",
+-		"duration": 450
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 10.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "slot_machine"
++    },
++    "is_global": true,
++    "base_score": 1.2,
++    "base_success_chance": 0.2,
++    "min_success_chance": 0.2,
++    "max_success_chance": 0.2,
++    "move_to_target_enabled": true,
++    "move_speed": 85.0,
++    "stop_distance": 24.0,
++    "interaction_duration": 6.0,
++    "can_be_interrupted": false,
++    "interrupt_priority": 800,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "IN_AREA_TAG",
++        "key": "slot_machine"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "SPAWN_GROUND_ITEMS",
++        "receiver": "SELF",
++        "key": "coin",
++        "min_count": 2,
++        "max_count": 4,
++        "payload": {
++          "piles": 3,
++          "scatter_radius": 80.0
++        }
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 20.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "BUFF_ADD",
++        "receiver": "SELF",
++        "key": "stunned",
++        "duration": 450
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 10.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "pickup_item",
+-	"display_name": "拾取",
+-	"feel": "把掉落在地上的{target}捡起来",
+-	"tags": [
+-	  "pickup",
++    "behavior_id": "pickup_item",
++    "display_name": "拾取",
++    "feel": "把掉落在地上的{target}捡起来",
++    "tags": [
++      "pickup",
+       "move"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_ITEM_WITH_ID",
+-	  "max_distance": 600.0
+-	},
+-	"is_global": true,
+-	"base_score": 2.2,
+-	"base_success_chance": 1.0,
+-	"max_success_chance": 1.0,
+-	"move_to_target_enabled": true,
+-	"move_speed": 95.0,
+-	"stop_distance": 20.0,
+-	"interaction_duration": 1.5,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "PICKUP_TARGET_ITEM",
+-		"receiver": "SELF"
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 3.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_ITEM_WITH_ID",
++      "max_distance": 600.0
++    },
++    "is_global": true,
++    "base_score": 2.2,
++    "base_success_chance": 1.0,
++    "max_success_chance": 1.0,
++    "move_to_target_enabled": true,
++    "move_speed": 95.0,
++    "stop_distance": 20.0,
++    "interaction_duration": 1.5,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "PICKUP_TARGET_ITEM",
++        "receiver": "SELF"
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 3.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "rescue_npc",
+-	"display_name": "救助",
+-	"feel": "{target} 晕倒在地上，过去把人扶起来",
+-	"tags": [
+-	  "social",
++    "behavior_id": "rescue_npc",
++    "display_name": "救助",
++    "feel": "{target} 晕倒在地上，过去把人扶起来",
++    "tags": [
++      "social",
+       "help"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_NPC",
+-	  "max_distance": 500.0,
+-	  "required_buff_id": "stunned"
+-	},
+-	"is_global": true,
+-	"base_score": 3.0,
+-	"base_success_chance": 1.0,
+-	"max_success_chance": 1.0,
+-	"move_to_target_enabled": true,
+-	"move_speed": 110.0,
+-	"stop_distance": 32.0,
+-	"interaction_duration": 4.0,
+-	"lock_target": true,
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  },
+-	  {
+-		"type": "TARGET_HAS_BUFF",
+-		"key": "stunned"
+-	  },
+-	  {
+-		"type": "TARGET_NOT_BUSY"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "BUFF_REMOVE",
+-		"receiver": "TARGET",
+-		"key": "stunned"
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "social",
+-		"amount": 10.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 5.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "TARGET",
+-		"key": "social",
+-		"amount": 8.0
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": 4.0,
+-		"relation_direction": "TARGET_TO_SELF"
+-	  },
+-	  {
+-		"type": "RELATION_DELTA",
+-		"receiver": "SELF",
+-		"amount": 2.0,
+-		"relation_direction": "SELF_TO_TARGET"
+-	  }
+-	],
+-	"failure_effects": []
++    ],
++    "target_query": {
++      "target_type": "NEAREST_NPC",
++      "max_distance": 500.0,
++      "required_buff_id": "stunned"
++    },
++    "is_global": true,
++    "base_score": 3.0,
++    "base_success_chance": 1.0,
++    "max_success_chance": 1.0,
++    "move_to_target_enabled": true,
++    "move_speed": 110.0,
++    "stop_distance": 32.0,
++    "interaction_duration": 4.0,
++    "lock_target": true,
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      },
++      {
++        "type": "TARGET_HAS_BUFF",
++        "key": "stunned"
++      },
++      {
++        "type": "TARGET_NOT_BUSY"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "BUFF_REMOVE",
++        "receiver": "TARGET",
++        "key": "stunned"
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "social",
++        "amount": 10.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 5.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "TARGET",
++        "key": "social",
++        "amount": 8.0
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": 4.0,
++        "relation_direction": "TARGET_TO_SELF"
++      },
++      {
++        "type": "RELATION_DELTA",
++        "receiver": "SELF",
++        "amount": 2.0,
++        "relation_direction": "SELF_TO_TARGET"
++      }
++    ],
++    "failure_effects": []
+   },
+   {
+-	"behavior_id": "flee_danger",
+-	"display_name": "逃离危险",
+-	"feel": "赶紧离开危险，找个安全地方",
+-	"tags": [
+-	  "flee",
++    "behavior_id": "flee_danger",
++    "display_name": "逃离危险",
++    "feel": "赶紧离开危险，找个安全地方",
++    "tags": [
++      "flee",
+       "move"
+-	],
+-	"target_query": {
+-	  "target_type": "NEAREST_AREA_WITH_TAG",
+-	  "required_tag": "shelter"
+-	},
+-	"is_global": false,
+-	"move_to_target_enabled": true,
+-	"move_speed": 140.0,
+-	"stop_distance": 40.0,
+-	"interaction_duration": 0.5,
+-	"can_be_interrupted": false,
+-	"interrupt_priority": 999,
+-	"base_success_chance": 0.65,
+-	"stat_weights": {
+-	  "athletic": 0.004,
+-	  "patience": 0.001
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 8.0
+-	  },
+-	  {
+-		"type": "BUFF_ADD",
+-		"receiver": "SELF",
+-		"key": "safe",
+-		"duration": 10.0
+-	  }
+-	],
+-	"failure_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fatigue",
+-		"amount": 15.0
+-	  },
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": -5.0
+-	  }
+-	]
++    ],
++    "target_query": {
++      "target_type": "NEAREST_AREA_WITH_TAG",
++      "required_tag": "shelter"
++    },
++    "is_global": false,
++    "move_to_target_enabled": true,
++    "move_speed": 140.0,
++    "stop_distance": 40.0,
++    "interaction_duration": 0.5,
++    "can_be_interrupted": false,
++    "interrupt_priority": 999,
++    "base_success_chance": 0.65,
++    "stat_weights": {
++      "athletic": 0.004,
++      "patience": 0.001
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 8.0
++      },
++      {
++        "type": "BUFF_ADD",
++        "receiver": "SELF",
++        "key": "safe",
++        "duration": 10.0
++      }
++    ],
++    "failure_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fatigue",
++        "amount": 15.0
++      },
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": -5.0
++      }
++    ]
+   },
+   {
+-	"behavior_id": "update_goal",
+-	"display_name": "思索目标",
+-	"feel": "静下来思索，并制定（或修正）一个内心的长期目标",
+-	"tags": [
++    "behavior_id": "update_goal",
++    "display_name": "思索目标",
++    "feel": "静下来思索，并制定（或修正）一个内心的长期目标",
++    "tags": [
+       "reflect"
+-	],
+-	"target_query": {
+-	  "target_type": "SELF"
+-	},
+-	"is_global": true,
+-	"base_score": 0.5,
+-	"base_success_chance": 1.0,
+-	"interaction_duration": 6.0,
+-	"param_config": {
+-	  "required": [
++    ],
++    "target_query": {
++      "target_type": "SELF"
++    },
++    "is_global": true,
++    "base_score": 0.5,
++    "base_success_chance": 1.0,
++    "interaction_duration": 6.0,
++    "param_config": {
++      "required": [
+         "new_goal"
+-	  ],
+-	  "schema": {
+-		"new_goal": {
+-		  "type": "string",
+-		  "description": "新的长期目标，一句中文描述，应符合人设与当前处境。"
+-		}
+-	  }
+-	},
+-	"preconditions": [
+-	  {
+-		"type": "TARGET_EXISTS"
+-	  }
+-	],
+-	"success_effects": [
+-	  {
+-		"type": "NEED_DELTA",
+-		"receiver": "SELF",
+-		"key": "fun",
+-		"amount": 2.0
+-	  }
+-	],
+-	"failure_effects": []
++      ],
++      "schema": {
++        "new_goal": {
++          "type": "string",
++          "description": "新的长期目标，一句中文描述，应符合人设与当前处境。"
++        }
++      }
++    },
++    "preconditions": [
++      {
++        "type": "TARGET_EXISTS"
++      }
++    ],
++    "success_effects": [
++      {
++        "type": "NEED_DELTA",
++        "receiver": "SELF",
++        "key": "fun",
++        "amount": 2.0
++      }
++    ],
++    "failure_effects": []
+   }
+-]
++]
+\ No newline at end of file
+diff --git a/configs/ai_catalog/events.json b/configs/ai_catalog/events.json
+index 09c7bfb..30750f2 100644
+--- a/configs/ai_catalog/events.json
++++ b/configs/ai_catalog/events.json
+@@ -1,161 +1,195 @@
+ [
+   {
+-	"reaction_id": "danger_started_reaction",
+-	"event_id": "danger_started",
+-	"feel": "附近出现危险，必须马上找安全地方",
+-	"conditions": [
+-	  {
+-		"type": "EVENT_DISTANCE_LESS_THAN",
+-		"value": 300.0
+-	  }
+-	],
+-	"interrupt_current_behavior": true,
+-	"interrupt_priority": 300,
+-	"forced_behavior_id": "flee_danger",
+-	"memory_duration": 10.0
++    "reaction_id": "danger_started_reaction",
++    "event_id": "danger_started",
++    "feel": "附近出现危险，必须马上找安全地方",
++    "conditions": [
++      {
++        "type": "EVENT_DISTANCE_LESS_THAN",
++        "value": 300.0
++      }
++    ],
++    "interrupt_current_behavior": true,
++    "interrupt_priority": 300,
++    "forced_behavior_id": "flee_danger",
++    "memory_duration": 10.0
+   },
+   {
+-	"event_id": "need_band_changed",
+-	"feel": "{actor}刚刚察觉到自己的身体状态变了：{detail}"
++    "event_id": "need_band_changed",
++    "feel": "{actor}刚刚察觉到自己的身体状态变了：{detail}"
+   },
+   {
+-	"event_id": "released_interaction_lock",
+-	"feel": "{actor}刚刚从一次互动里脱开了身。"
++    "event_id": "released_interaction_lock",
++    "feel": "{actor}刚刚从一次互动里脱开了身。"
+   },
+   {
+-	"event_id": "perception_memory_updated",
+-	"feel": "{actor}刚刚对{object_name}产生了新的感知：{feel}"
++    "event_id": "perception_memory_updated",
++    "feel": "{actor}刚刚对{object_name}产生了新的感知：{feel}"
+   },
+   {
+-	"event_id": "behavior_start",
+-	"feel": "{actor}开始进行{behavior_name}{target_clause}。"
++    "event_id": "behavior_start",
++    "feel": "{actor}开始进行{behavior_name}{target_clause}。"
+   },
+   {
+-	"event_id": "behavior_failed",
+-	"feel": "{actor}没能开始{behavior_name}{target_clause}{failure_clause}{detail_clause}。"
++    "event_id": "behavior_failed",
++    "feel": "{actor}没能开始{behavior_name}{target_clause}{failure_clause}{detail_clause}。"
+   },
+   {
+-	"event_id": "behavior_interrupted",
+-	"feel": "{actor}的{behavior_name}{target_clause}被打断了{reason_clause}{detail_clause}。"
++    "event_id": "behavior_interrupted",
++    "feel": "{actor}的{behavior_name}{target_clause}被打断了{reason_clause}{detail_clause}。"
+   },
+   {
+-	"event_id": "behavior_complete",
+-	"feel": "{actor}完成了{behavior_name}{target_clause}，结果是{result_text}{failure_clause}{detail_clause}。"
++    "event_id": "behavior_complete",
++    "feel": "{actor}完成了{behavior_name}{target_clause}，结果是{result_text}{failure_clause}{detail_clause}。"
+   },
+   {
+-	"event_id": "behavior_complete_talk_to_npc",
+-	"feel": "{actor}对{target}说：“{speech}”。"
++    "event_id": "behavior_complete_talk_to_npc",
++    "feel": "{actor}对{target}说：“{speech}”。"
+   },
+   {
+-	"event_id": "behavior_complete_reply_to_talk",
+-	"feel": "{actor}回应了刚才的谈话：“{speech}”。"
++    "event_id": "behavior_complete_reply_to_talk",
++    "feel": "{actor}回应了刚才的谈话：“{speech}”。"
+   },
+   {
+-	"event_id": "behavior_complete_enter_scene",
+-	"feel": "{actor}说：“{speech}”。"
++    "event_id": "behavior_complete_enter_scene",
++    "feel": "{actor}说：“{speech}”。"
+   },
+   {
+-	"event_id": "behavior_complete_gift_item_to_npc_success",
+-	"feel": "{actor}把{gift_item_name} x{gift_count}赠送给{target}{gift_description_clause}{gift_feel_clause}。"
++    "event_id": "behavior_complete_gift_item_to_npc_success",
++    "feel": "{actor}把{gift_item_name} x{gift_count}赠送给{target}{gift_description_clause}{gift_feel_clause}。"
+   },
+   {
+-	"event_id": "behavior_complete_gift_item_to_npc_failure",
+-	"feel": "{actor}想把{gift_item_name} x{gift_count}赠送给{target}，但没有成功{failure_clause}。"
++    "event_id": "behavior_complete_gift_item_to_npc_failure",
++    "feel": "{actor}想把{gift_item_name} x{gift_count}赠送给{target}，但没有成功{failure_clause}。"
+   },
+   {
+-	"event_id": "behavior_complete_gift_item_to_npc",
+-	"feel": "{actor}尝试把{gift_item_name} x{gift_count}赠送给{target}，结果是{result_text}{failure_clause}{gift_description_clause}{gift_feel_clause}。"
++    "event_id": "behavior_complete_gift_item_to_npc",
++    "feel": "{actor}尝试把{gift_item_name} x{gift_count}赠送给{target}，结果是{result_text}{failure_clause}{gift_description_clause}{gift_feel_clause}。"
+   },
+   {
+-	"event_id": "behavior_complete_pull_slot_lever_success",
+-	"feel": "{actor}拉下了那台怪机器的拉杆，机器哐当作响，居然往周围地上吐出了好几堆金币！"
++    "event_id": "behavior_complete_pull_slot_lever_success",
++    "feel": "{actor}拉下了那台怪机器的拉杆，机器哐当作响，居然往周围地上吐出了好几堆金币！"
+   },
+   {
+-	"event_id": "behavior_complete_pull_slot_lever_failure",
+-	"feel": "{actor}拉下了那台怪机器的拉杆，被一道电流击中，晕倒在了地上，需要有人救助。"
++    "event_id": "behavior_complete_pull_slot_lever_failure",
++    "feel": "{actor}拉下了那台怪机器的拉杆，被一道电流击中，晕倒在了地上，需要有人救助。"
+   },
+   {
+-	"event_id": "behavior_complete_rescue_npc_success",
+-	"feel": "{actor}把晕倒在地上的{target}扶了起来，{target}恢复了行动。"
++    "event_id": "behavior_complete_rescue_npc_success",
++    "feel": "{actor}把晕倒在地上的{target}扶了起来，{target}恢复了行动。"
+   },
+   {
+-	"event_id": "behavior_complete_pickup_item",
+-	"feel": "{actor}捡起了地上的{target}。"
++    "event_id": "behavior_complete_pickup_item",
++    "feel": "{actor}捡起了地上的{target}。"
+   },
+   {
+-	"event_id": "ground_items_spawned",
+-	"feel": "{detail}"
++    "event_id": "ground_items_spawned",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "item_dropped",
+-	"feel": "{detail}"
++    "event_id": "item_dropped",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "item_picked_up",
+-	"feel": "{detail}"
++    "event_id": "item_picked_up",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "buff_added",
+-	"feel": "{actor}{buff_source_clause}获得了{buff_name}状态{duration_clause}{body_feel_clause}{reason_clause}。"
++    "event_id": "buff_added",
++    "feel": "{actor}{buff_source_clause}获得了{buff_name}状态{duration_clause}{body_feel_clause}{reason_clause}。"
+   },
+   {
+-	"event_id": "buff_removed",
+-	"feel": "{actor}{buff_source_clause}失去了{buff_name}状态{body_feel_clause}{reason_clause}。"
++    "event_id": "buff_removed",
++    "feel": "{actor}{buff_source_clause}失去了{buff_name}状态{body_feel_clause}{reason_clause}。"
+   },
+   {
+-	"event_id": "behavior_complete_perform_on_stage_success",
+-	"feel": "{actor}在舞台上完成了一场表演，台下气氛热烈。"
++    "event_id": "behavior_complete_perform_on_stage_success",
++    "feel": "{actor}在舞台上完成了一场表演，台下气氛热烈。"
+   },
+   {
+-	"event_id": "behavior_complete_watch_performance",
+-	"feel": "{actor}在台下围观了演出。"
++    "event_id": "behavior_complete_watch_performance",
++    "feel": "{actor}在台下围观了演出。"
+   },
+   {
+-	"event_id": "performance_applause",
+-	"feel": "{detail}"
++    "event_id": "performance_applause",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "performance_tip",
+-	"feel": "{detail}"
++    "event_id": "performance_tip",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "performance_flop",
+-	"feel": "{detail}"
++    "event_id": "performance_flop",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "trade_offer_created",
+-	"feel": "{detail}"
++    "event_id": "trade_offer_created",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "trade_offer_resolved",
+-	"feel": "{detail}"
++    "event_id": "trade_offer_resolved",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "trade_offer_expired",
+-	"feel": "{detail}"
++    "event_id": "trade_offer_expired",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "behavior_complete_beg_from_npc_success",
+-	"feel": "{actor}向{target}哭穷乞讨：“{speech}”，{target}给了点东西。"
++    "event_id": "behavior_complete_beg_from_npc_success",
++    "feel": "{actor}向{target}哭穷乞讨：“{speech}”，{target}给了点东西。"
+   },
+   {
+-	"event_id": "behavior_complete_beg_from_npc_failure",
+-	"feel": "{actor}向{target}乞讨：“{speech}”，被嫌弃地拒绝了。"
++    "event_id": "behavior_complete_beg_from_npc_failure",
++    "feel": "{actor}向{target}乞讨：“{speech}”，被嫌弃地拒绝了。"
+   },
+   {
+-	"event_id": "steal_succeeded",
+-	"feel": "{detail}"
++    "event_id": "steal_succeeded",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "steal_caught",
+-	"feel": "{detail}"
++    "event_id": "steal_caught",
++    "feel": "{detail}"
+   },
+   {
+-	"event_id": "behavior_complete_steal_from_npc_failure",
+-	"feel": "{actor}想从{target}身上摸点东西，结果当场被抓了个正着，场面十分难看！"
++    "event_id": "behavior_complete_steal_from_npc_failure",
++    "feel": "{actor}想从{target}身上摸点东西，结果当场被抓了个正着，场面十分难看！"
+   },
+   {
+-	"event_id": "behavior_complete_steal_from_npc_success",
+-	"feel": "{actor}在{target}身边转了一圈就走开了。"
++    "event_id": "behavior_complete_steal_from_npc_success",
++    "feel": "{actor}在{target}身边转了一圈就走开了。"
++  },
++  {
++    "reaction_id": "performance_shout_reaction",
++    "event_id": "performance_shout",
++    "feel": "舞台方向传来吆喝声，有人在边表演边招揽观众",
++    "conditions": [
++      {
++        "type": "EVENT_DISTANCE_LESS_THAN",
++        "value": 600.0
++      }
++    ],
++    "interrupt_current_behavior": true,
++    "interrupt_priority": 50
++  },
++  {
++    "event_id": "performance_shout",
++    "feel": "{detail}"
++  },
++  {
++    "reaction_id": "performance_started_reaction",
++    "event_id": "performance_started",
++    "feel": "有人登上舞台开始表演了，要不要凑过去看看",
++    "conditions": [
++      {
++        "type": "EVENT_DISTANCE_LESS_THAN",
++        "value": 600.0
++      }
++    ],
++    "interrupt_current_behavior": true,
++    "interrupt_priority": 50
++  },
++  {
++    "event_id": "performance_started",
++    "feel": "{detail}"
+   }
+-]
++]
+\ No newline at end of file
+diff --git a/scripts/components/behavior_runner.gd b/scripts/components/behavior_runner.gd
+index cffa996..387232d 100644
+--- a/scripts/components/behavior_runner.gd
++++ b/scripts/components/behavior_runner.gd
+@@ -332,6 +332,7 @@ func _start_interaction() -> void:
+ 	_performance_pulse_accum = 0.0
+ 	_performance_tips_total = 0
+ 	owner_npc.velocity = Vector2.ZERO
++	_announce_performance_started()
+ 	_show_interaction_feedback()
+ 	AiDebug.log(owner_npc, "Runner", "phase INTERACTING behavior=%s duration=%.2f" % [String(current_behavior.behavior_id), interaction_time_left])
+ 
+@@ -348,6 +349,25 @@ func _update_interaction(delta: float) -> void:
+ 
+ 	_complete_with_roll()
+ 
++# A show starting is an attention-grabbing world event: NPCs in earshot get
++# an interrupt-rethink (events.json performance_started_reaction) and their
++# next decision sees watch_performance as a candidate.
++func _announce_performance_started() -> void:
++	if owner_npc == null or current_behavior == null:
++		return
++	var perform_id := DataCatalog.get_gameplay_string_name("stage_performance.behavior_id", &"perform_on_stage")
++	if current_behavior.behavior_id != perform_id:
++		return
++	var performer_name := EffectApplier.get_npc_display_name(owner_npc)
++	EventBus.emit_game_event(&"performance_started", {
++		&"source": owner_npc,
++		&"actor": owner_npc,
++		&"actor_name": performer_name,
++		&"position": owner_npc.global_position,
++		&"involved_npcs": [owner_npc],
++		&"detail": "%s 登上舞台开始表演了，台下还空着，欢迎围观" % performer_name
++	})
++
+ # While performing on stage: every pulse_interval_sec roll a charm check.
+ # Success rewards the audience (fun/social), the performer (social), and —
+ # if the LLM provided tip_speech — begs for tips with a bubble, collecting
+@@ -412,6 +432,17 @@ func _beg_for_tips(audience: Array, performer_name: String) -> void:
+ 		return
+ 
+ 	owner_npc.show_speech_bubble(tip_speech)
++	# The shout itself is a world event — NPCs in earshot see it in their
++	# recent_events and can decide to come watch, even with zero audience yet.
++	EventBus.emit_game_event(&"performance_shout", {
++		&"source": owner_npc,
++		&"actor": owner_npc,
++		&"actor_name": performer_name,
++		&"position": owner_npc.global_position,
++		&"involved_npcs": [owner_npc],
++		&"speech": tip_speech,
++		&"detail": "%s 在舞台上一边表演一边吆喝：「%s」" % [performer_name, tip_speech.left(60)]
++	})
+ 	var tip_chance := DataCatalog.get_gameplay_float("stage_performance.tip_chance", 0.5)
+ 	var tip_amount := maxi(DataCatalog.get_gameplay_int("stage_performance.tip_amount", 1), 1)
+ 	var tipped := 0
