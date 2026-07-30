@@ -1,11 +1,15 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "survey-history_2025-09-19_019b51c_009"
-category = "architecture"
+category = "behavior_logic"
 source_kind = "folder"
+info_level = "file-hint"
+godot_version = "4.5-stable"
 snapshot = "godot-open-rpg__019b51c"
 source_repo = "survey:godot-open-rpg (offline snapshot)"
 task = """
 Investigate and fix the defect in the following file(s), making the affected feature behave correctly: addons/dialogic/Editor/HomePage/icon_bg.png.import, addons/dialogic/Editor/Images/Dropdown/default.svg.import, addons/dialogic/Editor/Images/Dropdown/divide.svg.import, addons/dialogic/Editor/Images/Dropdown/join.svg.import, addons/dialogic/Editor/Images/Dropdown/leave.svg.import, addons/dialogic/Editor/Images/Dropdown/minus.svg.import, addons/dialogic/Editor/Images/Dropdown/multiply.svg.import, addons/dialogic/Editor/Images/Dropdown/plus.svg.import.
+Symptom: in combat, turn order handling is broken — battlers' readiness/turn-queue behavior does not advance the fight the way the combat design intends.
 """
 
 [verifier]

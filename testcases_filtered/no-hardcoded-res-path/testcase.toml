@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "no-hardcoded-res-path"
 category = "architecture"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "authored:representative-set"
 task = """
 res://scripts/spawner.gd spawns a goblin by building a hardcoded "res://entities/goblin.tscn" path string at the call site and passing it to load(). Refactor so the goblin scene is referenced through a preload()'d constant (or @export) instead of a hardcoded path literal living loose in the function body. The script must keep spawning the goblin correctly; only the way the scene resource is referenced should change.

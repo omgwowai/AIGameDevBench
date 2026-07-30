@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "hud-healthbar-anchor"
 category = "visual_audio"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "authored:representative-set"
 task = """
 The HealthBar in res://scenes/hud.tscn is currently placed with raw top-left offsets, so it drifts away from the corner when the window is resized. Re-anchor the HealthBar to the TOP-RIGHT corner of the HUD: set anchor_left and anchor_right to 1.0 and anchor_top and anchor_bottom to 0.0, and adjust the offsets (negative left/right offsets) so the bar still appears at the top-right with its current size. It must stay pinned to the right edge on resize.

@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "gdb-task_0012"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "GameDevBench:task_0012"
 task = """
 Update res://scripts/entities/tank/weapon/bullet.gd so the Bullet has const SPEED = 500, stores its travel direction and firing tank, moves every physics frame by direction.normalized() * SPEED * delta, queues itself when area_entered fires, and on body_entered destroys Crate bodies before calling queue_free().

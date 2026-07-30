@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "survey-stardive_84d8c23_stale-combat-target"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 snapshot = "stardive_kugutsushi__df2194f"
 source_repo = "survey:stardive_kugutsushi (offline snapshot)"
 task = """
