@@ -46,6 +46,14 @@
 #     --from-literal=ANTHROPIC_API_KEY=sk-...
 #   scripts/run_k8s_matrix.sh -i reg/aigdbench:latest -d command \
 #     -H 'npm i -g @anthropic-ai/claude-code' -s aigdbench-harness -j 20
+#
+#   # BARE claude (NO agentic-game-development plugin/skills). The runner image
+#   # bakes the plugin two ways: /opt/agd-plugin (loaded only via --plugin-dir,
+#   # so just omit that flag) AND $HOME/.claude/skills (HOME=/tmp, auto-loaded by
+#   # `claude -p` with no flag). To defeat the second path, point HOME at a clean
+#   # dir so claude finds no skills there:
+#   scripts/run_k8s_matrix.sh -i reg/aigdbench:latest -d command \
+#     -c 'env HOME=/tmp/bare-claude claude -p {task} --dangerously-skip-permissions'
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

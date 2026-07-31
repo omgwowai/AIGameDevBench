@@ -95,6 +95,15 @@ PR opened/synchronize (head.sha, number, base=main)
    含 Godot 的镜像，是最贵一步。改为 base 镜像（Godot+claude+testcases）固定，插件用
    init-container git-sync / ConfigMap / emptyDir 在 Pod 启动注入 `/opt/agd-plugin`。
    每候选从"几分钟 build+push"→"秒级"。彻底消除 stale-cache / 反复推拉的麻烦。
+
+   > **注意插件的两条加载路径**（当前 bake 镜像同时装了两处，见 `docker/Dockerfile`）：
+   > `/opt/agd-plugin`（仅 `claude ... --plugin-dir` 显式加载）**和** `$HOME/.claude/skills`
+   > （`HOME=/tmp`，`claude -p` 按 SKILL.md description **自动加载，无需 flag**）。改成运行时
+   > 注入后仍要覆盖两处，否则拿不到干净基线。
+   > 若要一个**裸 claude 基线**（不带 agentic-game-development 插件/skills，用于量化插件净收益）：
+   > `HARNESS_CMD='env HOME=/tmp/bare-claude claude -p {task} --dangerously-skip-permissions'`
+   > —— 既不 `--plugin-dir`，又把 `HOME` 指到干净目录切断自动加载。这可作为 baseline 分母：
+   > 门禁比较的是「候选插件 vs main 历史最高」，而裸 claude 分数衡量「插件相对无插件的净提升」。
 2. **不可变 `:<plugin-tree-hash>` tag + 内容去重**：若坚持 bake，用插件内容 hash 作 tag，
    相同 skills 内容命中已有镜像跳过 build；根治 mutable `:latest` stale 问题。
 3. **收集改"完成顺序"而非"启动顺序"**：v1 亲历 matrix 卡在 wait 一个卡死 case（claude

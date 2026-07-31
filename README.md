@@ -633,6 +633,20 @@ agentic-game-development 仓 PR opened
    ```
    （网关部署可再加 `ANTHROPIC_BASE_URL` / `ANTHROPIC_MODEL`。）
 
+   > **裸 claude（不带 agentic-game-development 插件/skills）**：镜像把插件装了两条路径 ——
+   > `/opt/agd-plugin`（仅 `--plugin-dir` 显式加载）**和** `$HOME/.claude/skills`（`HOME=/tmp`，
+   > `claude -p` 按 description **自动加载，无需任何 flag**）。所以**只去掉 `--plugin-dir` 不够**，
+   > 还得把 `HOME` 指到一个干净目录切断第二条自动加载路径：
+   > ```bash
+   > kubectl -n default create secret generic aigdbench-harness \
+   >   --from-literal=HARNESS_CMD='env HOME=/tmp/bare-claude claude -p {task} --dangerously-skip-permissions' \
+   >   --from-literal=ANTHROPIC_API_KEY=sk-... \
+   >   --from-literal=IS_SANDBOX=1
+   > ```
+   > `env HOME=…` 只改 `HOME`，Secret 里的 `ANTHROPIC_API_KEY` 等仍照常传给 claude。
+   > 跑一个 case 用 `--harness-format stream-json` 看 report 的 `ai_agent_context`，
+   > 确认没有 game-dev skill 加载即为真裸。
+
 3. **receiver 转发**：由 receiver 镜像作者按 [`docs/webhook-forward-contract.md`](docs/webhook-forward-contract.md)
    订阅 `pull_request` webhook、转发 `event/action/pr_number/head_sha/base_ref` 等字段，
    并配置两个 env（`BENCH_TRIGGER_URL` / `BENCH_TRIGGER_TOKEN`）；部署侧按
