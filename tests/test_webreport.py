@@ -96,6 +96,27 @@ def test_build_summary_score_matrix_fills_none_for_missing_testcase(tmp_path):
     assert matrix["t2"][b] is None
 
 
+def test_build_summary_time_matrix_carries_per_task_wall_time(tmp_path):
+    # The Time view of the matrix reads summary["matrix_time"]: testcase x run
+    # -> harness wall_time (s). Cells with no wall_time (or missing testcase)
+    # must be None so the UI renders "-" rather than 0.
+    _write_report(tmp_path / "a.json", "alpha",
+                  [_tc("t1", 1.0, wall_time=39.8), _tc("t2", 0.5, wall_time=51.2)])
+    _write_report(tmp_path / "b.json", "beta",
+                  [_tc("t1", 0.0, wall_time=48.7), _tc("t2", 0.0)])  # t2: no wall_time
+
+    reports = load_reports(tmp_path)
+    summary = build_summary(reports)
+    a = next(r["_run_id"] for r in reports if r["_file"] == "a.json")
+    b = next(r["_run_id"] for r in reports if r["_file"] == "b.json")
+
+    mt = summary["matrix_time"]
+    assert mt["t1"][a] == 39.8
+    assert mt["t1"][b] == 48.7
+    assert mt["t2"][a] == 51.2
+    assert mt["t2"][b] is None  # wall_time absent -> None, not 0
+
+
 def test_build_summary_run_meta_carries_mean_and_count(tmp_path):
     _write_report(tmp_path / "a.json", "alpha", [_tc("t1", 1.0), _tc("t2", 0.0)])
 

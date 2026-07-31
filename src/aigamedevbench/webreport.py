@@ -295,7 +295,12 @@ INDEX_HTML = r"""<!DOCTYPE html>
     <div id="overall"></div>
   </div>
   <div class="panel">
-    <h2>Score matrix (click a cell to drill in)</h2>
+    <h2>Score matrix (click a cell to drill in)
+      <span style="margin-left:12px;font-size:13px;font-weight:normal">
+        <button id="mtx-score" class="tab active" style="padding:2px 10px">Score</button><button
+                id="mtx-time" class="tab" style="padding:2px 10px">Time</button>
+      </span>
+    </h2>
     <div id="matrix" style="overflow:auto"></div>
   </div>
   <div class="panel">
@@ -448,6 +453,18 @@ function scoreColor(s) {
 function fmt(n, d=2) {
   return (n === null || n === undefined) ? "-" : Number(n).toFixed(d);
 }
+// Which quantity the score matrix renders: "score" (default) or "time"
+// (per-task harness wall_time in seconds). Toggled by the Score/Time buttons.
+let MATRIX_MODE = "score";
+// Slowest-is-hottest color for the Time view: 0..max seconds -> green..red.
+// `max` is the largest wall_time among visible cells so the scale is relative
+// to this comparison, making the slow harness/task pop out.
+function timeColor(sec, max) {
+  if (sec === null || sec === undefined) return null;
+  const frac = max > 0 ? Math.max(0, Math.min(1, sec / max)) : 0;
+  const hue = 120 - frac * 120;   // 120=green (fast) -> 0=red (slow)
+  return `hsl(${hue},55%,32%)`;
+}
 function esc(v) {
   if (v === null || v === undefined) return "null";
   return String(v).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -547,23 +564,62 @@ function renderMatrix() {
   const el = $("#matrix");
   if (!runs.length || !SUMMARY.testcases.length) {
     el.innerHTML = '<span class="empty">Nothing to show.</span>'; return; }
+  const timeMode = MATRIX_MODE === "time";
+  const src = timeMode ? (SUMMARY.matrix_time || {}) : SUMMARY.matrix;
+  // Only show testcases that at least one SELECTED run actually ran; drop rows
+  // that would be all "-" for the current selection. "Ran" is judged by the
+  // score matrix (a completed testcase has a non-null score) so a run that
+  // finished but lacked wall_time still keeps its row in Time mode.
+  const rows = SUMMARY.testcases.filter(tc =>
+    runs.some(r => {
+      const s = (SUMMARY.matrix[tc]||{})[r.run_id];
+      return s !== null && s !== undefined;
+    }));
+  if (!rows.length) {
+    el.innerHTML = '<span class="empty">No testcase was run by the selected run(s).</span>';
+    return; }
+  // In Time mode, scale the heatmap to the largest visible wall_time so the
+  // slowest harness/task stands out relative to this comparison.
+  let maxT = 0;
+  if (timeMode) {
+    for (const tc of rows)
+      for (const r of runs) {
+        const v = (src[tc]||{})[r.run_id];
+        if (typeof v === "number") maxT = Math.max(maxT, v);
+      }
+  }
+  const colTotals = {};   // run_id -> summed wall_time (Time mode footer)
   let h = "<table><thead><tr><th class='tc'>testcase</th>";
   for (const r of runs) h += `<th>${esc(r.harness)}<br><small>${esc(r.file)}</small></th>`;
   h += "</tr></thead><tbody>";
-  for (const tc of SUMMARY.testcases) {
+  for (const tc of rows) {
     h += `<tr><td class='tc'>${esc(tc)}</td>`;
     for (const r of runs) {
-      const s = SUMMARY.matrix[tc][r.run_id];
-      if (s === null || s === undefined) {
+      const v = (src[tc]||{})[r.run_id];
+      if (v === null || v === undefined) {
         h += `<td class="cell miss">-</td>`;
+      } else if (timeMode) {
+        colTotals[r.run_id] = (colTotals[r.run_id] || 0) + v;
+        h += `<td class="cell" style="background:${timeColor(v,maxT)}"
+          data-run="${esc(r.run_id)}" data-tc="${esc(tc)}">${fmt(v,1)}s</td>`;
       } else {
-        h += `<td class="cell" style="background:${scoreColor(s)}"
-          data-run="${esc(r.run_id)}" data-tc="${esc(tc)}">${fmt(s)}</td>`;
+        h += `<td class="cell" style="background:${scoreColor(v)}"
+          data-run="${esc(r.run_id)}" data-tc="${esc(tc)}">${fmt(v)}</td>`;
       }
     }
     h += "</tr>";
   }
-  h += "</tbody></table>";
+  h += "</tbody>";
+  // Footer: per-harness total harness time (Time mode only).
+  if (timeMode) {
+    h += "<tfoot><tr><td class='tc'><b>total harness time</b></td>";
+    for (const r of runs) {
+      const t = colTotals[r.run_id];
+      h += `<td class="cell" style="background:#2a2a2a"><b>${t ? fmt(t,1)+"s" : "-"}</b></td>`;
+    }
+    h += "</tr></tfoot>";
+  }
+  h += "</table>";
   el.innerHTML = h;
   el.querySelectorAll("td.cell[data-tc]").forEach(td =>
     td.addEventListener("click", () => openDetail(td.dataset.tc, td.dataset.run)));
@@ -1131,6 +1187,16 @@ $("#tab-status").addEventListener("click", () => { location.hash = "status"; });
 $("#tab-webhooks").addEventListener("click", () => { location.hash = "webhooks"; });
 $("#tc-back").addEventListener("click", () => { location.hash = "testcases"; });
 
+// Score/Time toggle for the matrix: flip MATRIX_MODE and re-render in place.
+function setMatrixMode(mode) {
+  MATRIX_MODE = mode;
+  $("#mtx-score").classList.toggle("active", mode === "score");
+  $("#mtx-time").classList.toggle("active", mode === "time");
+  renderMatrix();
+}
+$("#mtx-score").addEventListener("click", () => setMatrixMode("score"));
+$("#mtx-time").addEventListener("click", () => setMatrixMode("time"));
+
 // Testcases toolbar: live search + New button
 const tcSearchEl = $("#tc-search");
 if (tcSearchEl) tcSearchEl.addEventListener("input", e => {
@@ -1626,17 +1692,27 @@ def build_summary(reports: list[dict]) -> dict:
 
     ordered_ids = sorted(testcase_ids)
     run_ids = [run["run_id"] for run in runs]
+    # matrix       : testcase x run -> score  (the Score view)
+    # matrix_time  : testcase x run -> harness wall_time (s)  (the Time view)
+    # Two parallel maps so the UI can toggle a single table between scores and
+    # per-task harness cost without a second round-trip.
+    matrix_time: dict[str, dict] = {}
     for tcid in ordered_ids:
         matrix[tcid] = {run_id: None for run_id in run_ids}
+        matrix_time[tcid] = {run_id: None for run_id in run_ids}
     for r in reports:
         run_id = r["_run_id"]
         for tc in r.get("testcases", []):
             matrix[tc["testcase_id"]][run_id] = tc.get("score")
+            wt = tc.get("wall_time")
+            if isinstance(wt, (int, float)):
+                matrix_time[tc["testcase_id"]][run_id] = wt
 
     return {
         "runs": runs,
         "testcases": ordered_ids,
         "matrix": matrix,
+        "matrix_time": matrix_time,
         "categories": categories,
         "timing": timing,
         "failure_stages": failure_stages,
