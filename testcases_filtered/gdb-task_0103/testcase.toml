@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "gdb-task_0103"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "GameDevBench:task_0103"
 task = """
 Under Main, finish the navigation system for Enemy: add a Node2D child named Navigation that contains a NavigationAgent2D node named NavigationAgent2D (path_postprocessing set to Corridor and debug_enabled enabled) and a Timer named Timer (wait_time 0.1, autostart enabled), then connect the Timer timeout to Enemy._on_timer_timeout. Attach scripts/enemy.gd to Enemy, set its exported target to the node Target, and implement pathfinding logic that updates velocity using NavigationAgent2D.get_next_path_position() and does move_and_slide() in _physics_process, and updates NavigationAgent2D.target_position to the Target global position on timeout.

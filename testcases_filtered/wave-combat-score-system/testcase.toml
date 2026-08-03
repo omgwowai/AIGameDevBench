@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "wave-combat-score-system"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "authored:representative-set"
 task = """
 Implement the multi-system wave/combat/score game across res://scripts/enemy.gd and res://scripts/game_controller.gd.

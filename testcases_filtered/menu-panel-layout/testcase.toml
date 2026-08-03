@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "menu-panel-layout"
 category = "visual_audio"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "authored:representative-set"
 task = """
 res://scenes/menu.tscn holds a MainMenu (VBoxContainer) with three buttons, but they are in the wrong vertical order and the Options button is hidden. Lay the menu out to match the template: the buttons must appear top-to-bottom as Start, then Options, then Quit, and all three must be visible. Reorder the button nodes (a VBoxContainer lays children out in child order) and make OptionsButton visible.

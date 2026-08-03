@@ -1,7 +1,7 @@
 {
   "schema": "survey.bad_case.testcase.v1",
   "testcase_id": "survey-history_2023-06-09_73dc20c_000",
-  "source_repo": "C:\\Users\\WinterZhao\\AppData\\Local\\Temp\\scout\\godot-open-rpg",
+  "source_repo": "godot-open-rpg",
   "baseline_ref": "ce74c0e10f21cd63d4fc804653c700615c71b6a8",
   "repro_ref": "73dc20ca8b776ded1bab91531f52df53da95d4fa",
   "bad_ref": "73dc20ca8b776ded1bab91531f52df53da95d4fa",

@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "gdb-task_0281"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "GameDevBench:task_0281"
 task = """
 Finish the card dragging mechanic for the alternate harness. The provided `res://scenes/main.tscn` harness keeps three `CardUI` instances under `HUD/CardRow`, and each card should continue using the existing `CardStateMachine`, `CardBaseState`, `CardClickedState`, and `CardDraggingState` nodes from `res://scenes/card_ui/card_ui.tscn`. In `res://scenes/card_ui/card_state_machine.gd`, initialize every child state, connect each state's `transition_requested` signal, enter the exported `initial_state`, and forward `_input` and `gui_input` to the active state while ignoring transition requests that do not come from the current state. In `res://scenes/card_ui/card_ui.gd`, call `card_state_machine.init(self)` in `_ready()`, forward the existing input callbacks into the state machine, and keep `targets` updated from the `DropPointDetector` area enter/exit callbacks without duplicates. In the card state scripts, make the base state emit `reparent_requested`, reset `DropPointDetector.monitoring` to `false`, and move to the clicked state on left-click, make the clicked state record `original_index`, enable `DropPointDetector.monitoring`, and transition to dragging on mouse motion, make the dragging state reparent the card into the node in the `overlay_layer` group, follow the mouse, cancel back to base on right-click, and only confirm release after `DRAG_MINIMUM_THRESHOLD := 0.04` has elapsed, and make the released state immediately remove the card when `targets` is not empty but otherwise go back to base on the next input. In `res://scenes/ui/hand.gd`, connect each new card's `reparent_requested` signal and restore cancelled drags back into `CardRow` at their recorded index.

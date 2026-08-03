@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "timer-signal-wire"
 category = "precise_edit"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "authored:representative-set"
 task = """
 In res://scenes/main.tscn the Spawner (RespawnSpawner) already implements on_respawn() but nothing drives it. Add a Timer node named RespawnTimer as a child of Spawner, and connect that timer's `timeout` signal to the Spawner's on_respawn() method (an editor [connection] in the scene). Do not modify spawner.gd; only edit the scene.

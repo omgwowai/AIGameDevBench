@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "missing-resource-import"
 category = "precise_edit"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 task = """
 scenes/main.tscn references a Texture2D resource that does not exist, so the scene fails to load headless ('No loader found for resource ... expected type: Texture2D'). Fix the scene so it loads in headless Godot and shows a player sprite, without depending on a missing external resource.
 """

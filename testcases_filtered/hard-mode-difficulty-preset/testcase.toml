@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "hard-mode-difficulty-preset"
 category = "intent_translation"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "authored:representative-set"
 task = """
 Implement the "hard mode" difficulty preset. Hard mode means: enemies have 50% more health, and enemies spawn twice as often (the spawn interval is halved).

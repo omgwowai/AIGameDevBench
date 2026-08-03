@@ -1,3 +1,11 @@
+> **2026-07 治理更新（当前实况：36 个，以 `testcases_filtered_manifest.json` 为准）**：
+> - **单一事实源**：新增 `scripts/make_manifest.py` 自动生成 manifest（数量/分布/约束检查）。本文及 README 中的历史数字不再手工维护，一律以 manifest 为准。
+> - **可解性门禁**：新增 `scripts/audit_solvability.py`（golden 必须纯文本可复现）。`survey-history_2023-06-09_73dc20c_000` 因 good.diff 含二进制资产（缺失字体/PNG）被隔离至 `testcases_quarantine/`。
+> - **任务文本分级**：所有 case 增加 `info_level` 字段（`spec` = 给行为规格，考实现；`file-hint` = 只给文件线索+症状，考定位诊断）。survey-history 3 个 case 补充了玩家视角症状描述；`survey-stardive_26f37eb` 任务文本中泄漏的验证器内部断言已改写为可观察行为契约。
+> - **类别修正**：3 个 survey-history case 的 golden 实为 .gd 行为修复，category 由 architecture 改为 behavior_logic。
+> - **防污染**：新增 `BENCHMARK_CANARY.md`（canary GUID 注入所有 testcase.toml）；正式评测应使用私有镜像中的 golden/verifier。
+> - **已知未决**：verifier `godot_scene_assert` 占比 67%，超出 40% 治理上限（见 manifest `constraint_violations`）；消除需要补充 py_*/visual 类新 case。难度校准（参考 harness 通过率）字段已在 manifest 预留，待有 Godot 运行环境后执行。
+
 > **2026-07 更新（当前实况：30 个）**：本报告正文描述的是早期 50 个版本，分布数字已过时。
 > 当前 `testcases_filtered/` 为 **30 个**，最近一次改动：
 > - **移除** 4 个较"送分"的 `gdb-task_*`（behavior_logic / godot_scene_assert），缓解 behavior_logic 过度集中；

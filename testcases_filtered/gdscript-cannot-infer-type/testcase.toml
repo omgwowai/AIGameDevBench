@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "gdscript-cannot-infer-type"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 task = """
 Fix the compile error in res://scripts/score_tracker.gd. The script fails to load because of a GDScript type-inference error. After the fix the script must load and ScoreTracker.total_score() must return the summed score.
 """

@@ -203,7 +203,7 @@ model × agent_cli × orchestration × task_set × harness_components
 `experiments/testsets.yaml`，experiment YAML 通过 `test_set_file: testsets.yaml` 引用它。
 当前内置集合：
 
-- `filtered_30`：`testcases_filtered/` 的 30 个精选 strong-oracle case。
+- `filtered_30`：`testcases_filtered/` 的精选 strong-oracle case（数量与分布以 `testcases_filtered_manifest.json` 为准，由 `scripts/make_manifest.py` 生成）。
 - `smoke_2`：两个代表性 smoke case，用于快速验证 experiment wiring。
 - `all`：完整 `testcases/` 目录，不显式列 testcase，运行时扫描目录。
 
@@ -424,7 +424,7 @@ aigdbench serve --host 0.0.0.0 --port 8000 \
 | 目录 | 规模 | 用途 |
 |---|---|---|
 | `testcases/` | ~519 个（完整挖掘库） | 广度评测、统计显著性、研究真实修复分布 |
-| `testcases_filtered/` | **30 个（推荐评测集）** | 快速冒烟 / 演示 / 开发迭代 / 验证器全链路自检 |
+| `testcases_filtered/` | **推荐评测集（数量见 manifest）** | 快速冒烟 / 演示 / 开发迭代 / 验证器全链路自检 |
 
 ### 完整库 `testcases/`（~519 个）
 
@@ -438,9 +438,9 @@ aigdbench serve --host 0.0.0.0 --port 8000 \
 4. **survey-fixcommit / survey-\* 挖掘集**（~485 个）——由 sibling 工具从真实游戏 repo 的 git 历史里
    自动挖掘出的问题会话，git 型，用 `survey_bad_case` 验证器回归判定。
 
-### 推荐评测集 `testcases_filtered/`（30 个）
+### 推荐评测集 `testcases_filtered/`
 
-从完整库里人为**再平衡**挑出的 30 个最有代表性、oracle 最鲁棒的 case。特点：
+从完整库里人为**再平衡**挑出的最有代表性、oracle 最鲁棒的 case。**当前数量与分布以自动生成的 [`testcases_filtered_manifest.json`](testcases_filtered_manifest.json) 为单一事实源**（`python scripts/make_manifest.py --check` 同时校验分布约束，应接入 CI）。特点：
 
 - **26 个自包含 folder 型**（任意目录可跑）+ **4 个源自真实 git bug-fix commit 的高区分度 case**（见下）；
 - **5 个 category 全覆盖**：behavior_logic ×15、architecture ×6、precise_edit ×4、intent_translation ×3、visual_audio ×2；

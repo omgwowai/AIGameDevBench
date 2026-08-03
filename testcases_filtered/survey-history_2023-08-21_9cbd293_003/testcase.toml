@@ -1,11 +1,15 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "survey-history_2023-08-21_9cbd293_003"
-category = "architecture"
+category = "behavior_logic"
 source_kind = "folder"
+info_level = "file-hint"
+godot_version = "4.5-stable"
 snapshot = "godot-open-rpg__9cbd293"
 source_repo = "survey:godot-open-rpg (offline snapshot)"
 task = """
 The gamepiece controllers under src/field/gamepieces/controllers/ are inconsistent about the member that holds the controller's owning Gamepiece. Some code refers to a field named `_focus` (and handlers named `_on_focus_arriving` / `_on_focus_arrived`) while the surrounding code expects `_gamepiece` (with `_on_gamepiece_arriving` / `_on_gamepiece_arrived`). Reconcile them so the controllers consistently use the `_gamepiece` member and the matching handler names, and gamepiece movement/pathfinding works. Affected files: src/field/gamepieces/controllers/gamepiece_controller.gd, src/field/gamepieces/controllers/path_loop_ai_controller.gd, src/field/gamepieces/controllers/player_controller.gd.
+Symptom: gamepiece movement controllers misbehave — moving pieces do not respond correctly to their travel/waypoint updates (movement stalls or reacts to the wrong signal timing).
 """
 
 [verifier]

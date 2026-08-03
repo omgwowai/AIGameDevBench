@@ -1,11 +1,15 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "survey-history_2026-01-26_1406822_013"
-category = "architecture"
+category = "behavior_logic"
 source_kind = "folder"
+info_level = "file-hint"
+godot_version = "4.5-stable"
 snapshot = "godot-open-rpg__1406822"
 source_repo = "survey:godot-open-rpg (offline snapshot)"
 task = """
 Investigate and fix the defect in the following file(s), making the affected feature behave correctly: overworld/maps/town/battles/test_combat_arena.tscn, src/combat/battlers/battler.gd, src/combat/combat_ai_random.gd, src/combat/ui/action_menu/ui_action_button.gd, src/combat/ui/action_menu/ui_action_menu.gd, src/combat/ui/cursors/ui_battler_target_cursor.gd, src/combat/ui/ui_combat.gd, src/combat/ui/ui_combat.tscn.
+Symptom: the combat action menu misbehaves — action buttons/menu state do not stay consistent with the active battler's available actions during a fight.
 """
 
 [verifier]

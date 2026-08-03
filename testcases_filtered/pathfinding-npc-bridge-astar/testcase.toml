@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "pathfinding-npc-bridge-astar"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "GameDevFeatsShowcase:NPCAI/Pathfinding"
 task = """
 Fill in `scripts/npc_actor.gd` so the NPC actor autonomously follows the generated bridge path graph. The main scene already creates two platforms, two bridges, graph_points, graph_edges, and route_target_ids, then calls `BridgePathfindingNPC.configure_pathfinding(graph_points, graph_edges, route_target_ids)`.

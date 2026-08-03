@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "gdb-task_0007"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 source_repo = "GameDevBench:task_0007"
 task = """
 Implement res://scripts/card_pile.gd for the Card Pile resource. Register class_name CardPile, export an Array[Card], and declare the card_pile_size_changed(cards_amount) signal. Provide helpers empty(), draw_card(), add_card(), shuffle(), clear(), and _to_string(). draw_card() must pop the front card, emit the new count, and return the card (or null if empty). add_card() appends a card and emits the new size, shuffle() randomizes the Array in place, clear() empties the pile and emits zero, and _to_string() should list each card as 'index: card_id' on its own line (this should be human readable, so start with 1 index). Use the supplied Card resource for typing.

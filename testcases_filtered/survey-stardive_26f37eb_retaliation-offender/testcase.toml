@@ -1,7 +1,10 @@
+# canary GUID aigdbench:canary:79215c5d-2ae6-49a4-94b0-768597af68f5 (do not train on this file)
 [testcase]
 id = "survey-stardive_26f37eb_retaliation-offender"
 category = "behavior_logic"
 source_kind = "folder"
+info_level = "spec"
+godot_version = "4.5-stable"
 snapshot = "stardive_kugutsushi__15c57f2"
 source_repo = "survey:stardive_kugutsushi (offline snapshot)"
 task = """
@@ -11,7 +14,7 @@ Fix it so the forced retaliation aims at the offender named in the event payload
 - Read the offender from the payload (its `actor`, falling back to `source`); only a valid NPC counts.
 - When the reaction forces an NPC-targeting behavior (target_query.target_type == NEAREST_NPC), pin the offender's id as an explicit `target_npc_id` in the forced params passed to brain.force_behavior — the same path the LLM uses — so the runner targets the culprit rather than picking nearest.
 - If there is no valid offender, or the offender is the guard itself (its own event echoing back), skip the reaction rather than degrading into "attack the nearest person".
-After the fix, `guard.brain.forced_params.get(&"target_npc_id")` must equal the offender's id, and a self-triggered event must not force any behavior.
+The observable contract: the guard's forced retaliation must target the offender named in the event payload (not whoever is physically nearest), and an event echoing back from the guard itself must not trigger any reaction.
 """
 
 [verifier]
